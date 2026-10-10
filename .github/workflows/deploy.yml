@@ -31,9 +31,13 @@ jobs:
           SSH_PORT: 1022
           DEPLOY_DIR: htdocs/korilus
         run: |
-          sudo apt-get install -y -qq lftp
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp
           install -m 600 /dev/null ~/deploy_key
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/deploy_key
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/deploy_key
+          grep -q -- '-----BEGIN' ~/deploy_key || { echo "::error::SSH_PRIVATE_KEY is empty or missing its BEGIN line"; exit 1; }
+          ssh-keygen -y -f ~/deploy_key > /dev/null || { echo "::error::SSH_PRIVATE_KEY is not a valid private key (or has a passphrase)"; exit 1; }
+          ssh -i ~/deploy_key -p "$SSH_PORT" -o BatchMode=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=accept-new \
+            "$SSH_USER@$SSH_HOST" true || { echo "::error::SSH login to $SSH_HOST:$SSH_PORT failed (see the ssh error above)"; exit 1; }
           # Mirror dist/ to the server, removing stale files but keeping what the
           # host manages: .well-known (Let's Encrypt renewals) and elkdata_* (redirects).
           lftp -e "set sftp:connect-program 'ssh -a -x -i $HOME/deploy_key -o StrictHostKeyChecking=accept-new'; \
