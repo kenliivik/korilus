@@ -1,0 +1,12 @@
+name: Check live
+on: push
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for u in / /apple-touch-icon-180x180.png /splash/splash-1179x2556.jpg /splash/splash-1290x2796.jpg /manifest.webmanifest /pwa-192x192.png /sw.js; do
+            echo "::notice::$(curl -s -o /dev/null -w '%{http_code} %{content_type} %{size_download}' "https://korilus.dsgnr.ee$u") $u"
+          done
+          curl -s https://korilus.dsgnr.ee/ | head -c 4000 | tr '\n' ' ' | fold -w 900 | while read -r l; do echo "::notice::$l"; done
+          curl -sI https://korilus.dsgnr.ee/apple-touch-icon-180x180.png | tr '\r\n' '  ' | sed 's/^/::notice::/'; echo
