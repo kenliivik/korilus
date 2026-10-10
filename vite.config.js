@@ -31,6 +31,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,woff2}'],
+        importScripts: ['push-sw.js'],
       },
     }),
   ],

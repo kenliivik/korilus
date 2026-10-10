@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { findProduce } from '../data/berries.js'
-import { store, toggleReminder } from '../data/store.js'
+import { store, toggleReminder, toggleNotify } from '../data/store.js'
 
 const toggles = [
   { key: 'start', label: 'Marjad hakkavad valmima' },
@@ -22,7 +22,7 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
       role="switch"
       :aria-checked="store.notify[t.key]"
       class="grain card flex items-center justify-between text-left text-lg"
-      @click="store.notify[t.key] = !store.notify[t.key]"
+      @click="toggleNotify(t.key)"
     >
       {{ t.label }}
       <span class="flex w-14 rounded-full p-1 shadow-neu-inset" :class="store.notify[t.key] ? 'justify-end bg-leaf/30' : 'grain'">
