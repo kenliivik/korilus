@@ -1,0 +1,41 @@
+# Builds the app and uploads it to the Veebimajutus server on every push to main.
+# Needs repo secrets SSH_HOST, SSH_USER and SSH_PRIVATE_KEY (see README).
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency: deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Upload over SFTP
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PORT: 1022
+          DEPLOY_DIR: htdocs/korilus
+        run: |
+          sudo apt-get install -y -qq lftp
+          install -m 600 /dev/null ~/deploy_key
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/deploy_key
+          # Mirror dist/ to the server, removing stale files but keeping what the
+          # host manages: .well-known (Let's Encrypt renewals) and elkdata_* (redirects).
+          lftp -e "set sftp:connect-program 'ssh -a -x -i $HOME/deploy_key -o StrictHostKeyChecking=accept-new'; \
+            mirror --reverse --delete --verbose --exclude-glob .well-known/ --exclude-glob 'elkdata_*' --exclude-glob 'elkdata_*/' dist/ $DEPLOY_DIR/; bye" \
+            -p "$SSH_PORT" -u "$SSH_USER," "sftp://$SSH_HOST"
