@@ -9,7 +9,7 @@ const month = new Intl.DateTimeFormat('et-EE', { month: 'long' }).format(new Dat
 
 <template>
   <div class="paper min-h-dvh">
-    <main class="mx-auto flex max-w-[430px] flex-col gap-6 px-5 pt-4 pb-32">
+    <main class="mx-auto flex max-w-[430px] flex-col gap-6 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-32">
       <header class="flex items-center justify-between">
         <h1 class="font-serif-sc text-[32px] leading-none tracking-wide text-sage">Korilus</h1>
         <span class="font-hand text-lg text-muted">{{ month }}</span>
