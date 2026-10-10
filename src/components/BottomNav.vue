@@ -6,9 +6,9 @@ defineProps({
 })
 
 const items = [
-  { id: 'home', label: 'Avaleht', icon: 'home' },
-  { id: 'locations', label: 'Asukohad', icon: 'pin' },
-  { id: 'settings', label: 'Seaded', icon: 'settings' },
+  { id: 'home', label: 'Avaleht', icon: 'home', to: '/' },
+  { id: 'locations', label: 'Asukohad', icon: 'pin', to: '/asukohad' },
+  { id: 'settings', label: 'Seaded', icon: 'settings', to: '/seaded' },
 ]
 </script>
 
@@ -17,16 +17,16 @@ const items = [
     class="grain fixed inset-x-5 bottom-[max(1.5rem,env(safe-area-inset-bottom))] mx-auto flex h-16 max-w-[390px] gap-1 rounded-full p-2 shadow-neu-raised"
     aria-label="Peamenüü"
   >
-    <a
+    <RouterLink
       v-for="item in items"
       :key="item.id"
-      href="#"
+      :to="item.to"
       :aria-current="item.id === active ? 'page' : undefined"
       class="flex flex-1 items-center justify-center gap-2 rounded-full text-[15px] leading-5 text-sage"
       :class="item.id === active ? 'grain shadow-neu-inset' : 'opacity-60'"
     >
       <AppIcon :name="item.icon" :size="20" />
       {{ item.label }}
-    </a>
+    </RouterLink>
   </nav>
 </template>
