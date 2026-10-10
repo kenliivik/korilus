@@ -74,6 +74,8 @@
     z-index: -1;
     pointer-events: none;
     opacity: 0.2;
+    /* Fade the texture out at the top so the page meets the plain iPhone status bar without a seam. */
+    mask-image: linear-gradient(to bottom, transparent, #000 7rem);
     background:
       var(--grain),
       radial-gradient(ellipse 60% 45% at 10% 18%, rgb(217 199 155 / 0.7), transparent 70%),
