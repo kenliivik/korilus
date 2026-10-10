@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import PageHeader from '../components/PageHeader.vue'
 import BerryGlyph from '../components/BerryGlyph.vue'
 import AppIcon from '../components/AppIcon.vue'
-import { findProduce, phaseIn, statusText, seasonDates } from '../data/berries.js'
+import { findProduce, phaseIn, statusText } from '../data/berries.js'
 import { store, toggleReminder } from '../data/store.js'
 
 const props = defineProps({ id: { type: String, required: true } })
@@ -33,7 +33,7 @@ const reminded = computed(() => store.reminders.includes(props.id))
     <section class="flex flex-col gap-3">
       <h2 class="text-2xl leading-7">Küpsemisaeg</h2>
       <dl class="grain card grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-lg">
-        <template v-for="(value, label) in seasonDates(p)" :key="label">
+        <template v-for="(value, label) in p.dates" :key="label">
           <dt class="text-muted">{{ label }}</dt>
           <dd>{{ value }}</dd>
         </template>
@@ -42,7 +42,7 @@ const reminded = computed(() => store.reminders.includes(props.id))
       </dl>
     </section>
 
-    <section v-if="p.tips" class="flex flex-col gap-3">
+    <section class="flex flex-col gap-3">
       <h2 class="text-2xl leading-7">Korjamise nõuanded</h2>
       <ul class="grain card flex list-inside list-disc flex-col gap-1 text-lg marker:text-leaf">
         <li v-for="tip in p.tips" :key="tip">{{ tip }}</li>
