@@ -1,0 +1,40 @@
+name: Font diagnostic
+on:
+  push:
+    branches: [claude/font-diag]
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Headers and hashes
+        run: |
+          base=https://korilus.dsgnr.ee
+          for f in fonts/im-fell-double-pica-sc.woff2 fonts/la-belle-aurore.woff2; do
+            h=$(curl -sS -D - -o /tmp/f -H 'Accept-Encoding: gzip, br' -A 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1' "$base/$f?x=1" | tr -d '\r' | grep -iE '^(HTTP|content-type|content-encoding|content-length|location|cache-control|access-control)' | tr '\n' ' ')
+            echo "::notice title=$f::$h sha=$(sha256sum /tmp/f | cut -c1-12) size=$(stat -c%s /tmp/f) head=$(head -c4 /tmp/f | od -An -c | tr -d ' ')"
+          done
+          css=$(curl -sS "$base/" | grep -o '/assets/[^"]*\.css' | head -1)
+          echo "::notice title=css::$css $(curl -sS "$base$css" | grep -o '@font-face{[^}]*}' | head -1)"
+      - name: WebKit render check
+        run: |
+          npm init -y >/dev/null && npm i -s playwright@1.48.2 && npx playwright install --with-deps webkit >/dev/null
+          cat > t.mjs <<'JS'
+          import { webkit, devices } from 'playwright';
+          const b = await webkit.launch();
+          const p = await b.newPage({ ...devices['iPhone 13'] });
+          const fails = [];
+          p.on('requestfailed', r => fails.push(r.url() + ' ' + r.failure()?.errorText));
+          p.on('console', m => fails.push('console: ' + m.text()));
+          await p.goto('https://korilus.dsgnr.ee/?diag=1', { waitUntil: 'networkidle' });
+          await p.waitForTimeout(2000);
+          const r = await p.evaluate(async () => {
+            await document.fonts.ready;
+            return [...document.fonts].map(f => f.family + ':' + f.style + ':' + f.status).join(' | ') +
+              ' || h1=' + getComputedStyle(document.querySelector('h1')).fontFamily +
+              ' check=' + document.fonts.check('32px "IM Fell Double Pica SC"');
+          });
+          console.log('::notice title=webkit::' + r);
+          console.log('::notice title=failures::' + (fails.join(' ;; ') || 'none'));
+          await b.close();
+          JS
+          node t.mjs
