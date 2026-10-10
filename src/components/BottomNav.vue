@@ -21,12 +21,12 @@ const items = [
       v-for="item in items"
       :key="item.id"
       :to="item.to"
+      :aria-label="item.label"
       :aria-current="item.id === active ? 'page' : undefined"
-      class="flex flex-1 items-center justify-center gap-2 rounded-full text-[15px] leading-5 text-sage"
+      class="flex flex-1 items-center justify-center rounded-full text-sage"
       :class="item.id === active ? 'grain shadow-neu-inset' : 'opacity-60'"
     >
-      <AppIcon :name="item.icon" :size="20" />
-      {{ item.label }}
+      <AppIcon :name="item.icon" />
     </RouterLink>
   </nav>
 </template>
