@@ -37,5 +37,5 @@ jobs:
           # Mirror dist/ to the server, removing stale files but keeping what the
           # host manages: .well-known (Let's Encrypt renewals) and elkdata_* (redirects).
           lftp -e "set sftp:connect-program 'ssh -a -x -i $HOME/deploy_key -o StrictHostKeyChecking=accept-new'; \
-            mirror --reverse --delete --verbose --exclude-glob .well-known/ --exclude-glob 'elkdata_*' dist/ $DEPLOY_DIR/; bye" \
+            mirror --reverse --delete --verbose --exclude-glob .well-known/ --exclude-glob 'elkdata_*' --exclude-glob 'elkdata_*/' dist/ $DEPLOY_DIR/; bye" \
             -p "$SSH_PORT" -u "$SSH_USER," "sftp://$SSH_HOST"
