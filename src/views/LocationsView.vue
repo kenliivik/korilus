@@ -1,47 +1,18 @@
 <script setup>
 import { computed } from 'vue'
 import AppIcon from '../components/AppIcon.vue'
+import SpotMap from '../components/SpotMap.vue'
 import StarRating from '../components/StarRating.vue'
 import { findProduce } from '../data/berries.js'
 import { store, berriesAt, averageRating } from '../data/store.js'
 
-// Offline sketch map: saved spots plotted from their coordinates, no map tiles (no outside requests).
-const pins = computed(() => {
-  const located = store.locations.filter((l) => l.lat != null)
-  if (!located.length) return []
-  const lats = located.map((l) => l.lat)
-  const lngs = located.map((l) => l.lng)
-  const [minLat, minLng] = [Math.min(...lats), Math.min(...lngs)]
-  const span = Math.max(Math.max(...lats) - minLat, (Math.max(...lngs) - minLng) / 2, 0.005)
-  return located.map((l) => ({
-    ...l,
-    x: 20 + ((l.lng - minLng) / 2 / span) * 60,
-    y: 85 - ((l.lat - minLat) / span) * 65,
-  }))
-})
+const spots = computed(() => store.locations.filter((l) => l.lat != null))
 </script>
 
 <template>
   <h1 class="text-[32px] leading-9">Marjakohtade kaart</h1>
 
-  <section class="grain relative aspect-square overflow-hidden rounded-card shadow-neu-inset" aria-label="Kaart">
-    <svg viewBox="0 0 100 100" class="absolute inset-0 size-full text-sage/15" aria-hidden="true">
-      <path v-for="n in 9" :key="n" :d="`M${n * 10} 0V100M0 ${n * 10}H100`" stroke="currentColor" stroke-width="0.3" />
-    </svg>
-    <RouterLink
-      v-for="pin in pins"
-      :key="pin.id"
-      :to="`/asukohad/${pin.id}`"
-      class="absolute flex -translate-x-1/2 -translate-y-full flex-col items-center"
-      :style="{ left: `${pin.x}%`, top: `${pin.y}%` }"
-    >
-      <AppIcon name="pin" :size="28" />
-      <span class="font-hand text-sm whitespace-nowrap">{{ pin.name }}</span>
-    </RouterLink>
-    <p v-if="!pins.length" class="absolute inset-0 grid place-items-center p-8 text-center italic text-muted">
-      Salvestatud kohad ilmuvad siia kaardile.
-    </p>
-  </section>
+  <SpotMap :spots="spots" />
 
   <section class="flex flex-col gap-3">
     <h2 class="text-2xl leading-7">Minu asukohad</h2>
