@@ -6,9 +6,19 @@ jobs:
   diag:
     runs-on: ubuntu-latest
     steps:
-      - name: Headers
+      - name: WebKit render check
         run: |
-          for u in https://korilus.dsgnr.ee/ https://korilus.dsgnr.ee/fonts/la-belle-aurore.woff2; do
-            out=$(curl -sS --max-time 20 -D - -o /tmp/b "$u" 2>&1 | tr -d '\r' | tr '\n' '~')
-            echo "::notice title=$u::$out"
-          done
+          echo "::notice title=csp::$(curl -sS --max-time 20 -D - -o /dev/null https://korilus.dsgnr.ee/ | tr -d '\r' | grep -i content-security | tr '\n' '~')"
+          npm init -y >/dev/null && npm i -s playwright@1.48.2 && npx playwright install --with-deps webkit >/dev/null
+          cat > t.mjs <<'JS'
+          import { webkit, devices } from 'playwright';
+          const b = await webkit.launch();
+          const p = await b.newPage({ ...devices['iPhone 13'] });
+          const msgs = []; p.on('console', m => msgs.push(m.text()));
+          await p.goto('https://korilus.dsgnr.ee/?diag=2', { waitUntil: 'networkidle' });
+          await p.waitForTimeout(2000);
+          const r = await p.evaluate(async () => { await document.fonts.ready; return [...document.fonts].map(f => f.family + ':' + f.status).join(' | '); });
+          console.log('::notice title=webkit::' + r + ' || console: ' + (msgs.join(' ;; ') || 'none'));
+          await b.close();
+          JS
+          node t.mjs
