@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import PageHeader from '../components/PageHeader.vue'
 import BerryGlyph from '../components/BerryGlyph.vue'
 import AppIcon from '../components/AppIcon.vue'
@@ -17,6 +17,8 @@ const foundAt = computed(() =>
   }),
 )
 const reminded = computed(() => store.reminders.includes(props.id))
+const noPush = ref(false)
+const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && reminded.value)
 </script>
 
 <template>
@@ -61,10 +63,13 @@ const reminded = computed(() => store.reminders.includes(props.id))
       <p v-else class="italic text-muted">Sa pole seda veel üheski kohas märkinud.</p>
     </section>
 
-    <button type="button" class="btn" :class="reminded ? 'grain text-sage' : 'bg-sage text-milk'" @click="toggleReminder(p.id)">
+    <button type="button" class="btn" :class="reminded ? 'grain text-sage' : 'bg-sage text-milk'" @click="remind">
       <AppIcon name="bell" :size="20" />
       {{ reminded ? 'Meeldetuletus on sees' : 'Märguanne, kui küps' }}
     </button>
+    <p v-if="noPush" class="italic text-muted">
+      Meeldetuletus on salvestatud, kuid see seade ei luba teavitusi. iPhone'is lisa Korilus enne avaekraanile (Jaga → Lisa avaekraanile).
+    </p>
   </template>
 
   <PageHeader v-else title="Sellist marja ei leitud" back="/" />

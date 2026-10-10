@@ -1,0 +1,5 @@
+# Only push.php is for browsers. The data folder and the helper scripts stay private.
+<FilesMatch "^(store|webpush|send)\.php$">
+  Require all denied
+</FilesMatch>
+RedirectMatch 404 ^/api/data(/|$)

@@ -1,6 +1,7 @@
 import { reactive, watch } from 'vue'
+import { findProduce } from './berries.js'
 
-// Everything is kept on this phone until there is a backend (see audits/wireframe-audit-2026-10-10.md).
+// Everything is kept on this phone. Only the reminders also go to the server, for push (see syncPush).
 const KEY = 'korilus'
 
 export const store = reactive(
@@ -22,4 +23,35 @@ export const today = () => new Date().toISOString().slice(0, 10)
 export function toggleReminder(id) {
   const i = store.reminders.indexOf(id)
   i === -1 ? store.reminders.push(id) : store.reminders.splice(i, 1)
+  return syncPush()
+}
+
+export function toggleNotify(key) {
+  store.notify[key] = !store.notify[key]
+  return syncPush()
+}
+
+// Sends this phone's reminders to api/push.php, which pushes them when a season starts or peaks.
+// Resolves to false when this browser can't get push (e.g. an iPhone before "Lisa avaekraanile").
+export async function syncPush() {
+  try {
+    const reg = await navigator.serviceWorker?.getRegistration()
+    if (!reg?.pushManager || (!store.reminders.length && Notification.permission !== 'granted')) return false
+    if ((await Notification.requestPermission()) !== 'granted') return false
+    let sub = await reg.pushManager.getSubscription()
+    if (!sub) {
+      const { publicKey } = await (await fetch('/api/push.php')).json()
+      const key = Uint8Array.from(atob(publicKey.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0))
+      sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key })
+    }
+    const reminders = store.reminders.map((id) => ({ id, name: findProduce(id).name, season: findProduce(id).season }))
+    const res = await fetch('/api/push.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription: sub, reminders, notify: store.notify }),
+    })
+    return res.ok
+  } catch {
+    return false
+  }
 }
