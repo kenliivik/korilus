@@ -4,13 +4,13 @@ import AppIcon from './AppIcon.vue'
 defineProps({
   label: { type: String, required: true },
   icon: { type: String, required: true },
-  href: { type: String, default: '#' },
+  to: { type: String, required: true },
 })
 </script>
 
 <template>
-  <a
-    :href="href"
+  <RouterLink
+    :to="to"
     class="grain flex items-center gap-4 rounded-card p-4 text-sage shadow-neu-raised transition-shadow active:shadow-neu-inset"
   >
     <span class="grain grid size-11 shrink-0 place-items-center rounded-full shadow-neu-inset">
@@ -20,5 +20,5 @@ defineProps({
     <span class="grain grid size-9 shrink-0 place-items-center rounded-full shadow-neu-raised-sm">
       <AppIcon name="arrow" :size="18" />
     </span>
-  </a>
+  </RouterLink>
 </template>

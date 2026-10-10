@@ -57,6 +57,19 @@ const GLYPHS = {
     leaf('M20 4c4-2 8-1 9 2-4 1-7 0-9-2Z') +
     '<ellipse cx="11" cy="24" rx="6.5" ry="7.5" fill="#9B2233"/><ellipse cx="8.8" cy="21" rx="1.8" ry="2.4" fill="#fff" fill-opacity="0.45"/>' +
     '<ellipse cx="29" cy="25" rx="7" ry="8" fill="#A9283A"/><ellipse cx="26.6" cy="21.6" rx="1.9" ry="2.6" fill="#fff" fill-opacity="0.45"/>',
+  rabarber:
+    '<path d="M15 36l3-20M22 36V16M28 36l-2-19" stroke="#B2434E" stroke-width="3" stroke-linecap="round"/>' +
+    leaf('M6 15c3-9 25-11 29-2-7 6-23 7-29 2Z'),
+  oun:
+    '<path d="M20 13c-6-3-14 0-14 9 0 8 6 14 10 14 2 0 3-1 4-1s2 1 4 1c4 0 10-6 10-14 0-9-8-12-14-9Z" fill="#B8463A"/>' +
+    '<path d="M20 13c0-4 1-7 3-9" stroke="#6B5236" stroke-width="1.5" fill="none" stroke-linecap="round"/>' +
+    leaf('M22 8c4-4 9-3 10 0-4 2-7 2-10 0Z') +
+    '<ellipse cx="13" cy="19" rx="2" ry="3.5" fill="#fff" fill-opacity="0.35"/>',
+  kirss:
+    '<path d="M13 23c2-8 6-14 12-18M27 22c-1-7-1-11-2-17" stroke="#6E8263" stroke-width="1.3" fill="none" stroke-linecap="round"/>' +
+    leaf('M25 5c4-3 9-2 10 1-4 2-7 2-10-1Z') +
+    berry(13, 28, 6.5, '#8E1F2B', 0.4) +
+    berry(27, 27, 6.5, '#A0262F', 0.4),
 }
 
 const markup = computed(() => GLYPHS[props.name] ?? '')

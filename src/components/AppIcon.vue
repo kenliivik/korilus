@@ -33,5 +33,20 @@ defineProps({
     <template v-else-if="name === 'arrow'">
       <path d="M5 12h14M13 6l6 6-6 6" />
     </template>
+    <template v-else-if="name === 'back'">
+      <path d="M19 12H5M11 6l-6 6 6 6" />
+    </template>
+    <template v-else-if="name === 'bell'">
+      <path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 8 2.5 8h-17S6 15 6 9Z" /><path d="M10 20.5a2 2 0 0 0 4 0" />
+    </template>
+    <template v-else-if="name === 'plus'">
+      <path d="M12 5v14M5 12h14" />
+    </template>
+    <template v-else-if="name === 'edit'">
+      <path d="M4 20h4L19 9l-4-4L4 16v4Z" /><path d="M13.5 6.5l4 4" />
+    </template>
+    <template v-else-if="name === 'trash'">
+      <path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3" />
+    </template>
   </svg>
 </template>
