@@ -3,7 +3,8 @@ import { computed, ref } from 'vue'
 import PageHeader from '../components/PageHeader.vue'
 import BerryGlyph from '../components/BerryGlyph.vue'
 import AppIcon from '../components/AppIcon.vue'
-import { findProduce, phaseIn, statusText } from '../data/berries.js'
+import RecipeCard from '../components/RecipeCard.vue'
+import { findProduce, phaseIn, statusText, recipesFor } from '../data/berries.js'
 import { store, toggleReminder } from '../data/store.js'
 
 const props = defineProps({ id: { type: String, required: true } })
@@ -16,6 +17,7 @@ const foundAt = computed(() =>
     return v ? [{ id: l.id, name: l.name, date: v.date }] : []
   }),
 )
+const linkedRecipes = computed(() => recipesFor(props.id))
 const reminded = computed(() => store.reminders.includes(props.id))
 const noPush = ref(false)
 const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && reminded.value)
@@ -49,6 +51,14 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
       <ul class="grain card flex list-inside list-disc flex-col gap-1 text-lg marker:text-leaf">
         <li v-for="tip in p.tips" :key="tip">{{ tip }}</li>
       </ul>
+    </section>
+
+    <section v-if="linkedRecipes.length" class="flex flex-col gap-3">
+      <h2 class="flex items-baseline justify-between text-2xl leading-7">
+        Retseptid
+        <RouterLink :to="`/retseptid?mari=${p.id}`" class="text-base text-muted underline underline-offset-4">Kõik retseptid</RouterLink>
+      </h2>
+      <RecipeCard v-for="r in linkedRecipes" :key="r.id" :recipe="r" />
     </section>
 
     <section class="flex flex-col gap-3">

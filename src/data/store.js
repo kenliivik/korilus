@@ -12,6 +12,7 @@ export const store = reactive(
     notify: { start: true, peak: true },
   },
 )
+store.savedRecipes ??= [] // recipe ids ("Pane meelde"); added later, so older phones don't have it yet
 
 // Added with login (Sprint 3), so older saves get them here: updatedAt (ms) decides which copy wins when syncing,
 // dirty lists spots changed since the last sync, deleted keeps { id, updatedAt, deleted } until the server has it,
