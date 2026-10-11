@@ -1,0 +1,36 @@
+# Runs the login database setup on the server: creates or updates the tables (safe to run again after updates)
+# and, when an email is given, adds that person as an admin. Start it by hand: Actions → Server setup → Run workflow.
+name: Server setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      admin_email:
+        description: Email to add as admin (leave empty to only update the tables)
+        required: false
+      admin_name:
+        description: Name shown in the app
+        required: false
+        default: Ken
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run migrate.php and create-user.php over SSH
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          EMAIL: ${{ inputs.admin_email }}
+          NAME: ${{ inputs.admin_name }}
+        run: |
+          install -m 600 /dev/null ~/key
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/key
+          cmd='php ~/htdocs/korilus/api/migrate.php'
+          if [ -n "$EMAIL" ]; then
+            [[ "$EMAIL" =~ ^[^[:space:]\'\"\;\&\|\$\`]+@[^[:space:]\'\"\;\&\|\$\`]+$ ]] || { echo "::error::That doesn't look like an email address"; exit 1; }
+            [[ "$NAME" =~ ^[[:alnum:]\ äöüõšžÄÖÜÕŠŽ.-]{0,60}$ ]] || { echo "::error::Use only letters, spaces, dots and dashes in the name"; exit 1; }
+            cmd="$cmd && php ~/htdocs/korilus/api/create-user.php '$EMAIL' --admin '--name=$NAME'"
+          fi
+          ssh -i ~/key -p 1022 -o BatchMode=yes -o StrictHostKeyChecking=accept-new "$SSH_USER@$SSH_HOST" "$cmd"
