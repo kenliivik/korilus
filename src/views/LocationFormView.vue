@@ -4,15 +4,17 @@ import { useRouter } from 'vue-router'
 import PageHeader from '../components/PageHeader.vue'
 import AppIcon from '../components/AppIcon.vue'
 import VisitFields from '../components/VisitFields.vue'
-import { store, findLocation, today } from '../data/store.js'
+import { store, today, touch } from '../data/store.js'
+import { account } from '../data/account.js'
 
 // New spot (no id) or editing an existing one ("Muuda").
 const props = defineProps({ id: { type: String, default: '' } })
 const router = useRouter()
-const existing = props.id && findLocation(props.id)
+const existing = props.id && store.locations.find((l) => l.id === props.id) // own spots only, shared ones are read-only
 
 const name = ref(existing?.name ?? '')
 const coords = ref(existing ? { lat: existing.lat, lng: existing.lng } : null)
+const groupId = ref(existing?.groupId ?? null) // null = private
 const visit = ref({ berries: [], note: '', rating: 0 })
 const gps = ref('')
 
@@ -31,15 +33,16 @@ if (!existing) locate()
 
 function save() {
   if (existing) {
-    Object.assign(existing, { name: name.value.trim(), ...coords.value })
+    touch(Object.assign(existing, { name: name.value.trim(), ...coords.value, groupId: groupId.value }))
     return router.replace(`/asukohad/${existing.id}`)
   }
-  store.locations.unshift({
+  store.locations.unshift(touch({
     id: crypto.randomUUID(),
     name: name.value.trim(),
     ...coords.value,
+    groupId: groupId.value,
     visits: [{ date: today(), ...visit.value }],
-  })
+  }))
   router.replace('/asukohad')
 }
 </script>
@@ -54,6 +57,14 @@ function save() {
     </label>
 
     <VisitFields v-if="!existing" v-model="visit" />
+
+    <label v-if="account.user && account.groups.length" class="flex flex-col gap-2">
+      <span class="text-xl">Jaga</span>
+      <select v-model="groupId" class="field">
+        <option :value="null">Privaatne (ainult mina)</option>
+        <option v-for="g in account.groups" :key="g.id" :value="g.id">Grupiga „{{ g.name }}”</option>
+      </select>
+    </label>
 
     <button type="button" class="grain card flex items-center gap-3 text-left text-muted" @click="locate">
       <AppIcon name="pin" :size="20" />

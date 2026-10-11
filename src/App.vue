@@ -1,5 +1,6 @@
 <script setup>
 import BottomNav from './components/BottomNav.vue'
+import './data/account.js' // starts spot sync when logged in
 </script>
 
 <template>

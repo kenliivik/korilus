@@ -1,5 +1,5 @@
 <?php
-// Admin access for /admin: one password (config admin_password_hash). Logging in sets a signed
+// Admin access for /admin: a logged-in user with is_admin (once the database is set up), or one password (config admin_password_hash). Logging in sets a signed
 // HttpOnly cookie for 30 days. Changing the password logs every device out.
 require_once __DIR__ . '/store.php';
 
@@ -11,7 +11,10 @@ function admin_sig($expires) {
 
 function is_admin() {
     [$expires, $sig] = explode('.', $_COOKIE[ADMIN_COOKIE] ?? '', 2) + ['', ''];
-    return config('admin_password_hash') && (int) $expires > time() && hash_equals(admin_sig($expires), $sig);
+    if (config('admin_password_hash') && (int) $expires > time() && hash_equals(admin_sig($expires), $sig)) return true;
+    if (!config('db')) return false;
+    require_once __DIR__ . '/session.php';
+    return (bool) (current_user()['is_admin'] ?? false);
 }
 
 function set_admin_cookie($on) {
