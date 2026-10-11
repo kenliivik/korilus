@@ -7,6 +7,8 @@ defineProps({
 
 const items = [
   { id: 'home', label: 'Avaleht', icon: 'home', to: '/' },
+  { id: 'calendar', label: 'Kalender', icon: 'calendar', to: '/kalender' },
+  { id: 'recipes', label: 'Retseptid', icon: 'book', to: '/retseptid' },
   { id: 'locations', label: 'Asukohad', icon: 'pin', to: '/asukohad' },
   { id: 'settings', label: 'Seaded', icon: 'settings', to: '/seaded' },
 ]
