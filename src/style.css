@@ -62,7 +62,7 @@
 }
 
 @layer components {
-  /* Aged paper: vignette + foxing blots + grain, kept at 20% like the Figma paper layer. */
+  /* Aged paper: vignette + foxing blots + grain, at 40% so it reads on phone screens. */
   .paper {
     position: relative;
     isolation: isolate;
@@ -73,7 +73,7 @@
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    opacity: 0.2;
+    opacity: 0.4;
     /* Fade the texture out at the top so the page meets the plain iPhone status bar without a seam. */
     mask-image: linear-gradient(to bottom, transparent, #000 7rem);
     background:
