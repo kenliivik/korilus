@@ -11,6 +11,7 @@ export const store = reactive(
     notify: { start: true, peak: true },
   },
 )
+store.savedRecipes ??= [] // recipe ids ("Pane meelde"); added later, so older phones don't have it yet
 
 watch(store, () => localStorage.setItem(KEY, JSON.stringify(store)), { deep: true })
 

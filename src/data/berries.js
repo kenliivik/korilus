@@ -151,3 +151,72 @@ export const findProduce = (id) => produce.find((p) => p.id === id)
 export const phaseIn = (p, month = new Date().getMonth()) => p.season[month]
 export const inSeason = (month = new Date().getMonth()) => produce.filter((p) => p.season[month] !== '.')
 
+// --- recipes stand-in (replaced by CMS loader) ---
+// Temporary so the recipes branch builds before claude/cms lands. Drop this whole block when rebasing.
+import { reactive } from 'vue'
+
+export const recipes = reactive([
+  {
+    id: 'mustikamoos',
+    title: 'Mustikamoos',
+    berries: ['mustikas'],
+    type: 'moos',
+    time: '40 min',
+    yield: '4 purki (0,5 l)',
+    ingredients: [
+      { amount: '1 kg', item: 'mustikaid' },
+      { amount: '400 g', item: 'suhkrut' },
+      { amount: '1', item: 'sidruni mahl' },
+    ],
+    steps: [
+      'Puhasta marjad lehtedest ja prahist.',
+      'Sega marjad suhkruga ja lase tund aega seista, kuni tekib mahl.',
+      'Kuumuta keemiseni ja keeda tasasel tulel 10–15 minutit, vahtu eemaldades.',
+      'Lisa sidrunimahl ja vala kuum moos steriliseeritud purkidesse. Sulge kohe.',
+    ],
+    tip: 'Paksema moosi saad moosisuhkruga 2:1.',
+  },
+  {
+    id: 'maasika-rabarberimoos',
+    title: 'Maasika-rabarberimoos',
+    berries: ['metsmaasikas', 'rabarber'],
+    type: 'moos',
+    time: '1 h + seismine',
+    yield: '3 purki (0,5 l)',
+    ingredients: [
+      { amount: '500 g', item: 'rabarberivarsi' },
+      { amount: '500 g', item: 'maasikaid' },
+      { amount: '700 g', item: 'suhkrut' },
+    ],
+    steps: [
+      'Lõika rabarberivarred 1 cm tükkideks.',
+      'Sega rabarber suhkruga ja jäta paariks tunniks seisma.',
+      'Keeda 10 minutit, lisa maasikad ja keeda veel 5–10 minutit.',
+      'Vala kuumalt purkidesse ja sulge kohe.',
+    ],
+  },
+  {
+    id: 'pohlamoos',
+    title: 'Pohlamoos',
+    berries: ['pohl'],
+    type: 'moos',
+    time: '30 min',
+    yield: '3 purki (0,5 l)',
+    ingredients: [
+      { amount: '1 kg', item: 'pohli' },
+      { amount: '500 g', item: 'suhkrut' },
+      { amount: '100 ml', item: 'vett' },
+    ],
+    steps: [
+      'Sorteeri ja loputa pohlad.',
+      'Keeda vesi ja suhkur siirupiks.',
+      'Lisa pohlad ja keeda 5–10 minutit, kuni marjad lõhkevad.',
+      'Vala kuumalt purkidesse.',
+    ],
+    tip: 'Pohlades on looduslikku bensoehapet, nii et moos säilib hästi ka vähese suhkruga.',
+  },
+])
+
+export const recipesFor = (berryId) => recipes.filter((r) => r.berries.includes(berryId))
+// --- end recipes stand-in ---
+
