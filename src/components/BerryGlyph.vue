@@ -4,6 +4,7 @@ import { computed } from 'vue'
 const props = defineProps({
   name: { type: String, required: true },
   size: { type: Number, default: 40 },
+  image: { type: String, default: '' }, // a picture uploaded in /admin, shown instead of the drawing
 })
 
 const leaf = (d, extra = '') => `<path d="${d}" fill="#6E8263" ${extra}/>`
@@ -72,11 +73,21 @@ const GLYPHS = {
     berry(27, 27, 6.5, '#A0262F', 0.4),
 }
 
-const markup = computed(() => GLYPHS[props.name] ?? '')
+// Berries added in /admin without a picture get a plain sprig.
+const GENERIC =
+  '<path d="M20 5c-1 5-4 9-8 12M20 5c1 5 4 8 8 10" stroke="#6E8263" stroke-width="1.3" fill="none" stroke-linecap="round"/>' +
+  leaf('M20 5c5-3 10-1 11 2-5 2-8 1-11-2Z') +
+  berry(12, 24, 6, '#7A4E6E', 0.45) +
+  berry(27, 23, 6, '#86587A', 0.45) +
+  berry(19, 31, 5.5, '#6E4463', 0.45)
+
+const markup = computed(() => GLYPHS[props.name] ?? GENERIC)
 </script>
 
 <template>
+  <img v-if="image" :src="image" alt="" class="rounded-full object-cover" :style="{ width: `${size}px`, height: `${size}px` }" />
   <svg
+    v-else
     :width="size"
     :height="size"
     viewBox="0 0 40 40"

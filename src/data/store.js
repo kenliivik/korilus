@@ -44,7 +44,8 @@ export async function syncPush() {
       const key = Uint8Array.from(atob(publicKey.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0))
       sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key })
     }
-    const reminders = store.reminders.map((id) => ({ id, name: findProduce(id).name, season: findProduce(id).season }))
+    // Berries removed or hidden in /admin are skipped.
+    const reminders = store.reminders.map(findProduce).filter(Boolean).map(({ id, name, season }) => ({ id, name, season }))
     const res = await fetch('/api/push.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

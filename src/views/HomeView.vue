@@ -1,10 +1,11 @@
 <script setup>
+import { computed } from 'vue'
 import BerryTile from '../components/BerryTile.vue'
 import LinkCard from '../components/LinkCard.vue'
 import { inSeason, phaseIn, statusText, months } from '../data/berries.js'
 
 const month = months[new Date().getMonth()]
-const ripe = inSeason()
+const ripe = computed(() => inSeason()) // updates when new content arrives from the server
 </script>
 
 <template>
@@ -26,6 +27,7 @@ const ripe = inSeason()
       :key="p.id"
       :name="p.name"
       :glyph="p.id"
+      :image="p.image"
       :to="`/mari/${p.id}`"
       :note="statusText[phaseIn(p)]"
     />

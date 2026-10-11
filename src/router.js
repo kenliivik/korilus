@@ -20,6 +20,8 @@ export default createRouter({
     { path: '/asukohad/:id', component: LocationView, props: true, meta: { tab: 'locations' } },
     { path: '/asukohad/:id/muuda', component: LocationFormView, props: true, meta: { tab: 'locations' } },
     { path: '/seaded', component: SettingsView, meta: { tab: 'settings' } },
+    { path: '/admin', component: () => import('./views/admin/AdminView.vue'), meta: { tab: 'settings' } },
+    { path: '/admin/marjad/:id?', component: () => import('./views/admin/BerryEditor.vue'), props: true, meta: { tab: 'settings' } },
     { path: '/:rest(.*)', redirect: '/' },
   ],
 })

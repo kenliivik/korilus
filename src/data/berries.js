@@ -1,8 +1,12 @@
-// Species, seasons and tips. Mustikas dates and its first three tips come from the wireframes;
+import { reactive } from 'vue'
+
+// Species, seasons and tips, edited in /admin and served by api/content.php.
+// The list below is bundled with the app and used until the server has content (and offline on first run).
+// Mustikas dates and its first three tips come from the wireframes;
 // the rest was looked up on 2026-10-10 (RMK "Korilase nurgake", ERR, Looduskalender, Postimees, supertaim.ee).
 // `season` has one character per month, January first: a = algus, t = tipp, l = lõpp, . = not in season.
-// `glyph` keys map to the illustrations in components/BerryGlyph.vue.
-export const produce = [
+// Ids of the bundled nine map to the illustrations in components/BerryGlyph.vue; new berries may have an `image`.
+export const bundled = [
   {
     id: 'metsmaasikas',
     name: 'Metsmaasikas',
@@ -89,6 +93,52 @@ export const produce = [
     tips: ['Varased sordid valmivad juuli keskel, hilised juuli lõpus'],
   },
 ]
+
+// Everything from the server (hidden items too, for the admin). `produce` and `recipes` are what the app shows.
+// They are filled in place, so imports stay live when new content arrives.
+const KEY = 'korilus-content'
+export const content = reactive({ version: 0, berries: [], recipes: [] })
+export const produce = reactive([])
+export const recipes = reactive([])
+let serverHasBerries = null // unknown until the server has answered
+
+function setContent(c) {
+  Object.assign(content, { version: c.version, berries: c.berries?.length ? c.berries : bundled, recipes: c.recipes ?? [] })
+  produce.splice(0, produce.length, ...content.berries.filter((b) => !b.hidden))
+  recipes.splice(0, recipes.length, ...content.recipes.filter((r) => !r.hidden))
+  return content
+}
+
+function fromServer(c) {
+  serverHasBerries = !!c.berries?.length
+  if (c.version) {
+    setContent(c)
+    try { localStorage.setItem(KEY, JSON.stringify(c)) } catch { /* full storage: the cached copy just stays older */ }
+  }
+  return content
+}
+
+// Last good copy first, then whatever the server has now. Offline, the service worker answers from its cache.
+try { setContent(JSON.parse(localStorage.getItem(KEY)) ?? {}) } catch { setContent({}) }
+export const loadContent = () => fetch('/api/content.php').then((r) => r.json()).then(fromServer).catch(() => content)
+loadContent()
+
+// For /admin: posts one change to api/content.php (see the build contract) and shows the result.
+// The first berry change also stores the bundled list on the server, so editing one doesn't drop the rest.
+export async function saveContent(body) {
+  const post = async (b) => {
+    const res = await fetch('/api/content.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })
+    if (!res.ok) throw Object.assign(new Error((await res.json().catch(() => ({}))).error ?? res.statusText), { status: res.status })
+    return fromServer(await res.json())
+  }
+  if (serverHasBerries === null) await loadContent()
+  if (body.collection === 'berries' && serverHasBerries === false) {
+    for (const item of bundled) await post({ collection: 'berries', action: 'save', item })
+  }
+  return post(body)
+}
+
+export const recipesFor = (berryId) => recipes.filter((r) => r.berries?.includes(berryId))
 
 export const phases = { a: 'Algus', t: 'Tipp', l: 'Lõpp' }
 export const statusText = { a: 'hakkab valmima', t: 'küps!', l: 'hooaja lõpp', '.': 'pole hooaeg' }
