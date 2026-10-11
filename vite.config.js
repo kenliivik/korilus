@@ -32,6 +32,20 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,woff2}'],
         importScripts: ['push-sw.js'],
+        navigateFallbackDenylist: [/^\/api\//, /^\/uploads\//],
+        // Berries and recipes from /admin: fresh when online, the last copy offline. Pictures never change.
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname === '/api/content.php',
+            handler: 'NetworkFirst',
+            options: { cacheName: 'content', networkTimeoutSeconds: 5 },
+          },
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/uploads/'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'uploads', expiration: { maxEntries: 300 } },
+          },
+        ],
       },
     }),
   ],

@@ -14,3 +14,29 @@ function load_subs() {
 function save_subs($subs) {
     file_put_contents(SUBS_FILE, json_encode($subs, JSON_UNESCAPED_UNICODE), LOCK_EX);
 }
+
+// Server settings from data/config.php (see config.example.php), or [] when there is none yet.
+function config($key = null) {
+    static $config;
+    $config ??= is_file(DATA_DIR . '/config.php') ? (include DATA_DIR . '/config.php') : [];
+    return $key === null ? $config : ($config[$key] ?? null);
+}
+
+// Berries and recipes edited in /admin. Version 0 means nothing has been saved yet,
+// so the app keeps showing the berries bundled with it.
+const CONTENT_FILE = DATA_DIR . '/content.json';
+const BACKUP_DIR = DATA_DIR . '/backups';
+
+function load_content() {
+    return is_file(CONTENT_FILE) ? json_decode(file_get_contents(CONTENT_FILE), true)
+        : ['version' => 0, 'berries' => [], 'recipes' => []];
+}
+
+// Every save also leaves a dated copy (the newest 200 are kept), so a bad edit can be undone by hand.
+function save_content($content) {
+    $json = json_encode($content, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (!is_dir(BACKUP_DIR)) mkdir(BACKUP_DIR, 0700);
+    file_put_contents(BACKUP_DIR . '/content-' . date('Ymd-His') . "-v{$content['version']}.json", $json);
+    array_map('unlink', array_slice(array_reverse(glob(BACKUP_DIR . '/content-*.json')), 200));
+    file_put_contents(CONTENT_FILE, $json, LOCK_EX);
+}
