@@ -39,6 +39,11 @@ const ripe = computed(() => inSeason()) // updates when new content arrives from
   </section>
 
   <section class="flex flex-col gap-3">
+    <h2 class="text-2xl leading-7 text-sage">Retseptid</h2>
+    <LinkCard label="Moosid, mahlad ja kuivatamine" icon="book" to="/retseptid" />
+  </section>
+
+  <section class="flex flex-col gap-3">
     <h2 class="text-2xl leading-7 text-sage">Asukohad</h2>
     <LinkCard label="Salvesta marjakoha asukohad" icon="pin" to="/asukohad" />
   </section>

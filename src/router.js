@@ -6,6 +6,8 @@ import LocationsView from './views/LocationsView.vue'
 import LocationView from './views/LocationView.vue'
 import LocationFormView from './views/LocationFormView.vue'
 import SettingsView from './views/SettingsView.vue'
+import RecipesView from './views/RecipesView.vue'
+import RecipeView from './views/RecipeView.vue'
 
 // `meta.tab` decides which bottom-nav tab is highlighted.
 export default createRouter({
@@ -19,6 +21,11 @@ export default createRouter({
     { path: '/asukohad/uus', component: LocationFormView, meta: { tab: 'locations' } },
     { path: '/asukohad/:id', component: LocationView, props: true, meta: { tab: 'locations' } },
     { path: '/asukohad/:id/muuda', component: LocationFormView, props: true, meta: { tab: 'locations' } },
+    { path: '/retseptid', component: RecipesView, meta: { tab: 'home' } },
+    { path: '/retsept/:id', component: RecipeView, props: true, meta: { tab: 'home' } },
+    // Admin screens are only for Ken, so they load separately. `:id` "uus" = new recipe.
+    { path: '/admin/retseptid', component: () => import('./views/admin/RecipesAdmin.vue'), meta: { tab: 'settings' } },
+    { path: '/admin/retseptid/:id', component: () => import('./views/admin/RecipeEditor.vue'), props: true, meta: { tab: 'settings' } },
     { path: '/seaded', component: SettingsView, meta: { tab: 'settings' } },
     { path: '/admin', component: () => import('./views/admin/AdminView.vue'), meta: { tab: 'settings' } },
     { path: '/admin/marjad/:id?', component: () => import('./views/admin/BerryEditor.vue'), props: true, meta: { tab: 'settings' } },
