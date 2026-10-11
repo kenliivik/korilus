@@ -1,0 +1,197 @@
+<script setup>
+import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import AppIcon from '../components/AppIcon.vue'
+import PageHeader from '../components/PageHeader.vue'
+import { store } from '../data/store.js'
+import { account, requestCode, verifyCode, logout, deleteAccount, saveName, groupAction, downloadData } from '../data/account.js'
+
+const router = useRouter()
+const messages = {
+  not_invited: 'Korilus on praegu ainult kutsetega. Palu kutset kelleltki, kes seda juba kasutab.',
+  too_many: 'Liiga palju katseid. Proovi mõne minuti pärast uuesti.',
+  wrong_code: 'Vale kood. Proovi uuesti.',
+  expired: 'Kood on aegunud või liiga palju kordi valesti sisestatud. Küsi uus kood.',
+  mail: 'Kirja saatmine ei õnnestunud. Proovi hiljem uuesti.',
+  email: 'Kontrolli e-posti aadressi.',
+  already_user: 'See inimene juba kasutab Korilust. Lisa ta grupi lehelt oma gruppi.',
+}
+const say = (e) => messages[e.message] ?? 'Ühendus ei õnnestunud. Kas internet on olemas?'
+
+const email = ref('')
+const code = ref('')
+const step = ref('email')
+const busy = ref(false)
+const error = ref('')
+const note = ref('')
+
+// Runs fn, showing a spinner state and any error under the form.
+async function run(fn) {
+  busy.value = true
+  error.value = note.value = ''
+  try {
+    await fn()
+  } catch (e) {
+    error.value = say(e)
+  } finally {
+    busy.value = false
+  }
+}
+
+const sendCode = () => run(async () => {
+  await requestCode(email.value)
+  step.value = 'code'
+  code.value = ''
+})
+const login = () => run(() => verifyCode(email.value, code.value))
+
+const name = ref('')
+watch(() => account.user?.name, (n) => (name.value = n ?? ''), { immediate: true })
+const rename = () => run(() => saveName(name.value))
+
+const friend = ref('')
+const invite = () => run(async () => {
+  await groupAction({ action: 'invite', email: friend.value })
+  note.value = `Kutse saadetud aadressile ${friend.value}.`
+  friend.value = ''
+})
+
+const download = () => run(downloadData)
+const signOut = () => run(async () => {
+  await logout()
+  step.value = 'email'
+})
+const remove = () =>
+  confirm('Kas kustutada konto? Serverist kustutatakse sinu konto, kohad ja grupid, mille omanik oled. Selles telefonis jäävad kohad alles.') &&
+  run(async () => {
+    await deleteAccount()
+    router.replace('/seaded')
+  })
+
+const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit', minute: '2-digit' })
+</script>
+
+<template>
+  <PageHeader title="Konto" back="/seaded" />
+
+  <template v-if="!account.user">
+    <p class="text-lg">
+      Logi sisse, et su marjakohad oleksid alles ka uues telefonis ja et saaksid neid perega jagada. Ilma kontota töötab kõik
+      edasi selles seadmes.
+    </p>
+
+    <form v-if="step === 'email'" class="flex flex-col gap-4" @submit.prevent="sendCode">
+      <label class="flex flex-col gap-2">
+        <span class="text-xl">E-post</span>
+        <input v-model.trim="email" type="email" required autocomplete="email" class="field" placeholder="nimi@näide.ee" />
+      </label>
+      <button type="submit" class="btn bg-sage text-milk" :disabled="busy">{{ busy ? 'Saadan…' : 'Saada kood' }}</button>
+    </form>
+
+    <form v-else class="flex flex-col gap-4" @submit.prevent="login">
+      <p class="text-lg">Saatsime 6-kohalise koodi aadressile <b class="font-normal underline">{{ email }}</b>. Kood kehtib 10 minutit.</p>
+      <label class="flex flex-col gap-2">
+        <span class="text-xl">Kood</span>
+        <input
+          v-model="code"
+          required
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          pattern="\s*\d{3}\s*\d{3}\s*"
+          maxlength="7"
+          class="field text-center text-3xl tracking-[0.4em]"
+          placeholder="••••••"
+        />
+      </label>
+      <button type="submit" class="btn bg-sage text-milk" :disabled="busy">{{ busy ? 'Kontrollin…' : 'Logi sisse' }}</button>
+      <div class="flex justify-between text-base text-muted">
+        <button type="button" class="underline underline-offset-4" @click="step = 'email'">Muuda aadressi</button>
+        <button type="button" class="underline underline-offset-4" :disabled="busy" @click="sendCode">Saada uus kood</button>
+      </div>
+    </form>
+    <p v-if="error" role="alert" class="text-lg text-[#9c3a3a]">{{ error }}</p>
+  </template>
+
+  <template v-else>
+    <section class="flex flex-col gap-3">
+      <form class="grain card flex flex-col gap-3" @submit.prevent="rename">
+        <label class="flex flex-col gap-2">
+          <span class="text-muted">Nimi, mida grupi liikmed näevad</span>
+          <span class="flex gap-2">
+            <input v-model.trim="name" required maxlength="60" class="field" />
+            <button v-if="name !== account.user.name" type="submit" class="btn bg-sage px-4 text-milk" :disabled="busy">Salvesta</button>
+          </span>
+        </label>
+        <p class="text-lg">{{ account.user.email }}</p>
+        <p class="text-base italic text-muted">
+          {{ account.syncing ? 'Sünkroonin…' : account.error ? 'Sünkroonimine ei õnnestunud, proovin hiljem uuesti.'
+            : account.syncedAt ? `Kohad sünkroonitud kell ${time(account.syncedAt)}.` : 'Kohad pole veel sünkroonitud.' }}
+        </p>
+      </form>
+    </section>
+
+    <section class="flex flex-col gap-3">
+      <h2 class="text-2xl leading-7">Grupid</h2>
+      <RouterLink
+        v-for="g in account.groups"
+        :key="g.id"
+        :to="`/grupid/${g.id}`"
+        class="grain card flex items-center justify-between transition-shadow active:shadow-neu-inset"
+      >
+        <span class="flex flex-col">
+          <span class="text-xl">{{ g.name }}</span>
+          <span class="text-muted">{{ g.members.length }} {{ g.members.length === 1 ? 'liige' : 'liiget' }}{{ g.role === 'owner' ? ' · sinu grupp' : '' }}</span>
+        </span>
+        <AppIcon name="arrow" :size="20" />
+      </RouterLink>
+      <p v-if="!account.groups.length" class="italic text-muted">
+        Loo grupp (nt „Pere”) ja kutsu sinna inimesi. Iga koha juures saad valida, kas see on privaatne või grupiga jagatud.
+      </p>
+      <RouterLink to="/grupid" class="btn grain text-sage"><AppIcon name="plus" :size="20" /> Uus grupp</RouterLink>
+    </section>
+
+    <section class="flex flex-col gap-3">
+      <h2 class="text-2xl leading-7">Kutsu sõber</h2>
+      <form class="flex gap-2" @submit.prevent="invite">
+        <input v-model.trim="friend" type="email" required class="field" placeholder="sõbra e-post" />
+        <button type="submit" class="btn bg-sage px-4 text-milk" :disabled="busy">Kutsu</button>
+      </form>
+    </section>
+
+    <p v-if="error" role="alert" class="text-lg text-[#9c3a3a]">{{ error }}</p>
+    <p v-if="note" role="status" class="text-lg">{{ note }}</p>
+
+    <section class="flex flex-col gap-3">
+      <h2 class="text-2xl leading-7">Minu andmed</h2>
+      <RouterLink v-if="account.user.isAdmin" to="/admin" class="btn grain text-sage">Halda sisu</RouterLink>
+      <button type="button" class="btn grain text-sage" :disabled="busy" @click="download">Laadi alla minu andmed</button>
+      <button type="button" class="btn grain text-sage" :disabled="busy" @click="signOut">Logi välja</button>
+      <button type="button" class="btn grain text-[#9c3a3a]" :disabled="busy" @click="remove">
+        <AppIcon name="trash" :size="20" /> Kustuta konto
+      </button>
+      <p class="text-base italic text-muted">Välja logides jäävad sinu {{ store.locations.length }} kohta sellesse telefoni alles.</p>
+    </section>
+  </template>
+
+  <details class="grain card text-lg">
+    <summary class="cursor-pointer text-xl">Privaatsus</summary>
+    <div class="mt-3 flex flex-col gap-3">
+      <p>Ilma kontota on kõik sinu andmed ainult selles telefonis.</p>
+      <p>
+        Kui logid sisse, hoiame Koriluse serveris (Veebimajutus, Eesti) sinu e-posti aadressi, nime, sinu marjakohti koos
+        märkustega ning gruppe, kuhu kuulud. Seda on vaja, et kohad oleksid alles ka uues telefonis ja et saaksid neid jagada.
+      </p>
+      <p>
+        Grupiga jagatud kohti ja sinu nime näevad selle grupi liikmed. Privaatseid kohti ei näe keegi teine. Andmeid ei müüda
+        ega anta kellelegi edasi, reklaami ja jälgimist pole.
+      </p>
+      <p>
+        Sisselogimiseks saadame e-postiga ühekordse koodi. Sisselogituna hoiab üks vajalik küpsis sind sisse logituna.
+      </p>
+      <p>
+        Saad oma andmed igal ajal alla laadida ja konto kustutada. Konto kustutamisel kaovad serverist sinu konto, kohad ja
+        sinu loodud grupid.
+      </p>
+    </div>
+  </details>
+</template>

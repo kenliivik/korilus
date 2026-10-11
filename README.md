@@ -43,3 +43,43 @@ Set the admin password once, in either way:
 The password is stored only as a hash. Wrong passwords are limited to 10 per 15 minutes per IP address.
 
 Local test of the PHP parts: `npm run build && php -S localhost:8000 -t dist`, then call `http://localhost:8000/api/content.php`.
+
+## Login, groups and spot sync (server setup)
+
+Logging in is optional: the app keeps working on the phone without it. When someone logs in (email + a 6-digit code
+typed into the app), their spots sync to the server and they can share spots with groups such as "Pere".
+It runs on the same Veebimajutus server with PHP and MariaDB, no other services. One-time setup:
+
+1. **Database.** In Iseteenindus → Andmebaasid, create a MariaDB database and a user for it. Note the database name,
+   user and password.
+2. **Mailbox.** Create a mailbox such as `korilus@dsgnr.ee` (Iseteenindus → E-post). The login codes are sent from it.
+   For mail to land in inboxes, check that dsgnr.ee has SPF, DKIM and DMARC records (Iseteenindus → DNS; DKIM may
+   already be on). A DMARC record can start as `v=DMARC1; p=none`.
+3. **Config file.** On your computer, make a file `config.php` like this (keep any keys already in it):
+
+   ```php
+   <?php
+   return [
+       'db' => ['dsn' => 'mysql:host=localhost;dbname=DATABASE_NAME;charset=utf8mb4', 'user' => 'DB_USER', 'pass' => 'DB_PASSWORD'],
+       'smtp' => ['host' => 'mail.veebimajutus.ee', 'port' => 587, 'user' => 'korilus@dsgnr.ee', 'pass' => 'MAILBOX_PASSWORD', 'from' => 'korilus@dsgnr.ee'],
+       'app_url' => 'https://korilus.dsgnr.ee', // the app's address, used in invitation emails
+       'signup_open' => false, // true lets anyone log in; false = only people who were invited
+   ];
+   ```
+
+   Use the SMTP server name Veebimajutus shows for the mailbox (port 587 with STARTTLS, or 465). Upload the file with
+   WinSCP or FileZilla (SFTP, port 1022) to `htdocs/korilus/api/data/config.php`. That folder is never overwritten by
+   the deploy and is not reachable from the web.
+4. **Tables and first user.** Log in with SSH (on Windows: `ssh -p 1022 USER@HOST` in PowerShell, or PuTTY) and run:
+
+   ```
+   php ~/htdocs/korilus/api/migrate.php
+   php ~/htdocs/korilus/api/create-user.php ken@dsgnr.ee --admin --name=Ken
+   ```
+
+   Without SSH, add each line once as a cron job in Iseteenindus → Cron (any time in the next minutes), wait for it
+   to run (the result comes by email), then delete the cron job. `migrate.php` is safe to run again after updates.
+5. Open the app → Seaded → Konto, log in with the code from the email, create a group and invite people by email.
+   Invited people can then log in with their own address.
+
+Helper scripts, `schema.sql` and `api/data/` are blocked from the web in `public/api/.htaccess`.

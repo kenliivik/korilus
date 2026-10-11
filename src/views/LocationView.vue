@@ -6,12 +6,14 @@ import AppIcon from '../components/AppIcon.vue'
 import StarRating from '../components/StarRating.vue'
 import VisitFields from '../components/VisitFields.vue'
 import { findProduce } from '../data/berries.js'
-import { store, findLocation, berriesAt, averageRating, today } from '../data/store.js'
+import { findLocation, berriesAt, averageRating, today, touch, removeLocation } from '../data/store.js'
+import { account } from '../data/account.js'
 
 const props = defineProps({ id: { type: String, required: true } })
 const router = useRouter()
 
 const loc = computed(() => findLocation(props.id))
+const groupName = computed(() => account.groups.find((g) => g.id === loc.value?.groupId)?.name)
 const names = (ids) => ids.map((id) => findProduce(id)?.name).join(', ')
 // Visits grouped by year (newest first), so seasons can be compared.
 const years = computed(() =>
@@ -21,12 +23,13 @@ const years = computed(() =>
 const draft = ref(null)
 function addVisit() {
   loc.value.visits.unshift({ date: today(), ...draft.value })
+  touch(loc.value)
   draft.value = null
 }
 
 function remove() {
   if (!confirm(`Kas kustutada „${loc.value.name}” koos kõigi märkustega?`)) return
-  store.locations.splice(store.locations.indexOf(loc.value), 1)
+  removeLocation(loc.value)
   router.replace('/asukohad')
 }
 </script>
@@ -34,6 +37,8 @@ function remove() {
 <template>
   <template v-if="loc">
     <PageHeader :title="loc.name" back="/asukohad" />
+    <p v-if="loc.shared" class="font-hand text-xl text-muted">Jagab {{ loc.owner }}{{ groupName ? ` grupis „${groupName}”` : '' }}</p>
+    <p v-else-if="groupName" class="font-hand text-xl text-muted">Jagatud grupiga „{{ groupName }}”</p>
 
     <section class="flex flex-col gap-3">
       <h2 class="text-2xl leading-7">Asukoha info</h2>
@@ -59,20 +64,22 @@ function remove() {
       </template>
     </section>
 
-    <form v-if="draft" class="grain card flex flex-col gap-4" @submit.prevent="addVisit">
-      <h2 class="text-2xl leading-7">Tänane külastus</h2>
-      <VisitFields v-model="draft" />
-      <button type="submit" class="btn bg-sage text-milk">Salvesta märkus</button>
-      <button type="button" class="btn grain text-sage" @click="draft = null">Tühista</button>
-    </form>
-    <button v-else type="button" class="btn bg-sage text-milk" @click="draft = { berries: [], note: '', rating: 0 }">
-      <AppIcon name="plus" :size="20" /> Lisa märkus tänasel külastusel
-    </button>
+    <template v-if="!loc.shared">
+      <form v-if="draft" class="grain card flex flex-col gap-4" @submit.prevent="addVisit">
+        <h2 class="text-2xl leading-7">Tänane külastus</h2>
+        <VisitFields v-model="draft" />
+        <button type="submit" class="btn bg-sage text-milk">Salvesta märkus</button>
+        <button type="button" class="btn grain text-sage" @click="draft = null">Tühista</button>
+      </form>
+      <button v-else type="button" class="btn bg-sage text-milk" @click="draft = { berries: [], note: '', rating: 0 }">
+        <AppIcon name="plus" :size="20" /> Lisa märkus tänasel külastusel
+      </button>
 
-    <div class="grid grid-cols-2 gap-4">
-      <RouterLink :to="`/asukohad/${loc.id}/muuda`" class="btn grain text-sage"><AppIcon name="edit" :size="20" /> Muuda</RouterLink>
-      <button type="button" class="btn grain text-[#9c3a3a]" @click="remove"><AppIcon name="trash" :size="20" /> Kustuta</button>
-    </div>
+      <div class="grid grid-cols-2 gap-4">
+        <RouterLink :to="`/asukohad/${loc.id}/muuda`" class="btn grain text-sage"><AppIcon name="edit" :size="20" /> Muuda</RouterLink>
+        <button type="button" class="btn grain text-[#9c3a3a]" @click="remove"><AppIcon name="trash" :size="20" /> Kustuta</button>
+      </div>
+    </template>
   </template>
 
   <PageHeader v-else title="Asukohta ei leitud" back="/asukohad" />

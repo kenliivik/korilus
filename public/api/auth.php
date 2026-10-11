@@ -1,5 +1,5 @@
 <?php
-// Admin access for /admin: one password (config admin_password_hash). Logging in sets a signed
+// Admin access for /admin: a user account with is_admin, or one password (config admin_password_hash). Logging in sets a signed
 // HttpOnly cookie for 30 days. Changing the password logs every device out.
 require_once __DIR__ . '/store.php';
 
@@ -22,9 +22,14 @@ function set_admin_cookie($on) {
     ]);
 }
 
-// Sends 401 and stops unless the request comes from the logged-in admin.
+// Sends 401 and stops unless the request comes from the admin: the password login above, or a
+// logged-in user with is_admin (php api/create-user.php email --admin) once the database is set up.
 function require_admin() {
     if (is_admin()) return;
+    if (config('db')) {
+        require_once __DIR__ . '/session.php';
+        if (current_user()['is_admin'] ?? false) return;
+    }
     http_response_code(401);
     header('Content-Type: application/json');
     exit('{"error":"login required"}');

@@ -1,7 +1,9 @@
 <script setup>
 import { computed } from 'vue'
+import AppIcon from '../components/AppIcon.vue'
 import { findProduce } from '../data/berries.js'
 import { store, toggleReminder, toggleNotify } from '../data/store.js'
+import { account } from '../data/account.js'
 
 const toggles = [
   { key: 'start', label: 'Marjad hakkavad valmima' },
@@ -12,6 +14,14 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
 
 <template>
   <h1 class="text-[32px] leading-9">Seaded</h1>
+
+  <section class="flex flex-col gap-3">
+    <h2 class="text-2xl leading-7">Konto</h2>
+    <RouterLink to="/konto" class="grain card flex items-center justify-between gap-3 text-lg transition-shadow active:shadow-neu-inset">
+      <span class="truncate">{{ account.user ? account.user.email : 'Logi sisse või loo grupp' }}</span>
+      <AppIcon name="arrow" :size="20" />
+    </RouterLink>
+  </section>
 
   <section class="flex flex-col gap-3">
     <h2 class="text-2xl leading-7">Märguanded</h2>
@@ -53,7 +63,7 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
       <dt>Asukohad</dt><dd>{{ store.locations.length }} kohta</dd>
       <dt>Märkused</dt><dd>{{ notes }} märkust</dd>
     </dl>
-    <p class="text-base italic text-muted">Andmed on salvestatud ainult selles seadmes.</p>
+    <p class="text-base italic text-muted">{{ account.user ? 'Andmed on selles seadmes ja sünkroonitakse sinu kontoga.' : 'Andmed on salvestatud ainult selles seadmes.' }}</p>
   </section>
 
   <section class="flex flex-col gap-3">
