@@ -15,8 +15,8 @@ AddType font/woff2 .woff2
     Header set Cache-Control "no-cache"
   </FilesMatch>
 
-  # Built files have a content hash in their name, so they never change.
-  <If "%{REQUEST_URI} =~ m#^/assets/#">
+  # Built files have a content hash in their name and uploads a random one, so they never change.
+  <If "%{REQUEST_URI} =~ m#^/(assets|uploads)/#">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </If>
 </IfModule>

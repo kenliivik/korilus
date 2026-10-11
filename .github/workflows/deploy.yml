@@ -40,7 +40,8 @@ jobs:
             "$SSH_USER@$SSH_HOST" true || { echo "::error::SSH login to $SSH_HOST:$SSH_PORT failed (see the ssh error above)"; exit 1; }
           # Mirror dist/ to the server, removing stale files but keeping what the
           # host manages: .well-known (Let's Encrypt renewals) and elkdata_* (redirects),
-          # and the push subscriptions and key in api/data/ (listed both ways, as lftp may match the path or the name).
+          # the push subscriptions, key, config and content in api/data/ (listed both ways, as lftp may match the path or the name),
+          # and the pictures uploaded in /admin (uploads/).
           lftp -e "set sftp:connect-program 'ssh -a -x -i $HOME/deploy_key -o StrictHostKeyChecking=accept-new'; \
-            mirror --reverse --delete --verbose --exclude-glob .well-known/ --exclude-glob 'elkdata_*' --exclude-glob 'elkdata_*/' --exclude-glob api/data/ --exclude-glob data/ dist/ $DEPLOY_DIR/; bye" \
+            mirror --reverse --delete --verbose --exclude-glob .well-known/ --exclude-glob 'elkdata_*' --exclude-glob 'elkdata_*/' --exclude-glob api/data/ --exclude-glob data/ --exclude-glob uploads/ dist/ $DEPLOY_DIR/; bye" \
             -p "$SSH_PORT" -u "$SSH_USER," "sftp://$SSH_HOST"

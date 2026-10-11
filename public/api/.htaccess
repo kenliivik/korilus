@@ -1,5 +1,6 @@
-# Only push.php is for browsers. The data folder and the helper scripts stay private.
-<FilesMatch "^(store|webpush|send)\.php$">
+# Only push.php, content.php, upload.php and admin-login.php are for browsers.
+# The data folder and the helper and command-line scripts stay private.
+<FilesMatch "^(store|webpush|send|auth|admin-password|config\.example)\.php$">
   Require all denied
 </FilesMatch>
 RedirectMatch 404 ^/api/data(/|$)
