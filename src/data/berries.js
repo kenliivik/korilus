@@ -5,7 +5,8 @@ import { reactive } from 'vue'
 // Mustikas dates and its first three tips come from the wireframes;
 // the rest was looked up on 2026-10-10 (RMK "Korilase nurgake", ERR, Looduskalender, Postimees, supertaim.ee).
 // `season` has one character per month, January first: a = algus, t = tipp, l = lõpp, . = not in season.
-// Ids of the bundled nine map to the illustrations in components/BerryGlyph.vue; new berries may have an `image`.
+// Põldmari (põldmurakas) and the two sõstrad were added on 2026-10-12 (RMK, Postimees, Looduspere, bio.edu.ee, Aiasõber, Maheklubi).
+// Each bundled id has an illustration in src/assets/berries/<id>.webp; berries added in /admin may have an `image`.
 export const bundled = [
   {
     id: 'metsmaasikas',
@@ -92,6 +93,40 @@ export const bundled = [
     dates: { Algus: 'juuli keskpaik', Lõpp: 'augusti algus' },
     tips: ['Varased sordid valmivad juuli keskel, hilised juuli lõpus'],
   },
+  {
+    id: 'poldmari',
+    name: 'Põldmari',
+    latin: 'Rubus caesius',
+    season: '......atl...',
+    dates: { Algus: 'juuli lõpp', Tipp: 'august', Lõpp: 'september' },
+    tips: [
+      'Otsi lubjarikkalt pinnaselt metsaservadest, raiesmikelt, teeservadest ja põlluäärtest, peamiselt Põhja- ja Lääne-Eestis',
+      'Küps mari on peaaegu must, sinakashalli kirmega ja tuleb kergelt lahti',
+      'Korja käsitsi ja ettevaatlikult, sest küpsed marjad purunevad kergesti',
+      'Marjad ei säili kaua, seega korja iga päev ja tarvita kiiresti',
+    ],
+  },
+  {
+    id: 'must-sostar',
+    name: 'Must sõstar',
+    latin: 'Ribes nigrum',
+    season: '......tl....',
+    dates: { Algus: 'juuli (varased sordid juuni lõpus)', Tipp: 'juuli', Lõpp: 'august' },
+    tips: [
+      'Küps mari on must ja läikiv',
+      'Võid korjata üksikmarju või terveid kobaraid',
+      'Õrna koorega sorte korja valmimise alguses, mõni sort pudeneb küpsena',
+      'Külmuta kohe pärast korjamist, nii jääb alles kõige rohkem vitamiine',
+    ],
+  },
+  {
+    id: 'punane-sostar',
+    name: 'Punane sõstar',
+    latin: 'Ribes rubrum',
+    season: '......tl....',
+    dates: { Algus: 'juuli', Tipp: 'juuli', Lõpp: 'august' },
+    tips: ['Marjad kasvavad kobaratena, korja terve kobar korraga', 'Kuival ja kergel mullal vajab põõsas valmimise ajal lisakastmist'],
+  },
 ]
 
 // Everything from the server (hidden items too, for the admin). `produce` and `recipes` are what the app shows.
@@ -102,8 +137,11 @@ export const produce = reactive([])
 export const recipes = reactive([])
 let serverHasBerries = null // unknown until the server has answered
 
+// Species bundled after the server got its copy are added at the end until they are saved in /admin.
+const withBundled = (berries) => [...berries, ...bundled.filter((b) => !berries.some((s) => s.id === b.id))]
+
 function setContent(c) {
-  Object.assign(content, { version: c.version, berries: c.berries?.length ? c.berries : bundled, recipes: c.recipes ?? [] })
+  Object.assign(content, { version: c.version, berries: withBundled(c.berries ?? []), recipes: c.recipes ?? [] })
   produce.splice(0, produce.length, ...content.berries.filter((b) => !b.hidden))
   recipes.splice(0, recipes.length, ...content.recipes.filter((r) => !r.hidden))
   return content
