@@ -5,7 +5,7 @@ import { reactive } from 'vue'
 // Mustikas dates and its first three tips come from the wireframes;
 // the rest was looked up on 2026-10-10 (RMK "Korilase nurgake", ERR, Looduskalender, Postimees, supertaim.ee).
 // `season` has one character per month, January first: a = algus, t = tipp, l = lõpp, . = not in season.
-// Põldmurakas and the two sõstrad were added on 2026-10-12 (RMK, Postimees, Looduspere, bio.edu.ee, Aiasõber, Maheklubi).
+// Põldmari (põldmurakas) and the two sõstrad were added on 2026-10-12 (RMK, Postimees, Looduspere, bio.edu.ee, Aiasõber, Maheklubi).
 // Each bundled id has an illustration in src/assets/berries/<id>.webp; berries added in /admin may have an `image`.
 export const bundled = [
   {
@@ -94,8 +94,8 @@ export const bundled = [
     tips: ['Varased sordid valmivad juuli keskel, hilised juuli lõpus'],
   },
   {
-    id: 'poldmurakas',
-    name: 'Põldmurakas',
+    id: 'poldmari',
+    name: 'Põldmari',
     latin: 'Rubus caesius',
     season: '......atl...',
     dates: { Algus: 'juuli lõpp', Tipp: 'august', Lõpp: 'september' },
