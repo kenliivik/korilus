@@ -28,9 +28,7 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
     <PageHeader :title="p.name" back="/" />
 
     <section class="flex flex-col items-center gap-2">
-      <span class="grain grid size-48 place-items-center rounded-full shadow-neu-inset">
-        <BerryGlyph :name="p.id" :image="p.image" :size="176" />
-      </span>
+      <BerryGlyph :name="p.id" :image="p.image" :size="200" />
       <p class="italic text-muted">{{ p.latin }}</p>
     </section>
 

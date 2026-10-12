@@ -20,7 +20,7 @@ const ripe = computed(() => inSeason()) // updates when new content arrives from
     </p>
   </section>
 
-  <section v-if="ripe.length" class="grid grid-cols-3 gap-x-3 gap-y-4" aria-label="Praegu hooajal">
+  <section v-if="ripe.length" class="mt-6 grid grid-cols-3 gap-x-3 gap-y-12" aria-label="Praegu hooajal">
     <BerryTile
       v-for="p in ripe"
       :key="p.id"

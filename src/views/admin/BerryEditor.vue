@@ -101,9 +101,7 @@ function remove() {
   <!-- Preview: roughly how the berry page will look. -->
   <template v-else-if="preview">
     <section class="flex flex-col items-center gap-2">
-      <span class="grain grid size-32 place-items-center rounded-full shadow-neu-inset">
-        <BerryGlyph :name="item.id" :image="item.image" :size="120" />
-      </span>
+      <BerryGlyph :name="item.id" :image="item.image" :size="200" />
       <h2 class="text-[32px] leading-9">{{ item.name || 'Nimetu' }}</h2>
       <p class="italic text-muted">{{ item.latin }}</p>
     </section>
@@ -184,9 +182,7 @@ function remove() {
     <fieldset class="flex flex-col gap-3">
       <legend class="mb-2 text-xl">Pilt</legend>
       <div class="flex items-center gap-4">
-        <span class="grain grid size-20 shrink-0 place-items-center rounded-full shadow-neu-inset">
-          <BerryGlyph :name="item.id" :image="form.image" :size="76" />
-        </span>
+        <BerryGlyph :name="item.id" :image="form.image" :size="80" class="shrink-0" />
         <div class="flex flex-1 flex-col gap-2">
           <label class="btn grain cursor-pointer text-base text-sage">
             {{ busy ? 'Laen üles…' : form.image ? 'Vaheta pilti' : 'Lae pilt' }}

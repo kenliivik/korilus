@@ -39,7 +39,7 @@ const saved = computed(() => store.savedRecipes.includes(props.id))
         :to="`/mari/${p.id}`"
         class="grain flex items-center gap-2 rounded-full py-1 pr-4 pl-1 shadow-neu-raised-sm active:shadow-neu-inset"
       >
-        <span class="grain grid size-9 place-items-center rounded-full shadow-neu-inset"><BerryGlyph :name="p.id" :size="32" /></span>
+        <BerryGlyph :name="p.id" :size="36" />
         {{ p.name }}
       </RouterLink>
     </section>
