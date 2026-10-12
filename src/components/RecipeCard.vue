@@ -13,7 +13,7 @@ defineProps({ recipe: { type: Object, required: true } })
   >
     <img v-if="recipe.image" :src="recipe.image" alt="" class="size-14 shrink-0 rounded-full object-cover shadow-neu-inset" />
     <span v-else class="grain grid size-14 shrink-0 place-items-center rounded-full shadow-neu-inset">
-      <BerryGlyph :name="recipe.berries[0] ?? ''" :size="36" />
+      <BerryGlyph :name="recipe.berries[0] ?? ''" :size="48" />
     </span>
     <span class="flex min-w-0 flex-col">
       <span class="text-xl leading-6">{{ recipe.title }}</span>

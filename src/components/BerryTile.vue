@@ -16,7 +16,7 @@ defineProps({
     class="grain flex flex-col items-center gap-3 rounded-card px-2 pt-4 pb-3 shadow-neu-raised transition-shadow active:shadow-neu-inset"
   >
     <span class="grain grid size-15 place-items-center rounded-full shadow-neu-inset">
-      <BerryGlyph :name="glyph" :image="image" :size="image ? 56 : 40" />
+      <BerryGlyph :name="glyph" :image="image" :size="56" />
     </span>
     <span class="flex flex-col items-center">
       <span class="text-base leading-5 text-sage">{{ name }}</span>

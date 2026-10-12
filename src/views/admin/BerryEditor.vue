@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import PageHeader from '../../components/PageHeader.vue'
 import AppIcon from '../../components/AppIcon.vue'
 import BerryGlyph from '../../components/BerryGlyph.vue'
-import { content, loadContent, saveContent, months, phases, statusText } from '../../data/berries.js'
+import { bundled, content, loadContent, saveContent, months, phases, statusText } from '../../data/berries.js'
 import { checkAdmin, uploadImage } from '../../data/admin.js'
 
 // Add a berry (no id) or edit one. Saving sends it to api/content.php, so every phone gets it.
@@ -102,7 +102,7 @@ function remove() {
   <template v-else-if="preview">
     <section class="flex flex-col items-center gap-2">
       <span class="grain grid size-32 place-items-center rounded-full shadow-neu-inset">
-        <BerryGlyph :name="item.id" :image="item.image" :size="item.image ? 120 : 88" />
+        <BerryGlyph :name="item.id" :image="item.image" :size="120" />
       </span>
       <h2 class="text-[32px] leading-9">{{ item.name || 'Nimetu' }}</h2>
       <p class="italic text-muted">{{ item.latin }}</p>
@@ -185,7 +185,7 @@ function remove() {
       <legend class="mb-2 text-xl">Pilt</legend>
       <div class="flex items-center gap-4">
         <span class="grain grid size-20 shrink-0 place-items-center rounded-full shadow-neu-inset">
-          <BerryGlyph :name="item.id" :image="form.image" :size="form.image ? 76 : 56" />
+          <BerryGlyph :name="item.id" :image="form.image" :size="76" />
         </span>
         <div class="flex flex-1 flex-col gap-2">
           <label class="btn grain cursor-pointer text-base text-sage">
@@ -206,7 +206,8 @@ function remove() {
     <p v-if="message" class="italic text-[#9c3a3a]">{{ message }}</p>
     <button type="button" class="btn grain text-sage" @click="preview = true">Eelvaade</button>
     <button type="submit" class="btn bg-sage text-milk" :disabled="busy">Salvesta</button>
-    <button v-if="form.id" type="button" class="btn grain text-[#9c3a3a]" :disabled="busy" @click="remove">
+    <!-- The app's own species come back after deleting, so they can only be hidden. -->
+    <button v-if="form.id && !bundled.some((b) => b.id === form.id)" type="button" class="btn grain text-[#9c3a3a]" :disabled="busy" @click="remove">
       <AppIcon name="trash" :size="20" /> Kustuta
     </button>
   </form>

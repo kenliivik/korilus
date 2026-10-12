@@ -1,7 +1,6 @@
 <script setup>
 import { computed } from 'vue'
 import BerryTile from '../components/BerryTile.vue'
-import LinkCard from '../components/LinkCard.vue'
 import { inSeason, phaseIn, statusText, months } from '../data/berries.js'
 
 const month = months[new Date().getMonth()]
@@ -31,20 +30,5 @@ const ripe = computed(() => inSeason()) // updates when new content arrives from
       :to="`/mari/${p.id}`"
       :note="statusText[phaseIn(p)]"
     />
-  </section>
-
-  <section class="flex flex-col gap-3">
-    <h2 class="text-2xl leading-7 text-sage">Kalender</h2>
-    <LinkCard label="Vaata aastast kalendrit" icon="calendar" to="/kalender" />
-  </section>
-
-  <section class="flex flex-col gap-3">
-    <h2 class="text-2xl leading-7 text-sage">Retseptid</h2>
-    <LinkCard label="Moosid, mahlad ja kuivatamine" icon="book" to="/retseptid" />
-  </section>
-
-  <section class="flex flex-col gap-3">
-    <h2 class="text-2xl leading-7 text-sage">Asukohad</h2>
-    <LinkCard label="Salvesta marjakoha asukohad" icon="pin" to="/asukohad" />
   </section>
 </template>
