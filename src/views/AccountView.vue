@@ -14,7 +14,6 @@ const messages = {
   expired: 'Kood on aegunud või sisestati liiga mitu korda valesti. Küsi uus kood.',
   mail: 'Kirja saatmine ei õnnestunud. Proovi hiljem uuesti.',
   email: 'See e-posti aadress ei tundu õige.',
-  already_user: 'See inimene juba kasutab Korilust. Lisa ta grupi lehel oma gruppi.',
 }
 const say = (e) => messages[e.message] ?? 'Ei saanud ühendust. Kas internet töötab?'
 
@@ -55,6 +54,8 @@ const invite = () => run(async () => {
   note.value = `Kutse läks teele: ${friend.value}.`
   friend.value = ''
 })
+
+const answer = (action, groupId) => run(() => groupAction({ action, groupId }))
 
 const download = () => run(downloadData)
 const signOut = () => run(async () => {
@@ -132,6 +133,13 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
 
     <section class="flex flex-col gap-3">
       <h2 class="text-2xl leading-7">Grupid</h2>
+      <div v-for="i in account.invitations" :key="i.groupId" class="grain card flex flex-col gap-3">
+        <p class="text-lg">{{ i.from || 'Keegi' }} kutsus sind gruppi „{{ i.name }}”.</p>
+        <span class="flex gap-2">
+          <button type="button" class="btn bg-sage px-4 text-milk" :disabled="busy" @click="answer('accept', i.groupId)">Liitu</button>
+          <button type="button" class="btn grain px-4 text-sage" :disabled="busy" @click="answer('decline', i.groupId)">Loobu</button>
+        </span>
+      </div>
       <RouterLink
         v-for="g in account.groups"
         :key="g.id"

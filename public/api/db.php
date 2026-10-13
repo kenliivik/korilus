@@ -52,18 +52,28 @@ function app_url() {
     return rtrim(config('app_url') ?? 'https://' . ($_SERVER['SERVER_NAME'] ?? 'localhost'), '/');
 }
 
-// The user's groups with their members (and, for owners, the pending invites).
+// The user's groups with their members (and, for owners, the pending invites). Members see each other's names, not their email addresses.
 function user_groups($uid) {
     $groups = q('SELECT g.id, g.name, m.role FROM `groups` g JOIN group_members m ON m.group_id = g.id WHERE m.user_id = ? ORDER BY g.name', [$uid])->fetchAll();
     foreach ($groups as &$g) {
         $g['id'] = (int) $g['id'];
-        $g['members'] = array_map(fn($m) => ['id' => (int) $m['id']] + $m, q(
+        $g['members'] = array_map(fn($m) => ['id' => (int) $m['id'], 'email' => (int) $m['id'] === (int) $uid ? $m['email'] : ''] + $m, q(
             'SELECT u.id, u.name, u.email, m.role FROM group_members m JOIN users u ON u.id = m.user_id WHERE m.group_id = ? ORDER BY m.role DESC, u.name',
             [$g['id']])->fetchAll());
         $g['invites'] = $g['role'] === 'owner'
             ? q('SELECT email FROM invites WHERE group_id = ? ORDER BY email', [$g['id']])->fetchAll(PDO::FETCH_COLUMN) : [];
     }
     return $groups;
+}
+
+// What the app shows a logged-in user: their groups and the group invitations waiting for them to accept.
+function groups_reply($user) {
+    return [
+        'groups' => user_groups($user['id']),
+        'invitations' => array_map(fn($i) => ['groupId' => (int) $i['groupId']] + $i, q(
+            'SELECT i.group_id groupId, g.name, COALESCE(u.name, \'\') `from` FROM invites i JOIN `groups` g ON g.id = i.group_id LEFT JOIN users u ON u.id = i.invited_by
+             WHERE i.email = ? ORDER BY g.name', [$user['email']])->fetchAll()),
+    ];
 }
 
 function add_member($gid, $uid, $role = 'member') {

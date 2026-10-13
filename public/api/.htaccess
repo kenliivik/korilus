@@ -1,5 +1,9 @@
-# Only the endpoints are for browsers. The data folder, the schema and the helper and command-line scripts stay private.
-<FilesMatch "^(store|webpush|send|auth|admin-password|config\.example|db|session|mail|migrate|create-user)\.php$|\.sql$">
+# Only the endpoints are for browsers. Everything else (the data folder, the schema, the helper and command-line scripts,
+# and any new helper file) stays private, so a new endpoint has to be added to the second list.
+<FilesMatch "\.(php|sql)$">
   Require all denied
+</FilesMatch>
+<FilesMatch "^(account|admin-login|content|feedback|groups|login|push|spots|upload)\.php$">
+  Require all granted
 </FilesMatch>
 RedirectMatch 404 ^/api/data(/|$)

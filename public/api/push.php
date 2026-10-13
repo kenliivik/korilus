@@ -26,14 +26,18 @@ $reminders = array_values(array_filter(array_slice($in['reminders'] ?? [], 0, 50
 
 $subs = load_subs();
 $key = sha1($endpoint);
+// At most 10 phones per IP address, so one script can't use up the 1000 places.
+$ip = hash('sha256', $_SERVER['REMOTE_ADDR'] ?? '');
+$fromIp = count(array_filter($subs, fn($s, $k) => $k !== $key && ($s['ip'] ?? '') === $ip, ARRAY_FILTER_USE_BOTH));
 if (!$reminders) {
     unset($subs[$key]);
-} elseif (isset($subs[$key]) || count($subs) < 1000) {
+} elseif (isset($subs[$key]) || (count($subs) < 1000 && $fromIp < 10)) {
     $subs[$key] = [
         'subscription' => ['endpoint' => $endpoint, 'keys' => ['p256dh' => $sub['keys']['p256dh'], 'auth' => $sub['keys']['auth']]],
         'reminders' => array_map(fn($r) => ['id' => $r['id'], 'name' => $r['name'], 'season' => $r['season']], $reminders),
         'notify' => ['start' => !empty($in['notify']['start']), 'peak' => !empty($in['notify']['peak'])],
         'sent' => $subs[$key]['sent'] ?? [],
+        'ip' => $ip,
     ];
 }
 save_subs($subs);

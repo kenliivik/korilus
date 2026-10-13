@@ -15,6 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 require_admin();
+// JSON only: a form on another page can't send it, so a visit elsewhere can't edit content with Ken's cookie.
+if (!str_starts_with($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) { http_response_code(415); exit('{"error":"json only"}'); }
 
 function fail($error) {
     http_response_code(400);
