@@ -22,6 +22,6 @@ const goBack = () => (history.state?.back ? router.back() : router.push(props.ba
     >
       <AppIcon name="back" :size="20" />
     </button>
-    <h1 class="text-[32px] leading-9 text-sage">{{ title }}</h1>
+    <h1 class="text-[32px] leading-9 text-sage" :class="$route.meta.wide && 'lg:text-6xl lg:leading-tight'">{{ title }}</h1>
   </header>
 </template>

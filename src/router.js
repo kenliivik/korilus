@@ -18,7 +18,7 @@ export default createRouter({
   scrollBehavior: () => ({ top: 0 }),
   routes: [
     { path: '/', component: HomeView, meta: { tab: 'home', wide: true } },
-    { path: '/kalender', component: YearCalendarView, meta: { tab: 'calendar' } },
+    { path: '/kalender', component: YearCalendarView, meta: { tab: 'calendar', wide: true } },
     { path: '/mari/:id', component: ProduceView, props: true, meta: { tab: 'home' } },
     { path: '/asukohad', component: LocationsView, meta: { tab: 'locations' } },
     { path: '/asukohad/uus', component: LocationFormView, meta: { tab: 'locations' } },
