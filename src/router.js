@@ -19,7 +19,7 @@ export default createRouter({
   routes: [
     { path: '/', component: HomeView, meta: { tab: 'home', wide: true } },
     { path: '/kalender', component: YearCalendarView, meta: { tab: 'calendar', wide: true, top: true } },
-    { path: '/mari/:id', component: ProduceView, props: true, meta: { tab: 'home' } },
+    { path: '/mari/:id', component: ProduceView, props: true, meta: { tab: 'home', wide: true } },
     { path: '/asukohad', component: LocationsView, meta: { tab: 'locations', wide: true } },
     { path: '/asukohad/uus', component: LocationFormView, meta: { tab: 'locations', wide: true } },
     { path: '/asukohad/:id', component: LocationView, props: true, meta: { tab: 'locations', wide: true } },
