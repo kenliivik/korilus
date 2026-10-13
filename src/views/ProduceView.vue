@@ -51,11 +51,11 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
       </dl>
     </section>
 
-    <button type="button" class="btn order-1 lg:order-none" :class="reminded ? 'grain text-sage' : 'bg-sage text-milk'" @click="remind">
+    <button type="button" class="btn" :class="reminded ? 'grain text-sage' : 'bg-sage text-milk'" @click="remind">
       <AppIcon name="bell" :size="20" />
       {{ reminded ? 'Annan teada ✓' : 'Anna teada, kui valmib' }}
     </button>
-    <p v-if="noPush" class="order-1 italic text-muted lg:order-none">
+    <p v-if="noPush" class="italic text-muted">
       Jätsin meelde, aga see telefon ei luba teateid saata. iPhone'is lisa Korilus enne avakuvale (Jaga → Lisa avakuvale).
     </p>
     </aside>

@@ -14,6 +14,7 @@ let map
 
 onMounted(() => {
   map = createMap(el.value)
+  map.attributionControl.setPosition('bottomleft') // the phone's floating "+" sits bottom right on Asukohad
   for (const s of props.spots) {
     L.marker([s.lat, s.lng], { icon: s.shared ? sharedPin : pin, title: s.name }).addTo(map).on('click', () => props.small || router.push(`/asukohad/${s.id}`))
   }

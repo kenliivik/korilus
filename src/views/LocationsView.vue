@@ -47,9 +47,20 @@ const groupName = (l) => account.groups.find((g) => g.id === l.groupId)?.name
     <p v-if="!list.spots.length" class="italic text-muted">Sul pole veel ühtegi marjakohta salvestatud.</p>
   </section>
 
-  <RouterLink to="/asukohad/uus" class="btn bg-sage text-milk">
+  <RouterLink to="/asukohad/uus" class="btn bg-sage text-milk" :class="{ 'max-lg:hidden': !empty }">
     <AppIcon name="plus" :size="20" /> Lisa asukoht
   </RouterLink>
   </div>
   </div>
+
+  <!-- Phone with spots saved: the list pushes the button far down, so "+" floats above the menu instead,
+       at the right edge of the 430px column. -->
+  <RouterLink
+    v-if="!empty"
+    to="/asukohad/uus"
+    aria-label="Lisa asukoht"
+    class="fixed right-[max(1.25rem,calc(50vw-195px))] bottom-[calc(max(1.5rem,env(safe-area-inset-bottom))+5rem)] z-10 grid size-14 place-items-center rounded-full bg-sage text-milk shadow-neu-raised active:shadow-neu-inset lg:hidden"
+  >
+    <AppIcon name="plus" :size="26" />
+  </RouterLink>
 </template>
