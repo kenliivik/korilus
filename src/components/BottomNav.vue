@@ -44,10 +44,7 @@ const items = [
       class="flex items-center gap-4 rounded-full p-1 pr-4 text-lg text-sage"
       :class="[item.id === active ? '' : 'opacity-70 hover:opacity-100', item.id === 'settings' && 'mt-auto']"
     >
-      <span
-        class="grain flex size-11 items-center justify-center rounded-full"
-        :class="item.id === active ? 'shadow-neu-inset' : 'shadow-neu-raised-sm'"
-      >
+      <span class="flex size-11 items-center justify-center rounded-full" :class="item.id === active && 'grain shadow-neu-inset'">
         <AppIcon :name="item.icon" />
       </span>
       {{ item.label }}

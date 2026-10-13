@@ -85,6 +85,13 @@
       radial-gradient(ellipse at center, transparent 45%, rgb(184 162 115 / 0.32) 85%, rgb(184 162 115 / 0.6) 100%);
   }
 
+  /* Desktop has no status bar to meet, so the texture runs to the top edge. */
+  @media (width >= 64rem) {
+    .paper::before {
+      mask-image: none;
+    }
+  }
+
   /* Light grain on raised and inset surfaces. */
   .grain {
     background-color: var(--color-milk);
