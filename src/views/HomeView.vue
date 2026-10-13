@@ -14,7 +14,7 @@ const ripe = computed(() => inSeason()) // updates when new content arrives from
   </header>
 
   <section class="flex flex-col gap-1">
-    <h2 class="text-[32px] leading-9 text-sage">Mida praegu korjata?</h2>
+    <h2 class="text-[32px] leading-9 text-sage">Mida korjata?</h2>
     <p class="italic leading-5 text-muted">
       {{ ripe.length ? 'Need on praegu valmis:' : 'Praegu pole midagi korjata. Vaata kalendrist, mis on varsti valmimas.' }}
     </p>
