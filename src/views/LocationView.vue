@@ -5,6 +5,8 @@ import PageHeader from '../components/PageHeader.vue'
 import AppIcon from '../components/AppIcon.vue'
 import StarRating from '../components/StarRating.vue'
 import VisitFields from '../components/VisitFields.vue'
+import SpotMap from '../components/SpotMap.vue'
+import { directionsUrl } from '../components/map.js'
 import { findProduce } from '../data/berries.js'
 import { findLocation, berriesAt, averageRating, today, formatDate, touch, removeLocation } from '../data/store.js'
 import { account } from '../data/account.js'
@@ -74,6 +76,14 @@ function remove() {
         <dt class="text-muted">Käidud</dt>
         <dd>{{ loc.visits.length }} korda</dd>
       </dl>
+    </section>
+
+    <section v-if="loc.lat != null" class="flex flex-col gap-3">
+      <SpotMap :spots="[loc]" small />
+      <a :href="directionsUrl(loc)" target="_blank" rel="noopener" class="btn grain text-sage">
+        <AppIcon name="pin" :size="20" /> Juhata kohale
+      </a>
+      <p class="text-center text-base text-muted">{{ loc.lat.toFixed(5) }}, {{ loc.lng.toFixed(5) }}</p>
     </section>
 
     <template v-if="!loc.shared">

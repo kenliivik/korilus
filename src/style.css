@@ -33,7 +33,7 @@
 @theme {
   --color-milk: #fdfbf0;
   --color-sage: #465940;
-  --color-muted: #817a58;
+  --color-muted: #676246; /* darkened from #817a58 so small text passes 4.5:1 on the paper */
   --color-leaf: #6e8263;
   --color-danger: #9c3a3a; /* delete buttons and error messages */
 
@@ -93,6 +93,11 @@
     }
   }
 
+  /* Calendar "Lõpp": hatched sage, so it differs from "Algus" by pattern and not only by a faint tint. */
+  .hatch {
+    background: repeating-linear-gradient(135deg, rgb(70 89 64 / 0.6) 0 1.5px, transparent 1.5px 5px);
+  }
+
   /* Light grain on raised and inset surfaces. */
   .grain {
     background-color: var(--color-milk);
@@ -108,6 +113,6 @@
     @apply flex items-center justify-center gap-2 rounded-full px-5 py-3 text-lg leading-6 shadow-neu-raised transition-shadow active:shadow-neu-inset;
   }
   .field {
-    @apply w-full rounded-2xl bg-milk px-4 py-3 text-lg text-sage shadow-neu-inset outline-none placeholder:text-muted/70;
+    @apply w-full rounded-2xl bg-milk px-4 py-3 text-lg text-sage shadow-neu-inset outline-none placeholder:text-muted/85 focus:ring-2 focus:ring-sage/40;
   }
 }

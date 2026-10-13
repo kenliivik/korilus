@@ -45,6 +45,16 @@ export default defineConfig({
             handler: 'CacheFirst',
             options: { cacheName: 'uploads', expiration: { maxEntries: 300 } },
           },
+          {
+            // Map tiles the phone has already shown, for the forest without signal. Only what was viewed, never prefetched (OSM policy).
+            urlPattern: ({ url }) => url.origin === 'https://tile.openstreetmap.org',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'tiles',
+              expiration: { maxEntries: 3000, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
         ],
       },
     }),
