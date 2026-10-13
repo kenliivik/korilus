@@ -7,8 +7,8 @@ import { store, toggleReminder, toggleNotify } from '../data/store.js'
 import { account } from '../data/account.js'
 
 const toggles = [
-  { key: 'start', label: 'Marjad hakkavad valmima' },
-  { key: 'peak', label: 'Marjad on tipus' },
+  { key: 'start', label: 'Kui marjad hakkavad valmima' },
+  { key: 'peak', label: 'Kui käes on parim korjeaeg' },
 ]
 const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v) => v.note).length)
 </script>
@@ -19,13 +19,13 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
   <section class="flex flex-col gap-3">
     <h2 class="text-2xl leading-7">Konto</h2>
     <RouterLink to="/konto" class="grain card flex items-center justify-between gap-3 text-lg transition-shadow active:shadow-neu-inset">
-      <span class="truncate">{{ account.user ? account.user.email : 'Logi sisse või loo grupp' }}</span>
+      <span class="truncate">{{ account.user ? account.user.email : 'Logi sisse ja jaga kohti perega' }}</span>
       <AppIcon name="arrow" :size="20" />
     </RouterLink>
   </section>
 
   <section class="flex flex-col gap-3">
-    <h2 class="text-2xl leading-7">Märguanded</h2>
+    <h2 class="text-2xl leading-7">Teated</h2>
     <button
       v-for="t in toggles"
       :key="t.key"
@@ -43,32 +43,32 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
   </section>
 
   <section class="flex flex-col gap-3">
-    <h2 class="text-2xl leading-7">Aktiivsed meeldetuletused</h2>
+    <h2 class="text-2xl leading-7">Minu meeldetuletused</h2>
     <ul v-if="store.reminders.length" class="grain card flex flex-col gap-2 text-lg">
       <li v-for="id in store.reminders" :key="id" class="flex items-center justify-between">
         <RouterLink :to="`/mari/${id}`">{{ findProduce(id)?.name }}</RouterLink>
         <button type="button" class="text-base text-muted underline underline-offset-4" @click="toggleReminder(id)">Eemalda</button>
       </li>
     </ul>
-    <p v-else class="italic text-muted">Lisa meeldetuletus marja lehelt.</p>
+    <p v-else class="italic text-muted">Meeldetuletuse saad panna marja lehel.</p>
   </section>
 
   <section class="flex flex-col gap-3">
     <h2 class="text-2xl leading-7">Keel</h2>
-    <p class="grain card text-lg">Eesti ✓</p>
+    <p class="grain card text-lg">Eesti keel</p>
   </section>
 
   <section class="flex flex-col gap-3">
-    <h2 class="text-2xl leading-7">Andmed</h2>
+    <h2 class="text-2xl leading-7">Minu andmed</h2>
     <dl class="grain card grid grid-cols-[1fr_auto] gap-y-1 text-lg">
-      <dt>Asukohad</dt><dd>{{ store.locations.length }} kohta</dd>
-      <dt>Märkused</dt><dd>{{ notes }} märkust</dd>
+      <dt>Marjakohad</dt><dd>{{ store.locations.length }} kohta</dd>
+      <dt>Märkmed</dt><dd>{{ notes }} märget</dd>
     </dl>
-    <p class="text-base italic text-muted">{{ account.user ? 'Andmed on selles seadmes ja sünkroonitakse sinu kontoga.' : 'Andmed on salvestatud ainult selles seadmes.' }}</p>
+    <p class="text-base italic text-muted">{{ account.user ? 'Kõik on alles selles telefonis ja sinu kontol.' : 'Kõik on alles ainult selles telefonis.' }}</p>
   </section>
 
   <section class="flex flex-col gap-3">
-    <h2 class="text-2xl leading-7">Rakenduse kohta</h2>
+    <h2 class="text-2xl leading-7">Koriluse kohta</h2>
     <LinkCard label="Saada ettepanek või tagasiside" icon="chat" to="/tagasiside" />
     <p class="grain card text-lg">Korilus v1.0</p>
   </section>

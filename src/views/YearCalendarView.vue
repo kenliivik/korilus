@@ -12,9 +12,9 @@ const cellColor = { a: 'bg-leaf/35', t: 'bg-sage', l: 'bg-muted/35', '.': '' }
 </script>
 
 <template>
-  <PageHeader title="Aastane kalender" back="/" />
+  <PageHeader title="Korjekalender" back="/" />
 
-  <ul class="flex gap-5 text-base text-muted" aria-label="Legend">
+  <ul class="flex gap-5 text-base text-muted" aria-label="Selgitus">
     <li v-for="(label, key) in phases" :key="key" class="flex items-center gap-2">
       <span class="size-4 rounded" :class="cellColor[key]" />{{ label }}
     </li>
@@ -49,16 +49,16 @@ const cellColor = { a: 'bg-leaf/35', t: 'bg-sage', l: 'bg-muted/35', '.': '' }
     </template>
   </section>
 
-  <p class="font-hand text-lg text-muted">Puuduta marja nime, et näha detaile.</p>
+  <p class="font-hand text-lg text-muted">Puuduta marja nime, et rohkem lugeda.</p>
 
   <section class="flex flex-col gap-3">
-    <h2 class="text-2xl leading-7">Kuuvaade</h2>
+    <h2 class="text-2xl leading-7">Kuu kaupa</h2>
     <div class="grain card flex flex-col gap-3">
       <div class="flex items-center justify-between">
         <button type="button" aria-label="Eelmine kuu" class="grain grid size-9 place-items-center rounded-full shadow-neu-raised-sm" @click="step(-1)">
           <AppIcon name="back" :size="18" />
         </button>
-        <span class="text-xl">{{ months[selected] }}<span v-if="selected === now" class="font-hand text-base text-muted"> · praegu</span></span>
+        <span class="text-xl">{{ months[selected] }}<span v-if="selected === now" class="font-hand text-base text-muted"> · see kuu</span></span>
         <button type="button" aria-label="Järgmine kuu" class="grain grid size-9 place-items-center rounded-full shadow-neu-raised-sm" @click="step(1)">
           <AppIcon name="arrow" :size="18" />
         </button>
@@ -70,7 +70,7 @@ const cellColor = { a: 'bg-leaf/35', t: 'bg-sage', l: 'bg-muted/35', '.': '' }
           </RouterLink>
         </li>
       </ul>
-      <p v-else class="italic text-muted">Sel kuul pole midagi hooajal.</p>
+      <p v-else class="italic text-muted">Sel kuul pole midagi korjata.</p>
     </div>
   </section>
 </template>

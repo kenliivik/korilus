@@ -20,7 +20,7 @@ async function load(body) {
 load()
 
 const date = (s) => new Date(s * 1000).toLocaleString('et-EE', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-const remove = (f) => confirm('Kas kustutada see sõnum?') && load({ action: 'delete', id: f.id })
+const remove = (f) => confirm('Kas kustutad selle sõnumi?') && load({ action: 'delete', id: f.id })
 </script>
 
 <template>

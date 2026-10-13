@@ -4,7 +4,7 @@ import PageHeader from '../components/PageHeader.vue'
 import BerryGlyph from '../components/BerryGlyph.vue'
 import AppIcon from '../components/AppIcon.vue'
 import RecipeCard from '../components/RecipeCard.vue'
-import { findProduce, phaseIn, statusText, recipesFor } from '../data/berries.js'
+import { findProduce, phaseIn, statusText, recipesFor, dateLabel } from '../data/berries.js'
 import { store, toggleReminder } from '../data/store.js'
 
 const props = defineProps({ id: { type: String, required: true } })
@@ -33,10 +33,10 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
     </section>
 
     <section class="flex flex-col gap-3">
-      <h2 class="text-2xl leading-7">Küpsemisaeg</h2>
+      <h2 class="text-2xl leading-7">Valmimisaeg</h2>
       <dl class="grain card grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-lg">
         <template v-for="(value, label) in p.dates" :key="label">
-          <dt class="text-muted">{{ label }}</dt>
+          <dt class="text-muted">{{ dateLabel(label) }}</dt>
           <dd>{{ value }}</dd>
         </template>
         <dt class="text-muted">Praegu</dt>
@@ -45,7 +45,7 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
     </section>
 
     <section class="flex flex-col gap-3">
-      <h2 class="text-2xl leading-7">Korjamise nõuanded</h2>
+      <h2 class="text-2xl leading-7">Korjaja nõuanded</h2>
       <ul class="grain card flex list-inside list-disc flex-col gap-1 text-lg marker:text-leaf">
         <li v-for="tip in p.tips" :key="tip">{{ tip }}</li>
       </ul>
@@ -60,7 +60,7 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
     </section>
 
     <section class="flex flex-col gap-3">
-      <h2 class="text-2xl leading-7">Kus leidsid</h2>
+      <h2 class="text-2xl leading-7">Minu kohad</h2>
       <ul v-if="foundAt.length" class="grain card flex flex-col gap-2 text-lg">
         <li v-for="f in foundAt" :key="f.id">
           <RouterLink :to="`/asukohad/${f.id}`" class="flex items-center gap-2">
@@ -68,17 +68,17 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
           </RouterLink>
         </li>
       </ul>
-      <p v-else class="italic text-muted">Sa pole seda veel üheski kohas märkinud.</p>
+      <p v-else class="italic text-muted">Sul pole veel ühtegi kohta, kus see kasvab.</p>
     </section>
 
     <button type="button" class="btn" :class="reminded ? 'grain text-sage' : 'bg-sage text-milk'" @click="remind">
       <AppIcon name="bell" :size="20" />
-      {{ reminded ? 'Meeldetuletus on sees' : 'Märguanne, kui küps' }}
+      {{ reminded ? 'Annan teada ✓' : 'Anna teada, kui valmib' }}
     </button>
     <p v-if="noPush" class="italic text-muted">
-      Meeldetuletus on salvestatud, kuid see seade ei luba teavitusi. iPhone'is lisa Korilus enne avaekraanile (Jaga → Lisa avaekraanile).
+      Jätsin meelde, aga see telefon ei luba teateid saata. iPhone'is lisa Korilus enne avakuvale (Jaga → Lisa avakuvale).
     </p>
   </template>
 
-  <PageHeader v-else title="Sellist marja ei leitud" back="/" />
+  <PageHeader v-else title="Seda marja ei leitud" back="/" />
 </template>

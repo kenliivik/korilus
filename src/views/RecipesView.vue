@@ -30,9 +30,9 @@ const chip = (on) => (on ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-
 <template>
   <PageHeader title="Retseptid" back="/" />
 
-  <p class="-mt-3 italic leading-5 text-muted">Moosid, mahlad, kuivatamine ja külmutamine.</p>
+  <p class="-mt-3 italic leading-5 text-muted">Moosid, mahlad ja talvevarud.</p>
 
-  <section v-if="recipes.length" class="flex flex-col gap-3" aria-label="Filtrid">
+  <section v-if="recipes.length" class="flex flex-col gap-3" aria-label="Valikud">
     <div class="flex flex-wrap gap-2">
       <button type="button" :aria-pressed="!berry" class="rounded-full px-3 py-1.5" :class="chip(!berry)" @click="berry = ''">
         Kõik marjad
@@ -69,7 +69,7 @@ const chip = (on) => (on ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-
         :class="chip(saved)"
         @click="saved = !saved"
       >
-        meelde jäetud
+        lemmikud
       </button>
     </div>
   </section>
@@ -78,6 +78,6 @@ const chip = (on) => (on ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-
     <RecipeCard v-for="r in shown" :key="r.id" :recipe="r" />
   </section>
   <p v-else class="italic text-muted">
-    {{ recipes.length ? 'Nende valikutega retsepte ei leitud.' : 'Retsepte veel pole.' }}
+    {{ recipes.length ? 'Selliseid retsepte ei leidnud.' : 'Retsepte veel pole.' }}
   </p>
 </template>

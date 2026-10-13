@@ -34,16 +34,16 @@ switch ($in['action'] ?? '') {
             if (!$gid) reply_error('already_user', 409);
             add_member($gid, $invitee);
             send_mail($email, "$who lisas sind Koriluse gruppi „{$group}”",
-                "Tere!\n\n$who lisas sind Koriluse gruppi „{$group}”. Grupi liikmed näevad marjakohti, mida nad selle grupiga jagavad.\n\n"
-                . "Ava Korilus: " . app_url() . "/konto\n");
+                "Tere!\n\n$who lisas sind Koriluse gruppi „{$group}”. Nüüd näed marjakohti, mida grupi liikmed seal jagavad, ja saad ka ise oma kohti jagada.\n\n"
+                . "Ava Korilus: " . app_url() . "/konto\n\nHead korjamist!\n");
         } else {
             if (!q('SELECT 1 FROM invites WHERE email = ? AND group_id <=> ?', [$email, $gid ?: null])->fetchColumn()) {
                 q('INSERT INTO invites (email, group_id, invited_by, created_at) VALUES (?, ?, ?, ?)', [$email, $gid ?: null, $uid, time()]);
             }
             send_mail($email, "$who kutsus sind Korilusse",
-                "Tere!\n\n$who kutsus sind kasutama Korilust, metsamarjade hooaegade ja korjekohtade rakendust"
-                . ($group ? ", ja oma gruppi „{$group}”" : '') . ".\n\n"
-                . "Ava " . app_url() . "/konto ja logi sisse selle e-posti aadressiga ($email). Saadame sulle sisselogimiseks koodi.\n");
+                "Tere!\n\n$who kutsus sind Korilusse"
+                . ($group ? " ja oma gruppi „{$group}”" : '') . ". Korilus ütleb, millal marjad valmivad, ja hoiab meeles sinu marjakohad.\n\n"
+                . "Ava " . app_url() . "/konto ja logi sisse selle e-posti aadressiga ($email). Saadame sulle koodi, millega sisse saad.\n\nHead korjamist!\n");
         }
         break;
 

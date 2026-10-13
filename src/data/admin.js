@@ -43,6 +43,6 @@ export async function uploadImage(file) {
   form.append('file', file)
   const res = await fetch('/api/upload.php', { method: 'POST', body: form })
   if (res.status === 401) isAdmin.value = false
-  if (!res.ok) throw new Error('Pildi üleslaadimine ebaõnnestus')
+  if (!res.ok) throw new Error('Pildi üleslaadimine ei õnnestunud')
   return (await res.json()).url
 }

@@ -17,7 +17,7 @@ loadContent()
 async function submit() {
   const r = await login(password.value)
   hash.value = r.hash ?? ''
-  message.value = r.admin ? '' : { 'wrong password': 'Vale parool.', 'too many attempts': 'Liiga palju katseid, proovi 15 minuti pärast.' }[r.error] ?? ''
+  message.value = r.admin ? '' : { 'wrong password': 'Vale parool.', 'too many attempts': 'Liiga palju katseid. Proovi 15 minuti pärast uuesti.' }[r.error] ?? ''
   password.value = ''
 }
 
@@ -27,7 +27,7 @@ async function save(body) {
     await saveContent(body)
   } catch (e) {
     if (e.status === 401) isAdmin.value = false
-    message.value = `Salvestamine ebaõnnestus (${e.message}).`
+    message.value = `Salvestamine ei õnnestunud (${e.message}).`
   }
 }
 
@@ -57,7 +57,7 @@ function drop() {
 <template>
   <PageHeader title="Haldus" back="/seaded" />
 
-  <p v-if="isAdmin === null" class="italic text-muted">Laen…</p>
+  <p v-if="isAdmin === null" class="italic text-muted">Laadin…</p>
 
   <form v-else-if="!isAdmin" class="flex flex-col gap-4" @submit.prevent="submit">
     <label class="flex flex-col gap-2">
@@ -78,7 +78,7 @@ function drop() {
   <template v-else>
     <section class="flex flex-col gap-3">
       <h2 class="text-2xl leading-7">Marjad</h2>
-      <p class="font-hand text-lg text-muted">Lohista ⠿, et järjekorda muuta.</p>
+      <p class="font-hand text-lg text-muted">Järjekorra muutmiseks lohista ⠿.</p>
       <ul ref="rows" class="flex flex-col gap-2">
         <li
           v-for="b in list"
