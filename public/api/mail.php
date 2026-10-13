@@ -1,8 +1,8 @@
 <?php
-// Sends a plain-text email through the mailbox in config 'smtp' (STARTTLS + AUTH LOGIN), or PHP mail() without one. Not served.
+// Sends a plain-text email (with an optional Reply-To) through the mailbox in config 'smtp' (STARTTLS + AUTH LOGIN), or PHP mail() without one. Not served.
 require_once __DIR__ . '/db.php';
 
-function send_mail($to, $subject, $text) {
+function send_mail($to, $subject, $text, $replyTo = null) {
     $c = config('smtp') ?? [];
     $from = $c['from'] ?? $c['user'] ?? 'korilus@' . ($_SERVER['SERVER_NAME'] ?? 'localhost');
     $subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
@@ -15,6 +15,7 @@ function send_mail($to, $subject, $text) {
         'Content-Type' => 'text/plain; charset=UTF-8',
         'Content-Transfer-Encoding' => 'quoted-printable',
     ];
+    if ($replyTo) $headers['Reply-To'] = "<$replyTo>";
     if (!empty($c['host'])) {
         try {
             smtp_send($c, $from, $to, $subject, $headers, $body);

@@ -40,9 +40,9 @@ if ($action === 'code') {
         [$email, $allowed ? $hash($email, $code) : '-', $ip, time(), $allowed ? time() + CODE_MINUTES * 60 : 0]);
     if (!$allowed) reply_error('not_invited', 403);
 
-    $sent = send_mail($email, "Korilus: sinu kood on $code",
-        "Tere!\n\nSinu Koriluse sisselogimise kood on:\n\n    $code\n\nKood kehtib " . CODE_MINUTES . " minutit. "
-        . "Kui sa ei proovinud sisse logida, võid selle kirja lihtsalt kustutada.\n\nKorilus\n" . app_url() . "\n");
+    $sent = send_mail($email, "Sinu Koriluse kood: $code",
+        "Tere!\n\nSinu kood Korilusse sisselogimiseks:\n\n    $code\n\nKood kehtib " . CODE_MINUTES . " minutit. "
+        . "Kui sa ise sisse ei loginud, võid selle kirja kustutada.\n\nHead korjamist!\nKorilus\n" . app_url() . "\n");
     $sent ? reply(['ok' => true]) : reply_error('mail', 502);
 }
 

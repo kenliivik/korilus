@@ -13,7 +13,7 @@ const toggle = (id) =>
 
 <template>
   <fieldset class="flex flex-col gap-2">
-    <legend class="mb-2 text-xl">Marjad, mida leidsid</legend>
+    <legend class="mb-2 text-xl">Mida leidsid?</legend>
     <div class="flex flex-wrap gap-2">
       <button
         v-for="p in produce"
@@ -30,12 +30,12 @@ const toggle = (id) =>
   </fieldset>
 
   <label class="flex flex-col gap-2">
-    <span class="text-xl">Märkused</span>
+    <span class="text-xl">Märkmed</span>
     <textarea v-model="visit.note" rows="3" class="field" placeholder='nt. "Palju marju, hommikul parim"' />
   </label>
 
   <div class="flex flex-col gap-2">
-    <span class="text-xl">Koha kvaliteet</span>
+    <span class="text-xl">Kui hea koht?</span>
     <StarRating v-model="visit.rating" :size="30" />
   </div>
 </template>

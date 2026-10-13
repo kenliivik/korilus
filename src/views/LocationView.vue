@@ -28,7 +28,7 @@ function addVisit() {
 }
 
 function remove() {
-  if (!confirm(`Kas kustutada „${loc.value.name}” koos kõigi märkustega?`)) return
+  if (!confirm(`Kas kustutad „${loc.value.name}” koos kõigi märkmetega?`)) return
   removeLocation(loc.value)
   router.replace('/asukohad')
 }
@@ -37,23 +37,23 @@ function remove() {
 <template>
   <template v-if="loc">
     <PageHeader :title="loc.name" back="/asukohad" />
-    <p v-if="loc.shared" class="font-hand text-xl text-muted">Jagab {{ loc.owner }}{{ groupName ? ` grupis „${groupName}”` : '' }}</p>
-    <p v-else-if="groupName" class="font-hand text-xl text-muted">Jagatud grupiga „{{ groupName }}”</p>
+    <p v-if="loc.shared" class="font-hand text-xl text-muted">{{ loc.owner }} jagas seda{{ groupName ? ` grupis „${groupName}”` : '' }}</p>
+    <p v-else-if="groupName" class="font-hand text-xl text-muted">Näevad ka grupi „{{ groupName }}” liikmed</p>
 
     <section class="flex flex-col gap-3">
-      <h2 class="text-2xl leading-7">Asukoha info</h2>
+      <h2 class="text-2xl leading-7">Ülevaade</h2>
       <dl class="grain card grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-1 text-lg">
         <dt class="text-muted">Marjad</dt>
         <dd>{{ names(berriesAt(loc)) || '–' }}</dd>
-        <dt class="text-muted">Kvaliteet</dt>
+        <dt class="text-muted">Hinne</dt>
         <dd><StarRating :model-value="averageRating(loc)" readonly /></dd>
-        <dt class="text-muted">Külastatud</dt>
+        <dt class="text-muted">Käidud</dt>
         <dd>{{ loc.visits.length }} korda</dd>
       </dl>
     </section>
 
     <section class="flex flex-col gap-3">
-      <h2 class="text-2xl leading-7">Külastuste ajalugu</h2>
+      <h2 class="text-2xl leading-7">Varasemad käigud</h2>
       <template v-for="[year, visits] in years" :key="year">
         <h3 class="font-hand text-xl text-muted">{{ year }}</h3>
         <article v-for="(v, i) in visits" :key="i" class="grain card flex flex-col gap-1">
@@ -66,13 +66,13 @@ function remove() {
 
     <template v-if="!loc.shared">
       <form v-if="draft" class="grain card flex flex-col gap-4" @submit.prevent="addVisit">
-        <h2 class="text-2xl leading-7">Tänane külastus</h2>
+        <h2 class="text-2xl leading-7">Tänane käik</h2>
         <VisitFields v-model="draft" />
-        <button type="submit" class="btn bg-sage text-milk">Salvesta märkus</button>
+        <button type="submit" class="btn bg-sage text-milk">Salvesta</button>
         <button type="button" class="btn grain text-sage" @click="draft = null">Tühista</button>
       </form>
       <button v-else type="button" class="btn bg-sage text-milk" @click="draft = { berries: [], note: '', rating: 0 }">
-        <AppIcon name="plus" :size="20" /> Lisa märkus tänasel külastusel
+        <AppIcon name="plus" :size="20" /> Pane tänane käik kirja
       </button>
 
       <div class="grid grid-cols-2 gap-4">
@@ -82,5 +82,5 @@ function remove() {
     </template>
   </template>
 
-  <PageHeader v-else title="Asukohta ei leitud" back="/asukohad" />
+  <PageHeader v-else title="Seda kohta ei leitud" back="/asukohad" />
 </template>

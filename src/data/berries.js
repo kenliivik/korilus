@@ -14,7 +14,7 @@ export const bundled = [
     latin: 'Fragaria vesca',
     season: '.....at.....',
     dates: { Algus: 'jaanipäev', Tipp: 'juuli algus', Lõpp: 'juuli lõpp' },
-    tips: ['Otsi raiesmikelt, lagendikelt ja metsaservadest', 'Pärast jaanipäeva leiad neid peamiselt tuttavatest kohtadest'],
+    tips: ['Otsi raiesmikelt, lagendikelt ja metsaservadest', 'Pärast jaanipäeva tasub minna oma vanadesse headesse kohtadesse'],
   },
   {
     id: 'vaarikas',
@@ -22,7 +22,7 @@ export const bundled = [
     latin: 'Rubus idaeus',
     season: '......tl....',
     dates: { Algus: 'juuli', Lõpp: 'augusti lõpp' },
-    tips: ['Parimad paigad on 3–4 aasta vanused raiesmikud'],
+    tips: ['Kõige rohkem marju on 3–4 aastat vanadel raiesmikel'],
   },
   {
     id: 'mustikas',
@@ -32,8 +32,8 @@ export const bundled = [
     dates: { Algus: '15. juuli', Tipp: '28. juuli – 10. august', Lõpp: '20. august' },
     tips: [
       'Otsi metsaservadest',
-      'Korja täiesti siniseid marju',
-      'Parim aeg on hommikul',
+      'Korja ainult läbinisti siniseid marju',
+      'Kõige parem on korjata hommikul',
       'Magusamad marjad on kuivades männikutes, suuremad rabaservadel ja kuusikutes',
     ],
   },
@@ -43,7 +43,7 @@ export const bundled = [
     latin: 'Rubus chamaemorus',
     season: '......tl....',
     dates: { Algus: 'juuli', Lõpp: 'augusti esimene pool' },
-    tips: ['Küps mari on meekollane, mitte punane', 'Igal varrel on üks mari, seega varu kannatust'],
+    tips: ['Valmis mari on meekollane ja pehme, punane on alles toores', 'Igal taimel on vaid üks mari, nii et varu kannatust'],
   },
   {
     id: 'pohl',
@@ -61,7 +61,7 @@ export const bundled = [
     dates: { Algus: 'septembri keskpaik', Tipp: 'pärast esimesi öökülmi', Lõpp: 'oktoober' },
     tips: [
       'Parim aeg on pärast esimesi öökülmi',
-      'Ära korja liiga vara: järelvalminud marjad on vähem maitsvad',
+      'Ära korja liiga vara, sest kodus järelvalminud marjad pole nii maitsvad',
       'Öökülma näinud marjad on magusamad, kuid säilivad halvemini',
     ],
   },
@@ -72,9 +72,9 @@ export const bundled = [
     season: '...atl......',
     dates: { Algus: 'aprill', Lõpp: '24. juuni (jaanipäev)' },
     tips: [
-      'Vali tugevad läikivad varred ilma pruunide laikudeta',
-      'Ära korja pärast jaanipäeva, siis on vartes palju oblikhapet',
-      'Lehed ei sobi söögiks',
+      'Vali tugevad läikivad varred, millel pole pruune laike',
+      'Pärast jaanipäeva enam ei korjata, siis on vartes liiga palju oblikhapet',
+      'Lehti ära söö, need on mürgised',
     ],
   },
   {
@@ -83,7 +83,7 @@ export const bundled = [
     latin: 'Malus domestica',
     season: '.......atl..',
     dates: { Algus: 'augusti teine pool (suveõunad)', Lõpp: 'hilissügis (talveõunad)' },
-    tips: ['Küps õun tuleb oksast kergelt lahti, ilma tõmbamata', "Suveõuna (nt 'Valge klaar') koor muutub rohelisest kollakasvalgeks"],
+    tips: ['Küps õun tuleb oksast kergelt lahti, ilma tõmbamata', 'Suveõuna (näiteks valge klaari) koor muutub valmides rohelisest kollakasvalgeks'],
   },
   {
     id: 'kirss',
@@ -101,9 +101,9 @@ export const bundled = [
     dates: { Algus: 'juuli lõpp', Tipp: 'august', Lõpp: 'september' },
     tips: [
       'Otsi lubjarikkalt pinnaselt metsaservadest, raiesmikelt, teeservadest ja põlluäärtest, peamiselt Põhja- ja Lääne-Eestis',
-      'Küps mari on peaaegu must, sinakashalli kirmega ja tuleb kergelt lahti',
-      'Korja käsitsi ja ettevaatlikult, sest küpsed marjad purunevad kergesti',
-      'Marjad ei säili kaua, seega korja iga päev ja tarvita kiiresti',
+      'Valmis mari on peaaegu must, sinakashalli kirmega ja tuleb kergesti lahti',
+      'Korja hellalt, sest valmis marjad lähevad kergesti katki',
+      'Marjad ei säili kaua, nii et korja tihti ja söö või keeda kohe ära',
     ],
   },
   {
@@ -113,9 +113,9 @@ export const bundled = [
     season: '......tl....',
     dates: { Algus: 'juuli (varased sordid juuni lõpus)', Tipp: 'juuli', Lõpp: 'august' },
     tips: [
-      'Küps mari on must ja läikiv',
-      'Võid korjata üksikmarju või terveid kobaraid',
-      'Õrna koorega sorte korja valmimise alguses, mõni sort pudeneb küpsena',
+      'Valmis mari on must ja läikiv',
+      'Korja kas marja kaupa või terve kobar korraga',
+      'Õrna koorega sorte korja kohe valmimise alguses, sest mõni sort pudeneb valmides maha',
       'Külmuta kohe pärast korjamist, nii jääb alles kõige rohkem vitamiine',
     ],
   },
@@ -178,7 +178,9 @@ export async function saveContent(body) {
 
 export const recipesFor = (berryId) => recipes.filter((r) => r.berries?.includes(berryId))
 
-export const phases = { a: 'Algus', t: 'Tipp', l: 'Lõpp' }
+export const phases = { a: 'Algus', t: 'Parim aeg', l: 'Lõpp' }
+// The dates are stored under Algus/Tipp/Lõpp (api/content.php); this is how a key is shown.
+export const dateLabel = (key) => (key === 'Tipp' ? phases.t : key)
 export const statusText = { a: 'hakkab valmima', t: 'küps!', l: 'hooaja lõpp', '.': 'pole hooaeg' }
 
 export const months = Array.from({ length: 12 }, (_, i) =>

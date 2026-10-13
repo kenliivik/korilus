@@ -27,7 +27,7 @@ const saved = computed(() => store.savedRecipes.includes(props.id))
         <dd>{{ r.time }}</dd>
       </template>
       <template v-if="r.yield">
-        <dt class="text-muted">Saagis</dt>
+        <dt class="text-muted">Kogus</dt>
         <dd>{{ r.yield }}</dd>
       </template>
     </dl>
@@ -65,7 +65,7 @@ const saved = computed(() => store.savedRecipes.includes(props.id))
     </section>
 
     <section v-if="r.tip" class="grain card flex flex-col gap-1">
-      <h2 class="font-hand text-xl text-muted">Nõuanne</h2>
+      <h2 class="font-hand text-xl text-muted">Hea nõu</h2>
       <p class="text-lg italic">{{ r.tip }}</p>
     </section>
 
@@ -76,7 +76,7 @@ const saved = computed(() => store.savedRecipes.includes(props.id))
       :aria-pressed="saved"
       @click="toggleSavedRecipe(r.id)"
     >
-      {{ saved ? 'Meelde jäetud ✓' : 'Pane meelde' }}
+      {{ saved ? 'Lemmikutes ✓' : 'Lisa lemmikuks' }}
     </button>
   </template>
 

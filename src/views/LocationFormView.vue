@@ -21,16 +21,16 @@ const gps = ref('')
 
 // auto: the lookup when the form opens, which mustn't overwrite a spot already tapped on the map.
 function locate(auto) {
-  gps.value = 'Otsin asukohta…'
+  gps.value = 'Otsin, kus sa oled…'
   navigator.geolocation?.getCurrentPosition(
     ({ coords: c }) => {
       if (auto && coords.value) return (gps.value = '')
       coords.value = { lat: c.latitude, lng: c.longitude }
-      gps.value = 'Praegune asukoht on kaardil märgitud.'
+      gps.value = 'Sinu praegune koht on kaardil.'
     },
-    () => (gps.value = 'Asukohta ei õnnestunud leida. Puuduta kaarti, et koht märkida.'),
+    () => (gps.value = 'Asukohta ei leidnud. Puuduta kaarti, et koht märkida.'),
     { enableHighAccuracy: true },
-  ) ?? (gps.value = 'See seade ei toeta asukoha leidmist.')
+  ) ?? (gps.value = 'See telefon ei oska asukohta leida.')
 }
 if (!existing) locate(true)
 
@@ -64,8 +64,8 @@ function save() {
     <label v-if="account.user && account.groups.length" class="flex flex-col gap-2">
       <span class="text-xl">Jaga</span>
       <select v-model="groupId" class="field">
-        <option :value="null">Privaatne (ainult mina)</option>
-        <option v-for="g in account.groups" :key="g.id" :value="g.id">Grupiga „{{ g.name }}”</option>
+        <option :value="null">Ainult mina</option>
+        <option v-for="g in account.groups" :key="g.id" :value="g.id">Mina ja grupp „{{ g.name }}”</option>
       </select>
     </label>
 
