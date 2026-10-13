@@ -42,7 +42,7 @@ const groupName = (l) => account.groups.find((g) => g.id === l.groupId)?.name
       <span v-if="l.shared" class="font-hand text-lg text-muted">{{ l.owner }}{{ groupName(l) ? ` · ${groupName(l)}` : '' }}</span>
       <span v-else-if="groupName(l)" class="font-hand text-lg text-muted">Jagatud: {{ groupName(l) }}</span>
       <span class="text-muted">Marjad: {{ berriesAt(l).map((id) => findProduce(id)?.name).join(', ') || '–' }}</span>
-      <span class="flex items-center gap-2 text-muted">Viimati käidud: {{ l.visits[0]?.date }} <StarRating :model-value="averageRating(l)" readonly :size="14" /></span>
+      <span v-if="l.visits.length" class="flex items-center gap-2 text-muted">Viimati käidud: {{ l.visits[0]?.date }} <StarRating :model-value="averageRating(l)" readonly :size="14" /></span>
     </RouterLink>
     <p v-if="!list.spots.length" class="italic text-muted">Sul pole veel ühtegi marjakohta salvestatud.</p>
   </section>

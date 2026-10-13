@@ -28,7 +28,7 @@ export const findLocation = (id) => store.locations.find((l) => l.id === id) ?? 
 export const berriesAt = (loc) => [...new Set(loc.visits.flatMap((v) => v.berries))]
 export const averageRating = (loc) =>
   Math.round(loc.visits.reduce((sum, v) => sum + v.rating, 0) / (loc.visits.length || 1))
-export const today = () => new Date().toISOString().slice(0, 10)
+export const today = () => new Date().toLocaleDateString('sv-SE') // YYYY-MM-DD in local time (toISOString would give yesterday after midnight)
 
 // Call after changing a spot, so it gets synced. Returns the spot.
 export function touch(loc) {

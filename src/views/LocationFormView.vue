@@ -16,7 +16,7 @@ const existing = props.id && store.locations.find((l) => l.id === props.id) // o
 const name = ref(existing?.name ?? '')
 const coords = ref(existing?.lat != null ? { lat: existing.lat, lng: existing.lng } : null)
 const groupId = ref(existing?.groupId ?? null) // null = private
-const visit = ref({ berries: [], note: '', rating: 0 })
+const visit = ref({ date: today(), berries: [], note: '', rating: 0 })
 const gps = ref('')
 
 // auto: the lookup when the form opens, which mustn't overwrite a spot already tapped on the map.
@@ -34,7 +34,10 @@ function locate(auto) {
 }
 if (!existing) locate(true)
 
+// A spot without a place never shows on the map, so it needs one before saving.
+const noPlace = ref(false)
 function save() {
+  if (!coords.value) return (noPlace.value = true)
   if (existing) {
     touch(Object.assign(existing, { name: name.value.trim(), ...coords.value, groupId: groupId.value }))
     return router.replace(`/asukohad/${existing.id}`)
@@ -44,7 +47,7 @@ function save() {
     name: name.value.trim(),
     ...coords.value,
     groupId: groupId.value,
-    visits: [{ date: today(), ...visit.value }],
+    visits: [visit.value],
   }))
   router.replace('/asukohad')
 }
@@ -71,6 +74,9 @@ function save() {
       </select>
     </label>
 
+    <p v-if="noPlace && !coords" role="alert" class="order-1 text-lg text-[#9c3a3a] lg:order-none">
+      Märgi koht kaardile: puuduta kaarti või vajuta „Kasuta praegust asukohta”.
+    </p>
     <button type="submit" class="btn order-1 bg-sage text-milk lg:order-none">Salvesta</button>
     <button type="button" class="btn order-1 grain text-sage lg:order-none" @click="router.back()">Tühista</button>
     </div>
