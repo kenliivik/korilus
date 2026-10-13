@@ -16,8 +16,8 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
 <template>
   <h1 class="text-[32px] leading-9 lg:text-6xl lg:leading-tight">Seaded</h1>
 
-  <!-- Desktop: the sections sit in two columns. On phones the wrapper dissolves. -->
-  <div class="contents lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-10 lg:gap-y-10">
+  <!-- Desktop: one stacked column at a readable width (like a document), with more room between sections. -->
+  <div class="contents lg:flex lg:max-w-3xl lg:flex-col lg:gap-12">
 
   <section class="flex flex-col gap-3">
     <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Konto</h2>
