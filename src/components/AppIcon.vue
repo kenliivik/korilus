@@ -21,6 +21,9 @@ defineProps({
     <template v-if="name === 'home'">
       <path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /><path d="M10 21v-6h4v6" />
     </template>
+    <template v-else-if="name === 'chat'">
+      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-5 4v-4.2A2.5 2.5 0 0 1 4 13.5Z" /><path d="M8 8h8M8 11.5h5" />
+    </template>
     <template v-else-if="name === 'pin'">
       <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
     </template>

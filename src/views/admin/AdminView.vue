@@ -113,6 +113,11 @@ function drop() {
       <LinkCard label="Halda retsepte" icon="edit" to="/admin/retseptid" />
     </section>
 
+    <section class="flex flex-col gap-3">
+      <h2 class="text-2xl leading-7">Tagasiside</h2>
+      <LinkCard label="Loe tagasisidet" icon="chat" to="/admin/tagasiside" />
+    </section>
+
     <button type="button" class="btn grain text-sage" @click="logout">Logi välja</button>
   </template>
 </template>

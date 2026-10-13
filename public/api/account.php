@@ -32,6 +32,7 @@ switch ($in['action'] ?? '') {
         q('DELETE FROM spots WHERE user_id = ?', [$uid]);
         q('DELETE FROM invites WHERE invited_by = ? OR email = ?', [$uid, $user['email']]);
         q('DELETE FROM login_codes WHERE email = ?', [$user['email']]);
+        q('DELETE FROM feedback WHERE user_id = ?', [$uid]);
         q('DELETE FROM sessions WHERE user_id = ?', [$uid]);
         q('DELETE FROM users WHERE id = ?', [$uid]);
         db()->commit();

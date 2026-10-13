@@ -82,4 +82,11 @@ It runs on the same Veebimajutus server with PHP and MariaDB, no other services.
 5. Open the app → Seaded → Konto, log in with the code from the email, create a group and invite people by email.
    Invited people can then log in with their own address.
 
+## Feedback
+
+Seaded → "Saada ettepanek või tagasiside" sends a message (with an optional email) to `api/feedback.php`, which keeps it
+in the `feedback` table and emails a copy to every admin account (or to `'feedback_to'` in config.php). Read and tick
+them off in `/admin` → Tagasiside. It works without login; a hidden honeypot field and a limit of 5 an hour per IP
+(50 a day in all) keep spam out. After updating, run Actions → Server setup once to add the table.
+
 Helper scripts, `schema.sql` and `api/data/` are blocked from the web in `public/api/.htaccess`.
