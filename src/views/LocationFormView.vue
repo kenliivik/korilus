@@ -53,7 +53,9 @@ function save() {
 <template>
   <PageHeader :title="existing ? 'Muuda asukohta' : 'Lisa asukoht'" back="/asukohad" />
 
-  <form class="flex flex-col gap-5" @submit.prevent="save">
+  <!-- Desktop: fields on the left, a big map on the right. On phones the wrapper dissolves and the buttons (order-1) stay last. -->
+  <form class="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-10" @submit.prevent="save">
+    <div class="contents lg:flex lg:flex-col lg:gap-5">
     <label class="flex flex-col gap-2">
       <span class="text-xl">Koha nimi</span>
       <input v-model="name" required class="field" placeholder='nt. "Vana metsa pool"' />
@@ -69,6 +71,10 @@ function save() {
       </select>
     </label>
 
+    <button type="submit" class="btn order-1 bg-sage text-milk lg:order-none">Salvesta</button>
+    <button type="button" class="btn order-1 grain text-sage lg:order-none" @click="router.back()">Tühista</button>
+    </div>
+
     <section class="flex flex-col gap-2">
       <span class="text-xl">Asukoht</span>
       <PickMap v-model="coords" />
@@ -78,8 +84,5 @@ function save() {
         <span class="flex-1">{{ gps || 'Kasuta praegust asukohta' }}</span>
       </button>
     </section>
-
-    <button type="submit" class="btn bg-sage text-milk">Salvesta</button>
-    <button type="button" class="btn grain text-sage" @click="router.back()">Tühista</button>
   </form>
 </template>
