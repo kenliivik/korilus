@@ -17,6 +17,10 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github
+
       - name: Run migrate.php and create-user.php over SSH
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
@@ -33,4 +37,4 @@ jobs:
             [[ "$NAME" =~ ^[[:alnum:]\ äöüõšžÄÖÜÕŠŽ.-]{0,60}$ ]] || { echo "::error::Use only letters, spaces, dots and dashes in the name"; exit 1; }
             cmd="$cmd && php ~/htdocs/korilus/api/create-user.php '$EMAIL' --admin '--name=$NAME'"
           fi
-          ssh -i ~/key -p 1022 -o BatchMode=yes -o StrictHostKeyChecking=accept-new "$SSH_USER@$SSH_HOST" "$cmd"
+          ssh -i ~/key -p 1022 -o BatchMode=yes -o HostKeyAlias=deploy -o UserKnownHostsFile="$PWD/.github/known_hosts" -o StrictHostKeyChecking=yes "$SSH_USER@$SSH_HOST" "$cmd"

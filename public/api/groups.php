@@ -1,6 +1,7 @@
 <?php
-// GET: the user's groups. POST, each answered with the user's groups:
+// GET: the user's groups and invitations. POST, each answered with the same:
 //   {action: "create", name} | {action: "invite", email, groupId?} (no groupId = invite to the app only)
+//   {action: "accept", groupId} | {action: "decline", groupId} (an invitation to the user)
 //   {action: "uninvite", groupId, email} | {action: "remove", groupId, userId} | {action: "leave", groupId} | {action: "delete", groupId}
 require __DIR__ . '/session.php';
 require __DIR__ . '/mail.php';
@@ -24,27 +25,30 @@ switch ($in['action'] ?? '') {
         break;
 
     case 'invite':
+        // Nobody joins a group without accepting, and the answer is the same whether or not the address already has an account.
         $email = clean_email($in['email'] ?? '') ?? reply_error('email');
         if ($gid) $ownerOnly();
         if (q('SELECT COUNT(*) FROM invites WHERE invited_by = ? AND created_at > ?', [$uid, time() - 86400])->fetchColumn() >= 20) reply_error('too_many', 429);
         $group = $gid ? q('SELECT name FROM `groups` WHERE id = ?', [$gid])->fetchColumn() : null;
         $who = $user['name'] ?: $user['email'];
         $invitee = q('SELECT id FROM users WHERE email = ?', [$email])->fetchColumn();
-        if ($invitee) {
-            if (!$gid) reply_error('already_user', 409);
-            add_member($gid, $invitee);
-            send_mail($email, "$who lisas sind Koriluse gruppi „{$group}”",
-                "Tere!\n\n$who lisas sind Koriluse gruppi „{$group}”. Nüüd näed marjakohti, mida grupi liikmed seal jagavad, ja saad ka ise oma kohti jagada.\n\n"
-                . "Ava Korilus: " . app_url() . "/konto\n\nHead korjamist!\n");
-        } else {
-            if (!q('SELECT 1 FROM invites WHERE email = ? AND group_id <=> ?', [$email, $gid ?: null])->fetchColumn()) {
-                q('INSERT INTO invites (email, group_id, invited_by, created_at) VALUES (?, ?, ?, ?)', [$email, $gid ?: null, $uid, time()]);
-            }
-            send_mail($email, "$who kutsus sind Korilusse",
-                "Tere!\n\n$who kutsus sind Korilusse"
+        if (($invitee && !$gid) || ($invitee && q('SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ?', [$gid, $invitee])->fetchColumn())) break;
+        if (!q('SELECT 1 FROM invites WHERE email = ? AND group_id <=> ?', [$email, $gid ?: null])->fetchColumn()) {
+            q('INSERT INTO invites (email, group_id, invited_by, created_at) VALUES (?, ?, ?, ?)', [$email, $gid ?: null, $uid, time()]);
+        }
+        send_mail($email, $invitee ? "$who kutsus sind Koriluse gruppi „{$group}”" : "$who kutsus sind Korilusse", $invitee
+            ? "Tere!\n\n$who kutsus sind Koriluse gruppi „{$group}”. Kui kutse vastu võtad, näed marjakohti, mida grupi liikmed seal jagavad, ja saad ka ise oma kohti jagada.\n\n"
+                . "Kutse vastuvõtmiseks ava Korilus: " . app_url() . "/konto\n\nHead korjamist!\n"
+            : "Tere!\n\n$who kutsus sind Korilusse"
                 . ($group ? " ja oma gruppi „{$group}”" : '') . ". Korilus ütleb, millal marjad valmivad, ja hoiab meeles sinu marjakohad.\n\n"
                 . "Ava " . app_url() . "/konto ja logi sisse selle e-posti aadressiga ($email). Saadame sulle koodi, millega sisse saad.\n\nHead korjamist!\n");
-        }
+        break;
+
+    case 'accept':
+        if (q('SELECT 1 FROM invites WHERE email = ? AND group_id = ?', [$user['email'], $gid])->fetchColumn()) add_member($gid, $uid);
+        // fall through: the invitation is used up either way
+    case 'decline':
+        q('DELETE FROM invites WHERE email = ? AND group_id = ?', [$user['email'], $gid]);
         break;
 
     case 'uninvite':
@@ -72,4 +76,4 @@ switch ($in['action'] ?? '') {
         reply_error('action');
 }
 
-reply(['groups' => user_groups($uid)]);
+reply(groups_reply($user));

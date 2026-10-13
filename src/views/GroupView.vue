@@ -70,7 +70,7 @@ const remove = () => confirm(`Kas kustutad grupi „${group.value.name}”? Kõi
         <li v-for="m in group.members" :key="m.id" class="flex items-center justify-between gap-3">
           <span class="flex min-w-0 flex-col">
             <span>{{ m.name }}<span v-if="m.role === 'owner'" class="font-hand text-muted"> · looja</span></span>
-            <span class="truncate text-base text-muted">{{ m.email }}</span>
+            <span v-if="m.email" class="truncate text-base text-muted">{{ m.email }}</span>
           </span>
           <button
             v-if="owner && m.id !== account.user.id"

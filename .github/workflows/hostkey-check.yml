@@ -1,0 +1,20 @@
+# Temporary: checks that SSH with the pinned host key works. Removed in the next commit.
+name: Host key check
+on:
+  push:
+    branches: [claude/security-fixes]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github
+      - env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          install -m 600 /dev/null ~/key
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/key
+          ssh -i ~/key -p 1022 -o BatchMode=yes -o HostKeyAlias=deploy -o UserKnownHostsFile="$PWD/.github/known_hosts" -o StrictHostKeyChecking=yes "$SSH_USER@$SSH_HOST" true && echo PINNED_OK

@@ -13,7 +13,7 @@ $hash = fn($email, $code) => hash('sha256', "$email:$code");
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $user = current_user();
-    reply(['user' => $user ? public_user($user) : null, 'groups' => $user ? user_groups($user['id']) : []]);
+    reply(['user' => $user ? public_user($user) : null] + ($user ? groups_reply($user) : ['groups' => [], 'invitations' => []]));
 }
 
 if ($action === 'logout') {
@@ -62,12 +62,10 @@ if ($action === 'verify') {
         q('INSERT INTO users (email, name, created_at) VALUES (?, ?, ?)', [$email, mb_substr(strstr($email, '@', true), 0, 60), time()]);
         $user = q('SELECT * FROM users WHERE email = ?', [$email])->fetch();
     }
-    foreach (q('SELECT DISTINCT group_id FROM invites WHERE email = ? AND group_id IS NOT NULL', [$email])->fetchAll(PDO::FETCH_COLUMN) as $gid) {
-        add_member($gid, $user['id']);
-    }
-    q('DELETE FROM invites WHERE email = ?', [$email]);
+    // Invites to the app are used up; group invites wait until the person accepts them in the app.
+    q('DELETE FROM invites WHERE email = ? AND group_id IS NULL', [$email]);
     start_session($user['id']);
-    reply(['user' => public_user($user), 'groups' => user_groups($user['id'])]);
+    reply(['user' => public_user($user)] + groups_reply($user));
 }
 
 reply_error('action');
