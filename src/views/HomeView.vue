@@ -8,8 +8,8 @@ const ripe = computed(() => inSeason()) // updates when new content arrives from
 </script>
 
 <template>
-  <header class="flex items-center justify-between">
-    <h1 class="font-serif-sc text-[32px] leading-none tracking-wide text-sage lg:text-5xl">Korilus</h1>
+  <header class="flex items-center justify-between lg:justify-end">
+    <h1 class="font-serif-sc text-[32px] leading-none tracking-wide text-sage lg:hidden">Korilus</h1>
     <span class="font-hand text-lg text-muted lg:text-3xl">{{ month }}</span>
   </header>
 
