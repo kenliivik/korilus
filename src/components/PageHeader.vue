@@ -12,16 +12,18 @@ const goBack = () => (history.state?.back ? router.back() : router.push(props.ba
 </script>
 
 <template>
+  <!-- On desktop pages (wide) the sidebar does the navigating, so the back button goes. -->
   <header class="flex items-center gap-4">
     <button
       v-if="back"
       type="button"
       aria-label="Tagasi"
       class="grain grid size-11 shrink-0 place-items-center rounded-full text-sage shadow-neu-raised-sm active:shadow-neu-inset"
+      :class="$route.meta.wide && 'lg:hidden'"
       @click="goBack"
     >
       <AppIcon name="back" :size="20" />
     </button>
-    <h1 class="text-[32px] leading-9 text-sage">{{ title }}</h1>
+    <h1 class="text-[32px] leading-9 text-sage" :class="$route.meta.wide && 'lg:text-6xl lg:leading-tight'">{{ title }}</h1>
   </header>
 </template>
