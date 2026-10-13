@@ -27,7 +27,7 @@ const items = [
       :aria-label="item.label"
       :aria-current="item.id === active ? 'page' : undefined"
       class="flex flex-1 items-center justify-center rounded-full text-sage"
-      :class="item.id === active ? 'grain shadow-neu-inset' : 'opacity-60'"
+      :class="item.id === active ? 'grain shadow-neu-inset' : 'opacity-75'"
     >
       <AppIcon :name="item.icon" />
     </RouterLink>
@@ -42,7 +42,7 @@ const items = [
       :to="item.to"
       :aria-current="item.id === active ? 'page' : undefined"
       class="flex items-center gap-4 rounded-full p-1 pr-4 text-lg text-sage"
-      :class="[item.id === active ? '' : 'opacity-70 hover:opacity-100', item.id === 'settings' && 'mt-auto']"
+      :class="[item.id === active ? '' : 'opacity-75 hover:opacity-100', item.id === 'settings' && 'mt-auto']"
     >
       <span class="flex size-11 items-center justify-center rounded-full" :class="item.id === active && 'grain shadow-neu-inset'">
         <AppIcon :name="item.icon" />
