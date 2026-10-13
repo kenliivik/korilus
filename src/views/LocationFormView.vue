@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import PageHeader from '../components/PageHeader.vue'
 import AppIcon from '../components/AppIcon.vue'
 import VisitFields from '../components/VisitFields.vue'
+import PickMap from '../components/PickMap.vue'
 import { store, today, touch } from '../data/store.js'
 import { account } from '../data/account.js'
 
@@ -13,23 +14,25 @@ const router = useRouter()
 const existing = props.id && store.locations.find((l) => l.id === props.id) // own spots only, shared ones are read-only
 
 const name = ref(existing?.name ?? '')
-const coords = ref(existing ? { lat: existing.lat, lng: existing.lng } : null)
+const coords = ref(existing?.lat != null ? { lat: existing.lat, lng: existing.lng } : null)
 const groupId = ref(existing?.groupId ?? null) // null = private
 const visit = ref({ berries: [], note: '', rating: 0 })
 const gps = ref('')
 
-function locate() {
+// auto: the lookup when the form opens, which mustn't overwrite a spot already tapped on the map.
+function locate(auto) {
   gps.value = 'Otsin, kus sa oled…'
   navigator.geolocation?.getCurrentPosition(
     ({ coords: c }) => {
+      if (auto && coords.value) return (gps.value = '')
       coords.value = { lat: c.latitude, lng: c.longitude }
-      gps.value = `Koht on kaardil (${c.latitude.toFixed(4)}, ${c.longitude.toFixed(4)})`
+      gps.value = 'Sinu praegune koht on kaardil.'
     },
-    () => (gps.value = 'Asukohta ei leidnud. Salvestan koha ilma kaardita.'),
+    () => (gps.value = 'Asukohta ei leidnud. Puuduta kaarti, et koht märkida.'),
     { enableHighAccuracy: true },
   ) ?? (gps.value = 'See telefon ei oska asukohta leida.')
 }
-if (!existing) locate()
+if (!existing) locate(true)
 
 function save() {
   if (existing) {
@@ -66,10 +69,15 @@ function save() {
       </select>
     </label>
 
-    <button type="button" class="grain card flex items-center gap-3 text-left text-muted" @click="locate">
-      <AppIcon name="pin" :size="20" />
-      <span class="flex-1">{{ gps || 'Puuduta, et märkida koht kaardile' }}</span>
-    </button>
+    <section class="flex flex-col gap-2">
+      <span class="text-xl">Asukoht</span>
+      <PickMap v-model="coords" />
+      <p class="font-hand text-lg text-muted">Puuduta kaarti, et koht märkida.</p>
+      <button type="button" class="grain card flex items-center gap-3 text-left text-muted" @click="locate()">
+        <AppIcon name="pin" :size="20" />
+        <span class="flex-1">{{ gps || 'Kasuta praegust asukohta' }}</span>
+      </button>
+    </section>
 
     <button type="submit" class="btn bg-sage text-milk">Salvesta</button>
     <button type="button" class="btn grain text-sage" @click="router.back()">Tühista</button>
