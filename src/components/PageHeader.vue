@@ -12,14 +12,14 @@ const goBack = () => (history.state?.back ? router.back() : router.push(props.ba
 </script>
 
 <template>
-  <!-- On desktop the sidebar navigates, so top-level wide pages drop the back button; detail pages keep it. -->
+  <!-- On desktop the sidebar already leads to top-level pages (meta.top), so they drop the back button. -->
   <header class="flex items-center gap-4">
     <button
       v-if="back"
       type="button"
       aria-label="Tagasi"
       class="grain grid size-11 shrink-0 place-items-center rounded-full text-sage shadow-neu-raised-sm active:shadow-neu-inset"
-      :class="$route.meta.wide && !Object.keys($route.params).length && 'lg:hidden'"
+      :class="$route.meta.top && 'lg:hidden'"
       @click="goBack"
     >
       <AppIcon name="back" :size="20" />
