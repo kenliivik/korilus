@@ -74,7 +74,7 @@ function save() {
       </select>
     </label>
 
-    <p v-if="noPlace && !coords" role="alert" class="order-1 text-lg text-[#9c3a3a] lg:order-none">
+    <p v-if="noPlace && !coords" role="alert" class="order-1 text-lg text-danger lg:order-none">
       Märgi koht kaardile: puuduta kaarti või vajuta „Kasuta praegust asukohta”.
     </p>
     <button type="submit" class="btn order-1 bg-sage text-milk lg:order-none">Salvesta</button>

@@ -65,7 +65,7 @@ function drop() {
       <input v-model="password" type="password" required autocomplete="current-password" class="field" />
     </label>
     <button type="submit" class="btn bg-sage text-milk">Logi sisse</button>
-    <p v-if="message" class="italic text-[#9c3a3a]">{{ message }}</p>
+    <p v-if="message" class="italic text-danger">{{ message }}</p>
     <div v-if="!configured" class="grain card flex flex-col gap-2 text-base">
       <p>Serveris pole veel admini parooli. Sisesta soovitud parool (vähemalt 8 märki) ja vajuta „Logi sisse”.</p>
       <template v-if="hash">
@@ -104,7 +104,7 @@ function drop() {
           </RouterLink>
         </li>
       </ul>
-      <p v-if="message" class="italic text-[#9c3a3a]">{{ message }}</p>
+      <p v-if="message" class="italic text-danger">{{ message }}</p>
       <RouterLink to="/admin/marjad" class="btn bg-sage text-milk"><AppIcon name="plus" :size="20" /> Lisa mari</RouterLink>
     </section>
 

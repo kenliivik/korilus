@@ -5,13 +5,14 @@ defineProps({ readonly: Boolean, size: { type: Number, default: 18 } })
 </script>
 
 <template>
-  <span class="inline-flex gap-1 text-sage" :aria-label="`${model} / 5`" :role="readonly ? 'img' : 'radiogroup'">
+  <span class="inline-flex text-sage" :class="readonly ? 'gap-1' : 'gap-4'" :aria-label="`${model} / 5`" :role="readonly ? 'img' : 'radiogroup'">
     <component
       :is="readonly ? 'span' : 'button'"
       v-for="n in 5"
       :key="n"
       :type="readonly ? undefined : 'button'"
       :aria-label="readonly ? undefined : `${n} tärni`"
+      :class="!readonly && '-m-1.5 p-1.5'"
       @click="readonly || (model = n)"
     >
       <svg :width="size" :height="size" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">

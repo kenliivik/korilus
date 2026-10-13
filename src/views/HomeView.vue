@@ -1,10 +1,13 @@
 <script setup>
 import { computed } from 'vue'
 import BerryTile from '../components/BerryTile.vue'
-import { inSeason, phaseIn, statusText, months } from '../data/berries.js'
+import BerryGlyph from '../components/BerryGlyph.vue'
+import InstallHint from '../components/InstallHint.vue'
+import { inSeason, comingSoon, phaseIn, statusText, months } from '../data/berries.js'
 
 const month = months[new Date().getMonth()]
 const ripe = computed(() => inSeason()) // updates when new content arrives from the server
+const next = computed(() => comingSoon())
 </script>
 
 <template>
@@ -16,7 +19,7 @@ const ripe = computed(() => inSeason()) // updates when new content arrives from
   <section class="flex flex-col gap-1 lg:gap-2">
     <h2 class="text-[32px] leading-9 text-sage lg:text-6xl lg:leading-tight">Mida korjata?</h2>
     <p class="italic leading-5 text-muted lg:text-xl">
-      {{ ripe.length ? 'Need on praegu valmis:' : 'Praegu pole midagi korjata. Vaata kalendrist, mis on varsti valmimas.' }}
+      {{ ripe.length ? 'Need on praegu valmis:' : 'Praegu pole midagi korjata.' }}
     </p>
   </section>
 
@@ -31,4 +34,19 @@ const ripe = computed(() => inSeason()) // updates when new content arrives from
       :note="statusText[phaseIn(p)]"
     />
   </section>
+
+  <!-- What ripens next, so the page has something to look forward to off-season. -->
+  <section v-if="next.length" class="mt-4 flex flex-col gap-3 lg:mt-16 lg:max-w-xl">
+    <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Varsti valmimas</h2>
+    <ul class="grain card flex flex-col gap-1">
+      <li v-for="{ p, month } in next" :key="p.id">
+        <RouterLink :to="`/mari/${p.id}`" class="flex items-center justify-between gap-3 text-lg lg:text-xl">
+          <span class="flex items-center gap-3"><BerryGlyph :name="p.id" :image="p.image" :size="48" />{{ p.name }}</span>
+          <span class="font-hand text-base text-muted">{{ months[month] }}</span>
+        </RouterLink>
+      </li>
+    </ul>
+  </section>
+
+  <InstallHint class="mt-4" />
 </template>

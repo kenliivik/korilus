@@ -98,13 +98,13 @@ const remove = () => confirm(`Kas kustutad grupi „${group.value.name}”? Kõi
       <p class="text-base italic text-muted">Kes Korilust juba kasutab, lisatakse kohe. Teistele saadame kutse e-postiga.</p>
     </section>
 
-    <p v-if="error" role="alert" class="text-lg text-[#9c3a3a]">{{ error }}</p>
+    <p v-if="error" role="alert" class="text-lg text-danger">{{ error }}</p>
     <p v-if="note" role="status" class="text-lg">{{ note }}</p>
 
-    <button v-if="owner" type="button" class="btn grain text-[#9c3a3a]" :disabled="busy" @click="remove">
+    <button v-if="owner" type="button" class="btn grain text-danger" :disabled="busy" @click="remove">
       <AppIcon name="trash" :size="20" /> Kustuta grupp
     </button>
-    <button v-else type="button" class="btn grain text-[#9c3a3a]" :disabled="busy" @click="leave">Lahku grupist</button>
+    <button v-else type="button" class="btn grain text-danger" :disabled="busy" @click="leave">Lahku grupist</button>
   </template>
 
   <PageHeader v-else title="Seda gruppi ei leia" back="/konto" />

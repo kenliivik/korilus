@@ -52,6 +52,6 @@ async function send() {
     <p v-else class="text-base italic text-muted">Vastame aadressile {{ account.user.email }}.</p>
     <input v-model="website" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
     <button type="submit" class="btn bg-sage text-milk" :disabled="busy">{{ busy ? 'Saadan…' : 'Saada' }}</button>
-    <p v-if="error" role="alert" class="text-lg text-[#9c3a3a]">{{ error }}</p>
+    <p v-if="error" role="alert" class="text-lg text-danger">{{ error }}</p>
   </form>
 </template>

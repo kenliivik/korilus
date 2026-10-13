@@ -5,7 +5,7 @@ import BerryGlyph from '../components/BerryGlyph.vue'
 import AppIcon from '../components/AppIcon.vue'
 import RecipeCard from '../components/RecipeCard.vue'
 import { findProduce, phaseIn, statusText, recipesFor, dateLabel } from '../data/berries.js'
-import { store, toggleReminder } from '../data/store.js'
+import { store, toggleReminder, formatDate } from '../data/store.js'
 
 const props = defineProps({ id: { type: String, required: true } })
 
@@ -81,7 +81,7 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
       <ul v-if="foundAt.length" class="grain card flex flex-col gap-2 text-lg lg:p-6 lg:text-xl">
         <li v-for="f in foundAt" :key="f.id">
           <RouterLink :to="`/asukohad/${f.id}`" class="flex items-center gap-2">
-            <AppIcon name="pin" :size="18" />{{ f.name }} <span class="ml-auto text-base text-muted">{{ f.date }}</span>
+            <AppIcon name="pin" :size="18" />{{ f.name }} <span class="ml-auto text-base text-muted">{{ formatDate(f.date) }}</span>
           </RouterLink>
         </li>
       </ul>

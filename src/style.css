@@ -35,6 +35,7 @@
   --color-sage: #465940;
   --color-muted: #817a58;
   --color-leaf: #6e8263;
+  --color-danger: #9c3a3a; /* delete buttons and error messages */
 
   --font-serif: "IM Fell Double Pica", Georgia, serif;
   --font-serif-sc: "IM Fell Double Pica SC", Georgia, serif;

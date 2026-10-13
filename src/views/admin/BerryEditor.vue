@@ -122,7 +122,7 @@ function remove() {
     </ul>
     <button type="button" class="btn bg-sage text-milk" :disabled="busy" @click="save">Salvesta</button>
     <button type="button" class="btn grain text-sage" @click="preview = false">Muuda edasi</button>
-    <p v-if="message" class="italic text-[#9c3a3a]">{{ message }}</p>
+    <p v-if="message" class="italic text-danger">{{ message }}</p>
   </template>
 
   <form v-else class="flex flex-col gap-5" @submit.prevent="save">
@@ -199,11 +199,11 @@ function remove() {
       <input v-model="form.hidden" type="checkbox" class="size-6 accent-sage" />
     </label>
 
-    <p v-if="message" class="italic text-[#9c3a3a]">{{ message }}</p>
+    <p v-if="message" class="italic text-danger">{{ message }}</p>
     <button type="button" class="btn grain text-sage" @click="preview = true">Eelvaade</button>
     <button type="submit" class="btn bg-sage text-milk" :disabled="busy">Salvesta</button>
     <!-- The app's own species come back after deleting, so they can only be hidden. -->
-    <button v-if="form.id && !bundled.some((b) => b.id === form.id)" type="button" class="btn grain text-[#9c3a3a]" :disabled="busy" @click="remove">
+    <button v-if="form.id && !bundled.some((b) => b.id === form.id)" type="button" class="btn grain text-danger" :disabled="busy" @click="remove">
       <AppIcon name="trash" :size="20" /> Kustuta
     </button>
   </form>
