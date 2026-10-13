@@ -9,7 +9,7 @@ const now = new Date().getMonth()
 const selected = ref(now)
 const step = (d) => (selected.value = (selected.value + d + 12) % 12)
 
-const cellColor = { a: 'bg-leaf/35', t: 'bg-sage', l: 'bg-muted/35', '.': '' }
+const cellColor = { a: 'bg-leaf/35', t: 'bg-sage', l: 'hatch', '.': '' }
 </script>
 
 <template>
