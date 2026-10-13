@@ -95,7 +95,7 @@ const remove = () => confirm(`Kas kustutad grupi „${group.value.name}”? Kõi
         <input v-model.trim="email" type="email" required class="field" placeholder="e-post" />
         <button type="submit" class="btn bg-sage px-4 text-milk" :disabled="busy">Kutsu</button>
       </form>
-      <p class="text-base italic text-muted">Kes Korilust juba kasutab, lisatakse kohe. Teistele saadame kutse e-postiga.</p>
+      <p class="text-base italic text-muted">Saadame kutse e-postiga. Kes Korilust juba kasutab, saab selle vastu võtta Konto all.</p>
     </section>
 
     <p v-if="error" role="alert" class="text-lg text-danger">{{ error }}</p>

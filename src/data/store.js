@@ -26,8 +26,11 @@ watch(store, () => localStorage.setItem(KEY, JSON.stringify(store)), { deep: tru
 
 export const findLocation = (id) => store.locations.find((l) => l.id === id) ?? store.shared.find((l) => l.id === id)
 export const berriesAt = (loc) => [...new Set(loc.visits.flatMap((v) => v.berries))]
-export const averageRating = (loc) =>
-  Math.round(loc.visits.reduce((sum, v) => sum + v.rating, 0) / (loc.visits.length || 1))
+// Visits saved without stars (rating 0) don't count.
+export const averageRating = (loc) => {
+  const rated = loc.visits.filter((v) => v.rating)
+  return Math.round(rated.reduce((sum, v) => sum + v.rating, 0) / (rated.length || 1))
+}
 // "2026-08-02" -> "2. august 2026" (or "2. august" under a year heading).
 export const formatDate = (d, year = true) =>
   new Date(`${d}T12:00`).toLocaleDateString('et-EE', { day: 'numeric', month: 'long', ...(year && { year: 'numeric' }) })

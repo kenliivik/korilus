@@ -13,9 +13,14 @@ $messages = [
     't' => ['peak', '%s: nüüd on parim aeg!', 'Marjad on valmis, mine metsa!'],
 ];
 
+// The season and name as they are now in /admin; the copy each phone sent is only the fallback (built-in berries before any save).
+$live = array_column(load_content()['berries'], null, 'id');
+
 $subs = load_subs();
 foreach ($subs as $key => &$s) {
     foreach ($s['reminders'] as $r) {
+        if (!empty($live[$r['id']]['hidden'])) continue;
+        $r = ($live[$r['id']] ?? []) + $r;
         $phase = $r['season'][$month];
         $tag = date('Y') . "-$phase";
         if (!isset($messages[$phase]) || !$s['notify'][$messages[$phase][0]] || ($s['sent'][$r['id']] ?? '') === $tag) continue;

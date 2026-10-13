@@ -33,9 +33,9 @@ switch ($in['action'] ?? '') {
         $who = $user['name'] ?: $user['email'];
         $invitee = q('SELECT id FROM users WHERE email = ?', [$email])->fetchColumn();
         if (($invitee && !$gid) || ($invitee && q('SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ?', [$gid, $invitee])->fetchColumn())) break;
-        if (!q('SELECT 1 FROM invites WHERE email = ? AND group_id <=> ?', [$email, $gid ?: null])->fetchColumn()) {
-            q('INSERT INTO invites (email, group_id, invited_by, created_at) VALUES (?, ?, ?, ?)', [$email, $gid ?: null, $uid, time()]);
-        }
+        // Only a new invitation sends an email, so the daily limit above also limits emails. To resend, uninvite and invite again.
+        if (q('SELECT 1 FROM invites WHERE email = ? AND group_id <=> ?', [$email, $gid ?: null])->fetchColumn()) break;
+        q('INSERT INTO invites (email, group_id, invited_by, created_at) VALUES (?, ?, ?, ?)', [$email, $gid ?: null, $uid, time()]);
         send_mail($email, $invitee ? "$who kutsus sind Koriluse gruppi „{$group}”" : "$who kutsus sind Korilusse", $invitee
             ? "Tere!\n\n$who kutsus sind Koriluse gruppi „{$group}”. Kui kutse vastu võtad, näed marjakohti, mida grupi liikmed seal jagavad, ja saad ka ise oma kohti jagada.\n\n"
                 . "Kutse vastuvõtmiseks ava Korilus: " . app_url() . "/konto\n\nHead korjamist!\n"

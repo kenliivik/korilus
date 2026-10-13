@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onBeforeUnmount, ref } from 'vue'
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import L from 'leaflet'
 import { createMap, pin, sharedPin } from './map.js'
@@ -10,15 +10,28 @@ const props = defineProps({
 })
 const router = useRouter()
 const el = ref()
-let map
+let map, pins
+const fit = (spots) => spots.length && map.fitBounds(spots.map((s) => [s.lat, s.lng]), { padding: [40, 40], maxZoom: 14 })
+
+// Redrawn when the spots change, e.g. a sync brings spots shared by the group after the map opened.
+function draw(spots) {
+  pins.clearLayers()
+  for (const s of spots) {
+    L.marker([s.lat, s.lng], { icon: s.shared ? sharedPin : pin, title: s.name }).addTo(pins).on('click', () => props.small || router.push(`/asukohad/${s.id}`))
+  }
+}
 
 onMounted(() => {
   map = createMap(el.value)
   map.attributionControl.setPosition('bottomleft') // the phone's floating "+" sits bottom right on Asukohad
-  for (const s of props.spots) {
-    L.marker([s.lat, s.lng], { icon: s.shared ? sharedPin : pin, title: s.name }).addTo(map).on('click', () => props.small || router.push(`/asukohad/${s.id}`))
-  }
-  if (props.spots.length) map.fitBounds(props.spots.map((s) => [s.lat, s.lng]), { padding: [40, 40], maxZoom: 14 })
+  pins = L.layerGroup().addTo(map)
+  draw(props.spots)
+  fit(props.spots)
+})
+watch(() => props.spots, (spots, before) => {
+  if (!pins) return
+  draw(spots)
+  if (!before.length) fit(spots) // the first spots arrived: zoom to them, otherwise keep the view
 })
 onBeforeUnmount(() => map?.remove())
 </script>
