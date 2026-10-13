@@ -66,3 +66,16 @@ CREATE TABLE IF NOT EXISTS spots (
   INDEX (user_id),
   INDEX (group_id)
 ) DEFAULT CHARSET = utf8mb4;
+
+-- Ideas and feedback sent from Seaded → "Saada tagasisidet". Works without login; user_id is set when logged in.
+CREATE TABLE IF NOT EXISTS feedback (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  message TEXT NOT NULL,
+  email VARCHAR(190) NOT NULL DEFAULT '',
+  user_id INT UNSIGNED NULL,
+  ip VARCHAR(45) NOT NULL,
+  created_at INT UNSIGNED NOT NULL,
+  done TINYINT(1) NOT NULL DEFAULT 0,
+  INDEX (ip),
+  INDEX (user_id)
+) DEFAULT CHARSET = utf8mb4;

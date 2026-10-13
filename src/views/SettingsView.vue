@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import AppIcon from '../components/AppIcon.vue'
+import LinkCard from '../components/LinkCard.vue'
 import { findProduce } from '../data/berries.js'
 import { store, toggleReminder, toggleNotify } from '../data/store.js'
 import { account } from '../data/account.js'
@@ -68,6 +69,7 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
 
   <section class="flex flex-col gap-3">
     <h2 class="text-2xl leading-7">Rakenduse kohta</h2>
+    <LinkCard label="Saada ettepanek või tagasiside" icon="chat" to="/tagasiside" />
     <p class="grain card text-lg">Korilus v1.0</p>
   </section>
 </template>

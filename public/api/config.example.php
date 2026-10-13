@@ -8,4 +8,6 @@ return [
     // 'smtp' => ['host' => 'mail.veebimajutus.ee', 'port' => 587, 'user' => 'korilus@dsgnr.ee', 'pass' => 'MAILBOX_PASSWORD', 'from' => 'korilus@dsgnr.ee'],
     // 'app_url' => 'https://korilus.dsgnr.ee',
     // 'signup_open' => false,
+    // Where feedback from Seaded → Tagasiside is emailed (default: every admin account).
+    // 'feedback_to' => 'ken@dsgnr.ee',
 ];
