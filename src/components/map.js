@@ -9,7 +9,6 @@ export function createMap(el) {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map)
-  map.attributionControl.setPosition('bottomleft') // the phone's floating "+" sits bottom right on Asukohad
   return map
 }
 
