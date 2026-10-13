@@ -1,6 +1,10 @@
 <?php
 // Shared paths and helpers. The data folder is never uploaded or served (see api/.htaccess and deploy.yml).
 
+// Errors go to the server log, never into a reply (a database error could otherwise show the connection details).
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
 const DATA_DIR = __DIR__ . '/data';
 const SUBS_FILE = DATA_DIR . '/subscriptions.json';
 const VAPID_FILE = DATA_DIR . '/vapid.pem';
