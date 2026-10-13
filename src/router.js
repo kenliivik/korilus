@@ -25,7 +25,7 @@ export default createRouter({
     { path: '/asukohad/:id', component: LocationView, props: true, meta: { tab: 'locations' } },
     { path: '/asukohad/:id/muuda', component: LocationFormView, props: true, meta: { tab: 'locations' } },
     { path: '/retseptid', component: RecipesView, meta: { tab: 'recipes', wide: true } },
-    { path: '/retsept/:id', component: RecipeView, props: true, meta: { tab: 'recipes' } },
+    { path: '/retsept/:id', component: RecipeView, props: true, meta: { tab: 'recipes', wide: true } },
     // Admin screens are only for Ken, so they load separately. `:id` "uus" = new recipe.
     { path: '/admin/retseptid', component: () => import('./views/admin/RecipesAdmin.vue'), meta: { tab: 'settings' } },
     { path: '/admin/retseptid/:id', component: () => import('./views/admin/RecipeEditor.vue'), props: true, meta: { tab: 'settings' } },
