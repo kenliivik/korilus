@@ -5,7 +5,8 @@ import PageHeader from '../../components/PageHeader.vue'
 import AppIcon from '../../components/AppIcon.vue'
 import BerryGlyph from '../../components/BerryGlyph.vue'
 import { bundled, content, loadContent, saveContent, months, phases, statusText, dateLabel } from '../../data/berries.js'
-import { checkAdmin, uploadImage } from '../../data/admin.js'
+import { uploadImage } from '../../data/admin.js'
+import { account } from '../../data/account.js'
 
 // Add a berry (no id) or edit one. Saving sends it to api/content.php, so every phone gets it.
 const props = defineProps({ id: { type: String, default: '' } })
@@ -17,7 +18,7 @@ const busy = ref(false)
 const message = ref('')
 
 ;(async () => {
-  if (!(await checkAdmin())) return router.replace('/admin')
+  if (!account.user?.isAdmin) return router.replace('/admin')
   await loadContent()
   const b = content.berries.find((b) => b.id === props.id)
   form.value = {

@@ -5,29 +5,19 @@ import AppIcon from '../../components/AppIcon.vue'
 import BerryGlyph from '../../components/BerryGlyph.vue'
 import LinkCard from '../../components/LinkCard.vue'
 import { content, loadContent, saveContent } from '../../data/berries.js'
-import { isAdmin, configured, checkAdmin, login, logout } from '../../data/admin.js'
+import { account } from '../../data/account.js'
 
-const password = ref('')
-const hash = ref('')
+// Admin = the logged-in account has isAdmin (the server checks it again on every save).
 const message = ref('')
 
-checkAdmin()
 loadContent()
-
-async function submit() {
-  const r = await login(password.value)
-  hash.value = r.hash ?? ''
-  message.value = r.admin ? '' : { 'wrong password': 'Vale parool.', 'too many attempts': 'Liiga palju katseid. Proovi 15 minuti pärast uuesti.' }[r.error] ?? ''
-  password.value = ''
-}
 
 async function save(body) {
   message.value = ''
   try {
     await saveContent(body)
   } catch (e) {
-    if (e.status === 401) isAdmin.value = false
-    message.value = `Salvestamine ei õnnestunud (${e.message}).`
+    message.value = e.status === 401 ? 'Logi uuesti sisse (Seaded → Konto).' : `Salvestamine ei õnnestunud (${e.message}).`
   }
 }
 
@@ -57,23 +47,9 @@ function drop() {
 <template>
   <PageHeader title="Haldus" back="/seaded" />
 
-  <p v-if="isAdmin === null" class="italic text-muted">Laadin…</p>
-
-  <form v-else-if="!isAdmin" class="flex flex-col gap-4" @submit.prevent="submit">
-    <label class="flex flex-col gap-2">
-      <span class="text-xl">Admini parool</span>
-      <input v-model="password" type="password" required autocomplete="current-password" class="field" />
-    </label>
-    <button type="submit" class="btn bg-sage text-milk">Logi sisse</button>
-    <p v-if="message" class="italic text-danger">{{ message }}</p>
-    <div v-if="!configured" class="grain card flex flex-col gap-2 text-base">
-      <p>Serveris pole veel admini parooli. Sisesta soovitud parool (vähemalt 8 märki) ja vajuta „Logi sisse”.</p>
-      <template v-if="hash">
-        <p>Seejärel lisa see rida serveris faili <code>api/data/config.php</code> (vaata README):</p>
-        <code class="field text-sm break-all select-all">'admin_password_hash' => '{{ hash }}',</code>
-      </template>
-    </div>
-  </form>
+  <p v-if="!account.user?.isAdmin" class="grain card text-lg">
+    Haldus on ainult adminile. <RouterLink to="/konto" class="underline underline-offset-4">Logi sisse</RouterLink> admini kontoga.
+  </p>
 
   <template v-else>
     <section class="flex flex-col gap-3">
@@ -117,7 +93,5 @@ function drop() {
       <h2 class="text-2xl leading-7">Tagasiside</h2>
       <LinkCard label="Loe tagasisidet" icon="chat" to="/admin/tagasiside" />
     </section>
-
-    <button type="button" class="btn grain text-sage" @click="logout">Logi välja</button>
   </template>
 </template>
