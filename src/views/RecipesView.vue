@@ -24,13 +24,13 @@ const shown = computed(() =>
   ),
 )
 
-const chip = (on) => (on ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-neu-raised-sm')
+const chip = (on) => (on ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-neu-raised-sm') + ' lg:px-4 lg:py-2 lg:text-lg'
 </script>
 
 <template>
   <PageHeader title="Retseptid" back="/" />
 
-  <p class="-mt-3 italic leading-5 text-muted">Moosid, mahlad ja talvevarud.</p>
+  <p class="-mt-3 italic leading-5 text-muted lg:text-xl">Moosid, mahlad ja talvevarud.</p>
 
   <section v-if="recipes.length" class="flex flex-col gap-3" aria-label="Valikud">
     <div class="flex flex-wrap gap-2">
@@ -74,8 +74,8 @@ const chip = (on) => (on ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-
     </div>
   </section>
 
-  <section v-if="shown.length" class="flex flex-col gap-3">
-    <RecipeCard v-for="r in shown" :key="r.id" :recipe="r" />
+  <section v-if="shown.length" class="flex flex-col gap-3 lg:mt-16 lg:grid lg:grid-cols-3 lg:gap-x-8 lg:gap-y-20 xl:grid-cols-4">
+    <RecipeCard v-for="r in shown" :key="r.id" :recipe="r" tile />
   </section>
   <p v-else class="italic text-muted">
     {{ recipes.length ? 'Selliseid retsepte ei leidnud.' : 'Retsepte veel pole.' }}
