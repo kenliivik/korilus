@@ -6,7 +6,7 @@ function db() {
     static $pdo;
     if (!$pdo) {
         $c = config('db') ?? reply_error('not set up', 503); // until Ken adds db to config.php
-        $pdo = new PDO($c['dsn'] ?? $c[0] ?? '', $c['user'] ?? $c[1] ?? null, $c['pass'] ?? $c[2] ?? null, [
+        $pdo = new PDO($c['dsn'] ?? '', $c['user'] ?? null, $c['pass'] ?? null, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]);

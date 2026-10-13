@@ -3,8 +3,9 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import PageHeader from '../../components/PageHeader.vue'
 import AppIcon from '../../components/AppIcon.vue'
-import { produce } from '../../data/berries.js'
-import { AuthError, deleteRecipe, loadAllRecipes, recipeTypes, saveRecipe, slugify, uploadImage } from '../../data/recipes.js'
+import { loadContent, produce, saveContent } from '../../data/berries.js'
+import { recipeTypes, slugify } from '../../data/recipes.js'
+import { uploadImage } from '../../data/admin.js'
 
 // Add (id "uus") or edit one recipe. Fields follow the recipe item in the build contract.
 const props = defineProps({ id: { type: String, required: true } })
@@ -18,7 +19,7 @@ const busy = ref(false)
 const error = ref('') // text, or 'auth' when the admin session is missing
 let all = []
 
-loadAllRecipes().then((list) => {
+loadContent().then(({ recipes: list }) => {
   all = list
   const r = list.find((r) => r.id === props.id)
   if (!isNew && !r) return (missing.value = true)
@@ -38,7 +39,7 @@ const move = (i, by) => {
 }
 
 function fail(e) {
-  error.value = e instanceof AuthError ? 'auth' : e.message
+  error.value = e.status === 401 ? 'auth' : e.message
   busy.value = false
 }
 
@@ -78,7 +79,7 @@ async function save() {
   busy.value = true
   error.value = ''
   try {
-    await saveRecipe(item)
+    await saveContent({ collection: 'recipes', action: 'save', item })
     router.replace('/admin/retseptid')
   } catch (e) {
     fail(e)
@@ -89,7 +90,7 @@ async function remove() {
   if (!confirm(`Kas kustutad „${draft.value.title}”?`)) return
   busy.value = true
   try {
-    await deleteRecipe(props.id)
+    await saveContent({ collection: 'recipes', action: 'delete', id: props.id })
     router.replace('/admin/retseptid')
   } catch (e) {
     fail(e)
