@@ -36,5 +36,10 @@ onBeforeUnmount(() => map?.remove())
 </script>
 
 <template>
-  <div ref="el" class="z-0 aspect-square overflow-hidden rounded-card shadow-neu-inset" aria-label="Kaart" />
+  <!-- Fills the screen between the page title and the bottom menu (9.25rem = title, gaps and menu). -->
+  <div
+    ref="el"
+    class="z-0 h-[calc(100dvh_-_max(1rem,env(safe-area-inset-top))_-_max(1.5rem,env(safe-area-inset-bottom))_-_9.25rem)] min-h-72 shrink-0 overflow-hidden rounded-card shadow-neu-inset"
+    aria-label="Kaart"
+  />
 </template>
