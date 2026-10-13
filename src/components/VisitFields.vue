@@ -1,8 +1,9 @@
 <script setup>
 import StarRating from './StarRating.vue'
 import { produce } from '../data/berries.js'
+import { today } from '../data/store.js'
 
-// The parts of a visit: what was found, a note and a 1–5 rating.
+// The parts of a visit: when, what was found, a note and a 1–5 rating.
 const visit = defineModel({ type: Object, required: true })
 
 const toggle = (id) =>
@@ -12,6 +13,11 @@ const toggle = (id) =>
 </script>
 
 <template>
+  <label class="flex flex-col gap-2">
+    <span class="text-xl">Millal?</span>
+    <input v-model="visit.date" type="date" required :max="today()" class="field" />
+  </label>
+
   <fieldset class="flex flex-col gap-2">
     <legend class="mb-2 text-xl">Mida leidsid?</legend>
     <div class="flex flex-wrap gap-2">
