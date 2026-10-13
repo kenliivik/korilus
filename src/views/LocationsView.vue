@@ -18,19 +18,27 @@ const groupName = (l) => account.groups.find((g) => g.id === l.groupId)?.name
 </script>
 
 <template>
-  <h1 class="text-[32px] leading-9">Minu marjakohad</h1>
+  <h1 class="text-[32px] leading-9 lg:text-6xl lg:leading-tight">Minu marjakohad</h1>
 
-  <SpotMap :spots="spots" :style="empty && { '--map-room': '4.5rem' }" />
+  <!-- Desktop: spot list on the left, a tall map on the right that stays in view. On phones the wrappers dissolve. -->
+  <div class="contents lg:grid lg:grid-cols-[22rem_1fr] lg:items-start lg:gap-10 xl:grid-cols-[26rem_1fr]">
 
+  <SpotMap
+    :spots="spots"
+    :style="empty && { '--map-room': '4.5rem' }"
+    class="lg:sticky lg:top-12 lg:col-start-2 lg:row-start-1 lg:h-[calc(100dvh-12rem)]"
+  />
+
+  <div class="contents lg:col-start-1 lg:row-start-1 lg:flex lg:flex-col lg:gap-8">
   <section v-for="list in lists" :key="list.title" class="flex flex-col gap-3" :class="{ 'order-1': empty }">
-    <h2 class="text-2xl leading-7">{{ list.title }}</h2>
+    <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">{{ list.title }}</h2>
     <RouterLink
       v-for="l in list.spots"
       :key="l.id"
       :to="`/asukohad/${l.id}`"
       class="grain card flex flex-col gap-1 transition-shadow active:shadow-neu-inset"
     >
-      <span class="text-xl">{{ l.name }}</span>
+      <span class="text-xl lg:text-2xl">{{ l.name }}</span>
       <span v-if="l.shared" class="font-hand text-lg text-muted">{{ l.owner }}{{ groupName(l) ? ` · ${groupName(l)}` : '' }}</span>
       <span v-else-if="groupName(l)" class="font-hand text-lg text-muted">Jagatud: {{ groupName(l) }}</span>
       <span class="text-muted">Marjad: {{ berriesAt(l).map((id) => findProduce(id)?.name).join(', ') || '–' }}</span>
@@ -42,4 +50,6 @@ const groupName = (l) => account.groups.find((g) => g.id === l.groupId)?.name
   <RouterLink to="/asukohad/uus" class="btn bg-sage text-milk">
     <AppIcon name="plus" :size="20" /> Lisa asukoht
   </RouterLink>
+  </div>
+  </div>
 </template>
