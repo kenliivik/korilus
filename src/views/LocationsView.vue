@@ -12,15 +12,17 @@ const lists = computed(() => [
   { title: 'Minu asukohad', spots: store.locations },
   ...(store.shared.length ? [{ title: 'Jagatud minuga', spots: store.shared }] : []),
 ])
+// No spots of my own yet: shorter map with "Lisa asukoht" right under it, so the button shows without scrolling.
+const empty = computed(() => !store.locations.length)
 const groupName = (l) => account.groups.find((g) => g.id === l.groupId)?.name
 </script>
 
 <template>
   <h1 class="text-[32px] leading-9">Marjakohtade kaart</h1>
 
-  <SpotMap :spots="spots" />
+  <SpotMap :spots="spots" :style="empty && { '--map-room': '4.5rem' }" />
 
-  <section v-for="list in lists" :key="list.title" class="flex flex-col gap-3">
+  <section v-for="list in lists" :key="list.title" class="flex flex-col gap-3" :class="{ 'order-1': empty }">
     <h2 class="text-2xl leading-7">{{ list.title }}</h2>
     <RouterLink
       v-for="l in list.spots"
