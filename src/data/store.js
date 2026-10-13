@@ -28,6 +28,9 @@ export const findLocation = (id) => store.locations.find((l) => l.id === id) ?? 
 export const berriesAt = (loc) => [...new Set(loc.visits.flatMap((v) => v.berries))]
 export const averageRating = (loc) =>
   Math.round(loc.visits.reduce((sum, v) => sum + v.rating, 0) / (loc.visits.length || 1))
+// "2026-08-02" -> "2. august 2026" (or "2. august" under a year heading).
+export const formatDate = (d, year = true) =>
+  new Date(`${d}T12:00`).toLocaleDateString('et-EE', { day: 'numeric', month: 'long', ...(year && { year: 'numeric' }) })
 export const today = () => new Date().toLocaleDateString('sv-SE') // YYYY-MM-DD in local time (toISOString would give yesterday after midnight)
 
 // Call after changing a spot, so it gets synced. Returns the spot.

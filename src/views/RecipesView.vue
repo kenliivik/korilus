@@ -28,7 +28,7 @@ const chip = (on) => (on ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-
 </script>
 
 <template>
-  <PageHeader title="Retseptid" back="/" />
+  <PageHeader title="Retseptid" />
 
   <p class="-mt-3 italic leading-5 text-muted lg:text-xl">Moosid, mahlad ja talvevarud.</p>
 
@@ -50,6 +50,9 @@ const chip = (on) => (on ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-
       </button>
     </div>
     <div class="flex flex-wrap gap-2">
+      <button type="button" :aria-pressed="!type && !saved" class="rounded-full px-3 py-1.5" :class="chip(!type && !saved)" @click="(type = ''), (saved = false)">
+        Kõik liigid
+      </button>
       <button
         v-for="t in types"
         :key="t"
@@ -65,11 +68,11 @@ const chip = (on) => (on ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-
         v-if="store.savedRecipes.length"
         type="button"
         :aria-pressed="saved"
-        class="rounded-full px-3 py-1.5 font-hand"
+        class="rounded-full px-3 py-1.5"
         :class="chip(saved)"
         @click="saved = !saved"
       >
-        lemmikud
+        Lemmikud
       </button>
     </div>
   </section>

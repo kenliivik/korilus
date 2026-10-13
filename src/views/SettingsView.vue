@@ -10,6 +10,8 @@ const toggles = [
   { key: 'start', label: 'Kui marjad hakkavad valmima' },
   { key: 'peak', label: 'Kui käes on parim korjeaeg' },
 ]
+// Whether this phone can show the reminders at all (an iPhone only can after "Lisa avakuvale").
+const pushState = typeof Notification === 'undefined' ? 'none' : Notification.permission
 const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v) => v.note).length)
 </script>
 
@@ -43,14 +45,16 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
         <span class="size-5 rounded-full shadow-neu-raised-sm" :class="store.notify[t.key] ? 'bg-sage' : 'grain'" />
       </span>
     </button>
+    <p v-if="pushState === 'denied'" class="text-base italic text-muted">Teated on selles telefonis keelatud. Luba need telefoni seadetes Koriluse juures.</p>
+    <p v-else-if="pushState === 'none'" class="text-base italic text-muted">See brauser ei saa teateid näidata. iPhone'is lisa Korilus enne avakuvale (Jaga → Lisa avakuvale).</p>
   </section>
 
   <section class="flex flex-col gap-3">
     <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Minu meeldetuletused</h2>
     <ul v-if="store.reminders.length" class="grain card flex flex-col gap-2 text-lg">
       <li v-for="id in store.reminders" :key="id" class="flex items-center justify-between">
-        <RouterLink :to="`/mari/${id}`">{{ findProduce(id)?.name }}</RouterLink>
-        <button type="button" class="text-base text-muted underline underline-offset-4" @click="toggleReminder(id)">Eemalda</button>
+        <RouterLink :to="`/mari/${id}`" class="-my-2 py-2">{{ findProduce(id)?.name }}</RouterLink>
+        <button type="button" class="-my-2 py-2 text-base text-muted underline underline-offset-4" @click="toggleReminder(id)">Eemalda</button>
       </li>
     </ul>
     <p v-else class="italic text-muted">Meeldetuletuse saad panna marja lehel.</p>
@@ -58,7 +62,7 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
 
   <section class="flex flex-col gap-3">
     <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Keel</h2>
-    <p class="grain card text-lg">Eesti keel</p>
+    <p class="text-lg">Eesti keel</p>
   </section>
 
   <section class="flex flex-col gap-3">
@@ -73,7 +77,7 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
   <section class="flex flex-col gap-3">
     <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Koriluse kohta</h2>
     <LinkCard label="Saada ettepanek või tagasiside" icon="chat" to="/tagasiside" />
-    <p class="grain card text-lg">Korilus v1.0</p>
+    <p class="text-base text-muted">Korilus v1.0</p>
   </section>
   </div>
 </template>

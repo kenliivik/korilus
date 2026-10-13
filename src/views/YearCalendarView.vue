@@ -13,7 +13,7 @@ const cellColor = { a: 'bg-leaf/35', t: 'bg-sage', l: 'hatch', '.': '' }
 </script>
 
 <template>
-  <PageHeader title="Korjekalender" back="/" />
+  <PageHeader title="Korjekalender" />
 
   <!-- Desktop: year chart with the month panel beside it (below it on small laptops). On phones the wrappers dissolve (display: contents). -->
   <div class="contents lg:flex lg:flex-col lg:gap-6 xl:grid xl:grid-cols-[1fr_22rem] xl:items-start xl:gap-10">
@@ -32,7 +32,7 @@ const cellColor = { a: 'bg-leaf/35', t: 'bg-sage', l: 'hatch', '.': '' }
       type="button"
       :aria-label="m"
       :aria-pressed="i === selected"
-      class="h-7 rounded-full text-center text-sm uppercase lg:h-9 lg:text-base lg:normal-case"
+      class="h-11 rounded-full text-center text-sm uppercase lg:h-9 lg:text-base lg:normal-case"
       :class="i === selected ? 'grain shadow-neu-inset' : i === now ? 'text-sage' : 'text-muted'"
       @click="selected = i"
     >
@@ -47,6 +47,7 @@ const cellColor = { a: 'bg-leaf/35', t: 'bg-sage', l: 'hatch', '.': '' }
         v-for="(c, i) in p.season"
         :key="i"
         class="mx-px h-6 rounded-sm lg:mx-0.5 lg:h-8"
+        @click="selected = i"
         :class="cellColor[c] || (i === selected && 'bg-sage/8')"
         :title="c !== '.' ? `${months[i]}: ${phases[c]}` : undefined"
       />

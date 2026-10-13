@@ -8,7 +8,7 @@ import VisitFields from '../components/VisitFields.vue'
 import SpotMap from '../components/SpotMap.vue'
 import { directionsUrl } from '../components/map.js'
 import { findProduce } from '../data/berries.js'
-import { findLocation, berriesAt, averageRating, today, touch, removeLocation } from '../data/store.js'
+import { findLocation, berriesAt, averageRating, today, formatDate, touch, removeLocation } from '../data/store.js'
 import { account } from '../data/account.js'
 
 const props = defineProps({ id: { type: String, required: true } })
@@ -99,7 +99,7 @@ function remove() {
 
       <div class="order-1 grid grid-cols-2 gap-4 lg:order-none">
         <RouterLink :to="`/asukohad/${loc.id}/muuda`" class="btn grain text-sage"><AppIcon name="edit" :size="20" /> Muuda</RouterLink>
-        <button type="button" class="btn grain text-[#9c3a3a]" @click="remove"><AppIcon name="trash" :size="20" /> Kustuta</button>
+        <button type="button" class="btn grain text-danger" @click="remove"><AppIcon name="trash" :size="20" /> Kustuta</button>
       </div>
     </template>
     </div>
@@ -114,19 +114,19 @@ function remove() {
             <button type="submit" class="btn bg-sage text-milk">Salvesta</button>
             <div class="grid grid-cols-2 gap-4">
               <button type="button" class="btn grain text-sage" @click="editing = null">Tühista</button>
-              <button type="button" class="btn grain text-[#9c3a3a]" @click="deleteVisit"><AppIcon name="trash" :size="20" /> Kustuta käik</button>
+              <button type="button" class="btn grain text-danger" @click="deleteVisit"><AppIcon name="trash" :size="20" /> Kustuta käik</button>
             </div>
           </form>
           <component
             :is="loc.shared ? 'article' : 'button'"
             v-else
             :type="loc.shared ? undefined : 'button'"
-            :aria-label="loc.shared ? undefined : `Muuda käiku ${v.date}`"
+            :aria-label="loc.shared ? undefined : `Muuda käiku ${formatDate(v.date)}`"
             class="grain card flex flex-col gap-1 text-left"
             :class="!loc.shared && 'transition-shadow active:shadow-neu-inset'"
             @click="loc.shared || editVisit(v)"
           >
-            <span class="flex w-full items-center justify-between">{{ v.date }} <StarRating :model-value="v.rating" readonly :size="14" /></span>
+            <span class="flex w-full items-center justify-between">{{ formatDate(v.date, false) }} <StarRating :model-value="v.rating" readonly :size="14" /></span>
             <span class="text-muted">{{ names(v.berries) }}</span>
             <span v-if="v.note" class="italic">„{{ v.note }}”</span>
           </component>

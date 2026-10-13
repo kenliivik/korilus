@@ -218,10 +218,10 @@ const small = 'grain grid size-9 shrink-0 place-items-center rounded-full shadow
     <p v-if="error === 'auth'" class="grain card text-lg">
       Oled välja logitud. <RouterLink to="/admin" class="underline underline-offset-4">Logi sisse</RouterLink> ja proovi uuesti.
     </p>
-    <p v-else-if="error" class="grain card text-lg text-[#9c3a3a]">{{ error }}</p>
+    <p v-else-if="error" class="grain card text-lg text-danger">{{ error }}</p>
 
     <button type="submit" class="btn bg-sage text-milk" :disabled="busy">{{ busy ? 'Salvestan…' : 'Salvesta' }}</button>
-    <button v-if="!isNew" type="button" class="btn grain text-[#9c3a3a]" :disabled="busy" @click="remove">
+    <button v-if="!isNew" type="button" class="btn grain text-danger" :disabled="busy" @click="remove">
       <AppIcon name="trash" :size="20" /> Kustuta
     </button>
   </form>

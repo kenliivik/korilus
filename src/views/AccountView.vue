@@ -110,7 +110,7 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
         <button type="button" class="underline underline-offset-4" :disabled="busy" @click="sendCode">Saada uus kood</button>
       </div>
     </form>
-    <p v-if="error" role="alert" class="text-lg text-[#9c3a3a]">{{ error }}</p>
+    <p v-if="error" role="alert" class="text-lg text-danger">{{ error }}</p>
   </template>
 
   <template v-else>
@@ -166,7 +166,7 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
       </form>
     </section>
 
-    <p v-if="error" role="alert" class="text-lg text-[#9c3a3a]">{{ error }}</p>
+    <p v-if="error" role="alert" class="text-lg text-danger">{{ error }}</p>
     <p v-if="note" role="status" class="text-lg">{{ note }}</p>
 
     <section class="flex flex-col gap-3">
@@ -174,7 +174,7 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
       <RouterLink v-if="account.user.isAdmin" to="/admin" class="btn grain text-sage">Halda sisu</RouterLink>
       <button type="button" class="btn grain text-sage" :disabled="busy" @click="download">Laadi oma andmed alla</button>
       <button type="button" class="btn grain text-sage" :disabled="busy" @click="signOut">Logi välja</button>
-      <button type="button" class="btn grain text-[#9c3a3a]" :disabled="busy" @click="remove">
+      <button type="button" class="btn grain text-danger" :disabled="busy" @click="remove">
         <AppIcon name="trash" :size="20" /> Kustuta konto
       </button>
       <p class="text-base italic text-muted">Kui välja logid, jäävad su {{ store.locations.length }} kohta sellesse telefoni alles.</p>

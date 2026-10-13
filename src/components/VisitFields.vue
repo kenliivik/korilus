@@ -42,6 +42,6 @@ const toggle = (id) =>
 
   <div class="flex flex-col gap-2">
     <span class="text-xl">Kui hea koht?</span>
-    <StarRating v-model="visit.rating" :size="30" />
+    <StarRating v-model="visit.rating" :size="32" />
   </div>
 </template>

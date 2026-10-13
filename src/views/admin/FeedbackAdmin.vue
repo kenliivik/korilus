@@ -27,7 +27,7 @@ const remove = (f) => confirm('Kas kustutad selle sõnumi?') && load({ action: '
   <PageHeader title="Tagasiside" back="/admin" />
 
   <p v-if="!items" class="italic text-muted">Laadin…</p>
-  <p v-if="error" role="alert" class="text-lg text-[#9c3a3a]">{{ error }}</p>
+  <p v-if="error" role="alert" class="text-lg text-danger">{{ error }}</p>
   <ul v-if="items?.length" class="flex flex-col gap-3">
     <li v-for="f in items" :key="f.id" class="grain card flex flex-col gap-2" :class="{ 'opacity-60': f.done }">
       <p class="font-hand text-sm text-muted">

@@ -2,9 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from './views/HomeView.vue'
 import YearCalendarView from './views/YearCalendarView.vue'
 import ProduceView from './views/ProduceView.vue'
-import LocationsView from './views/LocationsView.vue'
-import LocationView from './views/LocationView.vue'
-import LocationFormView from './views/LocationFormView.vue'
 import SettingsView from './views/SettingsView.vue'
 import AccountView from './views/AccountView.vue'
 import GroupView from './views/GroupView.vue'
@@ -12,19 +9,20 @@ import RecipesView from './views/RecipesView.vue'
 import RecipeView from './views/RecipeView.vue'
 import FeedbackView from './views/FeedbackView.vue'
 
+// The places pages load separately because they bring the map library (Leaflet).
 // `meta.tab` decides which bottom-nav tab is highlighted.
 export default createRouter({
   history: createWebHistory(),
   scrollBehavior: () => ({ top: 0 }),
   routes: [
     { path: '/', component: HomeView, meta: { tab: 'home', wide: true } },
-    { path: '/kalender', component: YearCalendarView, meta: { tab: 'calendar', wide: true, top: true } },
+    { path: '/kalender', component: YearCalendarView, meta: { tab: 'calendar', wide: true } },
     { path: '/mari/:id', component: ProduceView, props: true, meta: { tab: 'home', wide: true } },
-    { path: '/asukohad', component: LocationsView, meta: { tab: 'locations', wide: true } },
-    { path: '/asukohad/uus', component: LocationFormView, meta: { tab: 'locations', wide: true } },
-    { path: '/asukohad/:id', component: LocationView, props: true, meta: { tab: 'locations', wide: true } },
-    { path: '/asukohad/:id/muuda', component: LocationFormView, props: true, meta: { tab: 'locations', wide: true } },
-    { path: '/retseptid', component: RecipesView, meta: { tab: 'recipes', wide: true, top: true } },
+    { path: '/asukohad', component: () => import('./views/LocationsView.vue'), meta: { tab: 'locations', wide: true } },
+    { path: '/asukohad/uus', component: () => import('./views/LocationFormView.vue'), meta: { tab: 'locations', wide: true } },
+    { path: '/asukohad/:id', component: () => import('./views/LocationView.vue'), props: true, meta: { tab: 'locations', wide: true } },
+    { path: '/asukohad/:id/muuda', component: () => import('./views/LocationFormView.vue'), props: true, meta: { tab: 'locations', wide: true } },
+    { path: '/retseptid', component: RecipesView, meta: { tab: 'recipes', wide: true } },
     { path: '/retsept/:id', component: RecipeView, props: true, meta: { tab: 'recipes', wide: true } },
     // Admin screens are only for Ken, so they load separately. `:id` "uus" = new recipe.
     { path: '/admin/retseptid', component: () => import('./views/admin/RecipesAdmin.vue'), meta: { tab: 'settings', wide: true, doc: true } },
