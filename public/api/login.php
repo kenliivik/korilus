@@ -47,6 +47,8 @@ if ($action === 'code') {
 }
 
 if ($action === 'verify') {
+    // At most 15 wrong codes a day per address, however many codes were asked for, so guessing one stays hopeless.
+    if (q('SELECT SUM(attempts) FROM login_codes WHERE email = ?', [$email])->fetchColumn() >= 15) reply_error('too_many', 429);
     $row = q('SELECT * FROM login_codes WHERE email = ? AND expires_at > ? ORDER BY id DESC LIMIT 1', [$email, time()])->fetch();
     if (!$row || $row['attempts'] >= CODE_ATTEMPTS) reply_error('expired');
     if (!hash_equals($row['code_hash'], $hash($email, preg_replace('/\D/', '', (string) ($in['code'] ?? ''))))) {
