@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import PageHeader from '../../components/PageHeader.vue'
 import AppIcon from '../../components/AppIcon.vue'
 import BerryGlyph from '../../components/BerryGlyph.vue'
-import { bundled, content, loadContent, saveContent, months, phases, statusText } from '../../data/berries.js'
+import { bundled, content, loadContent, saveContent, months, phases, statusText, dateLabel } from '../../data/berries.js'
 import { checkAdmin, uploadImage } from '../../data/admin.js'
 
 // Add a berry (no id) or edit one. Saving sends it to api/content.php, so every phone gets it.
@@ -78,31 +78,31 @@ async function run(body) {
     router.push('/admin')
   } catch (e) {
     if (e.status === 401) return router.replace('/admin')
-    message.value = `Salvestamine ebaõnnestus (${e.message}).`
+    message.value = `Salvestamine ei õnnestunud (${e.message}).`
   }
   busy.value = false
 }
 
 function save() {
-  if (form.value.season === '............') return (message.value = 'Märgi hooajakalendris vähemalt üks kuu.')
+  if (form.value.season === '............') return (message.value = 'Märgi kalendris vähemalt üks kuu.')
   run({ collection: 'berries', action: 'save', item: item.value })
 }
 
 function remove() {
-  if (confirm(`Kas kustutada „${form.value.name}”? Selle asemel saab marja ka peita.`)) run({ collection: 'berries', action: 'delete', id: form.value.id })
+  if (confirm(`Kas kustutad „${form.value.name}”? Marja saab ka lihtsalt peita.`)) run({ collection: 'berries', action: 'delete', id: form.value.id })
 }
 </script>
 
 <template>
   <PageHeader :title="id ? 'Muuda marja' : 'Lisa mari'" back="/admin" />
 
-  <p v-if="!form" class="italic text-muted">Laen…</p>
+  <p v-if="!form" class="italic text-muted">Laadin…</p>
 
   <!-- Preview: roughly how the berry page will look. -->
   <template v-else-if="preview">
     <section class="flex flex-col items-center gap-2">
       <BerryGlyph :name="item.id" :image="item.image" :size="200" />
-      <h2 class="text-[32px] leading-9">{{ item.name || 'Nimetu' }}</h2>
+      <h2 class="text-[32px] leading-9">{{ item.name || 'Nimeta' }}</h2>
       <p class="italic text-muted">{{ item.latin }}</p>
     </section>
     <section class="grain card grid grid-cols-12 gap-1 px-3">
@@ -111,7 +111,7 @@ function remove() {
     </section>
     <dl class="grain card grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-lg">
       <template v-for="(value, label) in item.dates" :key="label">
-        <dt class="text-muted">{{ label }}</dt>
+        <dt class="text-muted">{{ dateLabel(label) }}</dt>
         <dd>{{ value }}</dd>
       </template>
       <dt class="text-muted">Praegu</dt>
@@ -121,7 +121,7 @@ function remove() {
       <li v-for="tip in item.tips" :key="tip">{{ tip }}</li>
     </ul>
     <button type="button" class="btn bg-sage text-milk" :disabled="busy" @click="save">Salvesta</button>
-    <button type="button" class="btn grain text-sage" @click="preview = false">Tagasi muutma</button>
+    <button type="button" class="btn grain text-sage" @click="preview = false">Muuda edasi</button>
     <p v-if="message" class="italic text-[#9c3a3a]">{{ message }}</p>
   </template>
 
@@ -157,19 +157,19 @@ function remove() {
           <span class="size-4 rounded" :class="cellColor[key]" />{{ label }}
         </li>
       </ul>
-      <p class="font-hand text-lg text-muted">Puuduta kuud: algus → tipp → lõpp → tühi.</p>
+      <p class="font-hand text-lg text-muted">Puuduta kuud: algus → parim aeg → lõpp → tühi.</p>
     </fieldset>
 
     <fieldset class="flex flex-col gap-2">
-      <legend class="mb-2 text-xl">Küpsemisaeg sõnadega</legend>
-      <label v-for="(_, k) in form.dates" :key="k" class="grid grid-cols-[4rem_1fr] items-center gap-3">
-        <span class="text-muted">{{ k }}</span>
+      <legend class="mb-2 text-xl">Valmimisaeg sõnadega</legend>
+      <label v-for="(_, k) in form.dates" :key="k" class="grid grid-cols-[5.5rem_1fr] items-center gap-3">
+        <span class="text-muted">{{ dateLabel(k) }}</span>
         <input v-model="form.dates[k]" maxlength="80" class="field" placeholder="nt. juuli algus" />
       </label>
     </fieldset>
 
     <fieldset class="flex flex-col gap-2">
-      <legend class="mb-2 text-xl">Korjamise nõuanded</legend>
+      <legend class="mb-2 text-xl">Korjaja nõuanded</legend>
       <div v-for="(_, i) in form.tips" :key="i" class="flex items-center gap-2">
         <input v-model="form.tips[i]" maxlength="300" class="field" />
         <button type="button" aria-label="Eemalda nõuanne" class="grain grid size-9 shrink-0 place-items-center rounded-full text-muted shadow-neu-raised-sm" @click="form.tips.splice(i, 1)">
@@ -185,17 +185,17 @@ function remove() {
         <BerryGlyph :name="item.id" :image="form.image" :size="80" class="shrink-0" />
         <div class="flex flex-1 flex-col gap-2">
           <label class="btn grain cursor-pointer text-base text-sage">
-            {{ busy ? 'Laen üles…' : form.image ? 'Vaheta pilti' : 'Lae pilt' }}
+            {{ busy ? 'Laadin üles…' : form.image ? 'Vaheta pilt' : 'Lisa pilt' }}
             <input type="file" accept="image/*" class="sr-only" :disabled="busy" @change="pickImage" />
           </label>
           <button v-if="form.image" type="button" class="text-base text-muted underline underline-offset-4" @click="form.image = ''">Eemalda pilt</button>
         </div>
       </div>
-      <p class="text-base italic text-muted">Foto või joonistus. Ilma pildita näidatakse joonistust.</p>
+      <p class="text-base italic text-muted">Foto või joonistus. Kui pilti pole, näitame tavalist joonistust.</p>
     </fieldset>
 
     <label class="grain card flex items-center justify-between text-lg">
-      Peidetud (ei näidata rakenduses)
+      Peida rakendusest
       <input v-model="form.hidden" type="checkbox" class="size-6 accent-sage" />
     </label>
 

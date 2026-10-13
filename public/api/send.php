@@ -9,8 +9,8 @@ require __DIR__ . '/webpush.php';
 $vapid = vapid_key(VAPID_FILE);
 $month = (int) date('n') - 1;
 $messages = [
-    'a' => ['start', '%s hakkab valmima', 'Hooaeg algab. Vaata, kus sa seda varem leidsid.'],
-    't' => ['peak', '%s on küps!', 'Praegu on parim aeg korjata.'],
+    'a' => ['start', '%s hakkab valmima', 'Vaata, kust sa seda eelmisel korral leidsid.'],
+    't' => ['peak', '%s: nüüd on parim aeg!', 'Marjad on valmis, mine metsa!'],
 ];
 
 $subs = load_subs();

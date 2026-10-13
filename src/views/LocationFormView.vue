@@ -19,15 +19,15 @@ const visit = ref({ berries: [], note: '', rating: 0 })
 const gps = ref('')
 
 function locate() {
-  gps.value = 'Otsin asukohta…'
+  gps.value = 'Otsin, kus sa oled…'
   navigator.geolocation?.getCurrentPosition(
     ({ coords: c }) => {
       coords.value = { lat: c.latitude, lng: c.longitude }
-      gps.value = `Asukoht leitud (${c.latitude.toFixed(4)}, ${c.longitude.toFixed(4)})`
+      gps.value = `Koht on kaardil (${c.latitude.toFixed(4)}, ${c.longitude.toFixed(4)})`
     },
-    () => (gps.value = 'Asukohta ei õnnestunud leida. Koht salvestatakse ilma kaardita.'),
+    () => (gps.value = 'Asukohta ei leidnud. Salvestan koha ilma kaardita.'),
     { enableHighAccuracy: true },
-  ) ?? (gps.value = 'See seade ei toeta asukoha leidmist.')
+  ) ?? (gps.value = 'See telefon ei oska asukohta leida.')
 }
 if (!existing) locate()
 
@@ -61,14 +61,14 @@ function save() {
     <label v-if="account.user && account.groups.length" class="flex flex-col gap-2">
       <span class="text-xl">Jaga</span>
       <select v-model="groupId" class="field">
-        <option :value="null">Privaatne (ainult mina)</option>
-        <option v-for="g in account.groups" :key="g.id" :value="g.id">Grupiga „{{ g.name }}”</option>
+        <option :value="null">Ainult mina</option>
+        <option v-for="g in account.groups" :key="g.id" :value="g.id">Mina ja grupp „{{ g.name }}”</option>
       </select>
     </label>
 
     <button type="button" class="grain card flex items-center gap-3 text-left text-muted" @click="locate">
       <AppIcon name="pin" :size="20" />
-      <span class="flex-1">{{ gps || 'Puuduta, et salvestada praegune asukoht' }}</span>
+      <span class="flex-1">{{ gps || 'Puuduta, et märkida koht kaardile' }}</span>
     </button>
 
     <button type="submit" class="btn bg-sage text-milk">Salvesta</button>

@@ -14,13 +14,13 @@ const ripe = computed(() => inSeason()) // updates when new content arrives from
   </header>
 
   <section class="flex flex-col gap-1">
-    <h2 class="text-[32px] leading-9 text-sage">Mis on praegu küps?</h2>
+    <h2 class="text-[32px] leading-9 text-sage">Mida praegu korjata?</h2>
     <p class="italic leading-5 text-muted">
-      {{ ripe.length ? `${ripe.length} liiki on praegu hooajal` : 'Praegu pole midagi hooajal. Vaata aastast kalendrit.' }}
+      {{ ripe.length ? 'Need on praegu valmis:' : 'Praegu pole midagi korjata. Vaata kalendrist, mis on varsti valmimas.' }}
     </p>
   </section>
 
-  <section v-if="ripe.length" class="mt-6 grid grid-cols-3 gap-x-3 gap-y-12" aria-label="Praegu hooajal">
+  <section v-if="ripe.length" class="mt-6 grid grid-cols-3 gap-x-3 gap-y-12" aria-label="Praegu valmis korjamiseks">
     <BerryTile
       v-for="p in ripe"
       :key="p.id"

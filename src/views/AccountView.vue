@@ -8,15 +8,15 @@ import { account, requestCode, verifyCode, logout, deleteAccount, saveName, grou
 
 const router = useRouter()
 const messages = {
-  not_invited: 'Korilus on praegu ainult kutsetega. Palu kutset kelleltki, kes seda juba kasutab.',
-  too_many: 'Liiga palju katseid. Proovi mõne minuti pärast uuesti.',
-  wrong_code: 'Vale kood. Proovi uuesti.',
-  expired: 'Kood on aegunud või liiga palju kordi valesti sisestatud. Küsi uus kood.',
+  not_invited: 'Korilusse saab praegu ainult kutsega. Küsi kutset kelleltki, kes seda juba kasutab.',
+  too_many: 'Liiga palju katseid. Oota paar minutit ja proovi uuesti.',
+  wrong_code: 'Kood ei sobi. Proovi uuesti.',
+  expired: 'Kood on aegunud või sisestati liiga mitu korda valesti. Küsi uus kood.',
   mail: 'Kirja saatmine ei õnnestunud. Proovi hiljem uuesti.',
-  email: 'Kontrolli e-posti aadressi.',
-  already_user: 'See inimene juba kasutab Korilust. Lisa ta grupi lehelt oma gruppi.',
+  email: 'See e-posti aadress ei tundu õige.',
+  already_user: 'See inimene juba kasutab Korilust. Lisa ta grupi lehel oma gruppi.',
 }
-const say = (e) => messages[e.message] ?? 'Ühendus ei õnnestunud. Kas internet on olemas?'
+const say = (e) => messages[e.message] ?? 'Ei saanud ühendust. Kas internet töötab?'
 
 const email = ref('')
 const code = ref('')
@@ -52,7 +52,7 @@ const rename = () => run(() => saveName(name.value))
 const friend = ref('')
 const invite = () => run(async () => {
   await groupAction({ action: 'invite', email: friend.value })
-  note.value = `Kutse saadetud aadressile ${friend.value}.`
+  note.value = `Kutse läks teele: ${friend.value}.`
   friend.value = ''
 })
 
@@ -62,7 +62,7 @@ const signOut = () => run(async () => {
   step.value = 'email'
 })
 const remove = () =>
-  confirm('Kas kustutada konto? Serverist kustutatakse sinu konto, kohad ja grupid, mille omanik oled. Selles telefonis jäävad kohad alles.') &&
+  confirm('Kas kustutad konto? Serverist kaovad su konto, kohad ja grupid, mille sa lõid. Selles telefonis jäävad kohad alles.') &&
   run(async () => {
     await deleteAccount()
     router.replace('/seaded')
@@ -76,8 +76,8 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
 
   <template v-if="!account.user">
     <p class="text-lg">
-      Logi sisse, et su marjakohad oleksid alles ka uues telefonis ja et saaksid neid perega jagada. Ilma kontota töötab kõik
-      edasi selles seadmes.
+      Logi sisse, siis jäävad su marjakohad alles ka uut telefoni võttes ja saad neid perega jagada. Ilma kontota töötab kõik
+      edasi, lihtsalt ainult selles telefonis.
     </p>
 
     <form v-if="step === 'email'" class="flex flex-col gap-4" @submit.prevent="sendCode">
@@ -89,7 +89,7 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
     </form>
 
     <form v-else class="flex flex-col gap-4" @submit.prevent="login">
-      <p class="text-lg">Saatsime 6-kohalise koodi aadressile <b class="font-normal underline">{{ email }}</b>. Kood kehtib 10 minutit.</p>
+      <p class="text-lg">Saatsime aadressile <b class="font-normal underline">{{ email }}</b> kuuekohalise koodi. See kehtib 10 minutit.</p>
       <label class="flex flex-col gap-2">
         <span class="text-xl">Kood</span>
         <input
@@ -116,7 +116,7 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
     <section class="flex flex-col gap-3">
       <form class="grain card flex flex-col gap-3" @submit.prevent="rename">
         <label class="flex flex-col gap-2">
-          <span class="text-muted">Nimi, mida grupi liikmed näevad</span>
+          <span class="text-muted">Sinu nimi, nagu grupikaaslased seda näevad</span>
           <span class="flex gap-2">
             <input v-model.trim="name" required maxlength="60" class="field" />
             <button v-if="name !== account.user.name" type="submit" class="btn bg-sage px-4 text-milk" :disabled="busy">Salvesta</button>
@@ -124,8 +124,8 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
         </label>
         <p class="text-lg">{{ account.user.email }}</p>
         <p class="text-base italic text-muted">
-          {{ account.syncing ? 'Sünkroonin…' : account.error ? 'Sünkroonimine ei õnnestunud, proovin hiljem uuesti.'
-            : account.syncedAt ? `Kohad sünkroonitud kell ${time(account.syncedAt)}.` : 'Kohad pole veel sünkroonitud.' }}
+          {{ account.syncing ? 'Salvestan kontole…' : account.error ? 'Kontole salvestamine ei õnnestunud, proovin hiljem uuesti.'
+            : account.syncedAt ? `Kohad on kontol, viimati kell ${time(account.syncedAt)}.` : 'Kohad pole veel kontole jõudnud.' }}
         </p>
       </form>
     </section>
@@ -145,7 +145,7 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
         <AppIcon name="arrow" :size="20" />
       </RouterLink>
       <p v-if="!account.groups.length" class="italic text-muted">
-        Loo grupp (nt „Pere”) ja kutsu sinna inimesi. Iga koha juures saad valida, kas see on privaatne või grupiga jagatud.
+        Loo grupp, näiteks „Pere”, ja kutsu sinna oma inimesed. Iga koha juures saad valida, kas seda näed ainult sina või ka grupp.
       </p>
       <RouterLink to="/grupid" class="btn grain text-sage"><AppIcon name="plus" :size="20" /> Uus grupp</RouterLink>
     </section>
@@ -164,33 +164,34 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
     <section class="flex flex-col gap-3">
       <h2 class="text-2xl leading-7">Minu andmed</h2>
       <RouterLink v-if="account.user.isAdmin" to="/admin" class="btn grain text-sage">Halda sisu</RouterLink>
-      <button type="button" class="btn grain text-sage" :disabled="busy" @click="download">Laadi alla minu andmed</button>
+      <button type="button" class="btn grain text-sage" :disabled="busy" @click="download">Laadi oma andmed alla</button>
       <button type="button" class="btn grain text-sage" :disabled="busy" @click="signOut">Logi välja</button>
       <button type="button" class="btn grain text-[#9c3a3a]" :disabled="busy" @click="remove">
         <AppIcon name="trash" :size="20" /> Kustuta konto
       </button>
-      <p class="text-base italic text-muted">Välja logides jäävad sinu {{ store.locations.length }} kohta sellesse telefoni alles.</p>
+      <p class="text-base italic text-muted">Kui välja logid, jäävad su {{ store.locations.length }} kohta sellesse telefoni alles.</p>
     </section>
   </template>
 
   <details class="grain card text-lg">
     <summary class="cursor-pointer text-xl">Privaatsus</summary>
     <div class="mt-3 flex flex-col gap-3">
-      <p>Ilma kontota on kõik sinu andmed ainult selles telefonis.</p>
+      <p>Ilma kontota on kõik su andmed ainult selles telefonis.</p>
       <p>
-        Kui logid sisse, hoiame Koriluse serveris (Veebimajutus, Eesti) sinu e-posti aadressi, nime, sinu marjakohti koos
-        märkustega ning gruppe, kuhu kuulud. Seda on vaja, et kohad oleksid alles ka uues telefonis ja et saaksid neid jagada.
+        Kui logid sisse, hoiame Koriluse serveris (Veebimajutus, Eestis) su e-posti aadressi, nime, marjakohti koos
+        märkmetega ja gruppe, kuhu kuulud. Nii jäävad kohad alles ka uues telefonis ja saad neid jagada.
       </p>
       <p>
-        Grupiga jagatud kohti ja sinu nime näevad selle grupi liikmed. Privaatseid kohti ei näe keegi teine. Andmeid ei müüda
-        ega anta kellelegi edasi, reklaami ja jälgimist pole.
+        Grupiga jagatud kohti ja su nime näevad selle grupi liikmed. Kohti, mis on ainult sinu, ei näe keegi teine. Andmeid ei
+        müüda ega anta kellelegi edasi. Reklaame ega jälgimist pole.
       </p>
       <p>
-        Sisselogimiseks saadame e-postiga ühekordse koodi. Sisselogituna hoiab üks vajalik küpsis sind sisse logituna.
+        Sisselogimiseks saadame e-postiga ühekordse koodi. Et sa ei peaks iga kord uuesti sisse logima, kasutame üht vajalikku
+        küpsist.
       </p>
       <p>
-        Saad oma andmed igal ajal alla laadida ja konto kustutada. Konto kustutamisel kaovad serverist sinu konto, kohad ja
-        sinu loodud grupid.
+        Saad oma andmed igal ajal alla laadida ja konto kustutada. Siis kaovad serverist su konto, kohad ja su loodud
+        grupid.
       </p>
     </div>
   </details>

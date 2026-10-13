@@ -86,7 +86,7 @@ async function save() {
 }
 
 async function remove() {
-  if (!confirm(`Kas kustutada „${draft.value.title}”?`)) return
+  if (!confirm(`Kas kustutad „${draft.value.title}”?`)) return
   busy.value = true
   try {
     await deleteRecipe(props.id)
@@ -164,7 +164,7 @@ const small = 'grain grid size-9 shrink-0 place-items-center rounded-full shadow
         <input v-model="draft.time" class="field" placeholder="nt. 40 min" />
       </label>
       <label class="flex flex-col gap-2">
-        <span class="text-xl">Saagis</span>
+        <span class="text-xl">Kogus</span>
         <input v-model="draft.yield" class="field" placeholder="nt. 4 purki" />
       </label>
     </div>
@@ -206,17 +206,17 @@ const small = 'grain grid size-9 shrink-0 place-items-center rounded-full shadow
     </fieldset>
 
     <label class="flex flex-col gap-2">
-      <span class="text-xl">Nõuanne</span>
+      <span class="text-xl">Hea nõu</span>
       <textarea v-model="draft.tip" rows="2" class="field" placeholder="Valikuline" />
     </label>
 
     <label class="grain card flex items-center justify-between text-lg">
-      Peida avalikust nimekirjast
+      Peida rakendusest
       <input v-model="draft.hidden" type="checkbox" class="size-5 accent-sage" />
     </label>
 
     <p v-if="error === 'auth'" class="grain card text-lg">
-      Sessioon on aegunud. <RouterLink to="/admin" class="underline underline-offset-4">Logi sisse</RouterLink> ja proovi uuesti.
+      Oled välja logitud. <RouterLink to="/admin" class="underline underline-offset-4">Logi sisse</RouterLink> ja proovi uuesti.
     </p>
     <p v-else-if="error" class="grain card text-lg text-[#9c3a3a]">{{ error }}</p>
 

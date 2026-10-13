@@ -5,7 +5,7 @@ import { account, api } from '../data/account.js'
 
 const messages = {
   too_many: 'Oled täna juba palju kirjutanud. Proovi hiljem uuesti.',
-  email: 'Kontrolli e-posti aadressi.',
+  email: 'See e-posti aadress ei tundu õige.',
   message: 'Kirjuta paar sõna.',
 }
 
@@ -24,7 +24,7 @@ async function send() {
     sent.value = true
     message.value = ''
   } catch (e) {
-    error.value = messages[e.message] ?? 'Saatmine ei õnnestunud. Kas internet on olemas?'
+    error.value = messages[e.message] ?? 'Saatmine ei õnnestunud. Kas internet töötab?'
   } finally {
     busy.value = false
   }

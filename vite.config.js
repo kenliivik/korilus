@@ -14,7 +14,7 @@ export default defineConfig({
       manifest: {
         name: 'Korilus',
         short_name: 'Korilus',
-        description: 'Metsamarjade ja -viljade hooajad ning korjekohad',
+        description: 'Marjakalender ja sinu korjekohad',
         lang: 'et',
         start_url: '/',
         scope: '/',
