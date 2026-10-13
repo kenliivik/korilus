@@ -29,7 +29,7 @@ export default createRouter({
     // Admin screens are only for Ken, so they load separately. `:id` "uus" = new recipe.
     { path: '/admin/retseptid', component: () => import('./views/admin/RecipesAdmin.vue'), meta: { tab: 'settings' } },
     { path: '/admin/retseptid/:id', component: () => import('./views/admin/RecipeEditor.vue'), props: true, meta: { tab: 'settings' } },
-    { path: '/seaded', component: SettingsView, meta: { tab: 'settings' } },
+    { path: '/seaded', component: SettingsView, meta: { tab: 'settings', wide: true } },
     { path: '/admin', component: () => import('./views/admin/AdminView.vue'), meta: { tab: 'settings' } },
     { path: '/admin/marjad/:id?', component: () => import('./views/admin/BerryEditor.vue'), props: true, meta: { tab: 'settings' } },
     { path: '/admin/tagasiside', component: () => import('./views/admin/FeedbackAdmin.vue'), meta: { tab: 'settings' } },
