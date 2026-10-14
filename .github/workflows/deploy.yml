@@ -12,6 +12,8 @@ concurrency: deploy
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # The server key is kept in the "production" environment, which only main may use (see README → Deploy).
+    environment: production
     steps:
       - uses: actions/checkout@v4
 
@@ -48,3 +50,5 @@ jobs:
           lftp -e "set sftp:connect-program 'ssh -a -x -i $HOME/deploy_key $HOSTKEY'; \
             mirror --reverse --delete --verbose --exclude-glob .well-known/ --exclude-glob 'elkdata_*' --exclude-glob 'elkdata_*/' --exclude-glob api/data/ --exclude-glob data/ --exclude-glob uploads/ dist/ $DEPLOY_DIR/; bye" \
             -p "$SSH_PORT" -u "$SSH_USER," "sftp://$SSH_HOST"
+          # New tables or columns from schema.sql (safe to run again), so a change needing them works right after the upload.
+          ssh -i ~/deploy_key -p "$SSH_PORT" -o BatchMode=yes $HOSTKEY "$SSH_USER@$SSH_HOST" 'php ~/htdocs/korilus/api/migrate.php'

@@ -58,6 +58,12 @@ export async function logout() {
   forget()
 }
 
+// For a lost phone: every phone and computer has to log in again, this one included.
+export async function logoutAll() {
+  await api('account.php', { action: 'logout_all' })
+  forget()
+}
+
 export async function deleteAccount() {
   await api('account.php', { action: 'delete' })
   forget()

@@ -79,3 +79,13 @@ CREATE TABLE IF NOT EXISTS feedback (
   INDEX (ip),
   INDEX (user_id)
 ) DEFAULT CHARSET = utf8mb4;
+
+-- Invitation emails sent, so the daily limits hold even when an invite is withdrawn and sent again.
+CREATE TABLE IF NOT EXISTS mail_log (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  email VARCHAR(190) NOT NULL,
+  created_at INT UNSIGNED NOT NULL,
+  INDEX (user_id),
+  INDEX (email)
+) DEFAULT CHARSET = utf8mb4;
