@@ -31,6 +31,8 @@ $ip = $_SERVER['REMOTE_ADDR'] ?? '';
 if (q('SELECT COUNT(*) FROM feedback WHERE ip = ? AND created_at > ?', [$ip, time() - 3600])->fetchColumn() >= 5
     || q('SELECT COUNT(*) FROM feedback WHERE created_at > ?', [time() - 86400])->fetchColumn() >= 50) reply_error('too_many', 429);
 
+// The IP address is only for the limit above, so it is forgotten after 30 days.
+q("UPDATE feedback SET ip = '' WHERE ip <> '' AND created_at < ?", [time() - 30 * 86400]);
 q('INSERT INTO feedback (message, email, user_id, ip, created_at) VALUES (?, ?, ?, ?, ?)', [$message, $email, $user['id'] ?? null, $ip, time()]);
 
 // The copy goes to config 'feedback_to', else to every admin account. A failed email is fine: it is in /admin anyway.

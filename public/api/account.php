@@ -1,6 +1,7 @@
 <?php
 // GET ?export: everything the server keeps about the user, as a JSON download ("Laadi alla minu andmed").
-// POST {action: "name", name}: the name group members see. {action: "delete"}: deletes the account and its data on the server.
+// POST {action: "name", name}: the name group members see. {action: "logout_all"}: logs out every phone and computer.
+// {action: "delete"}: deletes the account and its data on the server.
 require __DIR__ . '/session.php';
 
 $user = require_user();
@@ -25,6 +26,11 @@ switch ($in['action'] ?? '') {
         q('UPDATE users SET name = ? WHERE id = ?', [$name, $uid]);
         reply(['user' => public_user(['name' => $name] + $user)]);
 
+    case 'logout_all':
+        q('DELETE FROM sessions WHERE user_id = ?', [$uid]);
+        session_cookie('', 1);
+        reply(['ok' => true]);
+
     case 'delete':
         db()->beginTransaction();
         foreach (q("SELECT group_id FROM group_members WHERE user_id = ? AND role = 'owner'", [$uid])->fetchAll(PDO::FETCH_COLUMN) as $gid) delete_group($gid);
@@ -33,6 +39,7 @@ switch ($in['action'] ?? '') {
         q('DELETE FROM invites WHERE invited_by = ? OR email = ?', [$uid, $user['email']]);
         q('DELETE FROM login_codes WHERE email = ?', [$user['email']]);
         q('DELETE FROM feedback WHERE user_id = ?', [$uid]);
+        q('DELETE FROM mail_log WHERE user_id = ?', [$uid]);
         q('DELETE FROM sessions WHERE user_id = ?', [$uid]);
         q('DELETE FROM users WHERE id = ?', [$uid]);
         db()->commit();

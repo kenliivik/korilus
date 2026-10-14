@@ -11,13 +11,16 @@ npm run build && npm run preview  # production build, test install and offline
 ## Deploy
 
 Every push to `main` builds the app and uploads `dist/` to `htdocs/korilus` on the Veebimajutus server
-(`.github/workflows/deploy.yml`). It needs three repository secrets (Settings → Secrets and variables → Actions):
+(`.github/workflows/deploy.yml`) and then runs `api/migrate.php`, so new tables in `schema.sql` exist right away.
+It needs three secrets in the `production` environment (Settings → Environments → production; under "Deployment branches"
+allow only `main`, so a workflow on any other branch can't read the server key):
 
 - `SSH_HOST`: the SSH server address from Iseteenindus → Veebiserver → SSH kasutajad
 - `SSH_USER`: the SSH username
 - `SSH_PRIVATE_KEY`: a deploy-only private key without a passphrase; its `.pub` half is added under SSH kasutajad → Võtmed
 
-A run can also be started by hand from the Actions tab.
+A run can also be started by hand from the Actions tab. A daily "Health check" run fails (and GitHub emails you)
+if the site or the API stops answering or the HTTPS certificate is about to expire.
 
 ## Admin (content editor)
 

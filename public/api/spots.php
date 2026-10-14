@@ -12,6 +12,16 @@ $groups = array_map('intval', q('SELECT group_id FROM group_members WHERE user_i
 [$used, $count] = array_map('intval', q('SELECT COALESCE(SUM(LENGTH(data)), 0), COUNT(*) FROM spots WHERE user_id = ?', [$uid])->fetch(PDO::FETCH_NUM));
 $meta = ['id' => 0, 'updatedAt' => 0, 'groupId' => 0, 'deleted' => 0, 'mine' => 0, 'owner' => 0, 'shared' => 0];
 
+// A spot can be shared with others, so it must be one their app can show: a name, visits with a date, and a real place on the map
+// (or none, for spots saved before a place was required).
+function showable($s) {
+    $place = fn($v, $max) => $v === null || (is_numeric($v) && abs($v) <= $max);
+    $visit = fn($v) => is_array($v) && is_string($v['date'] ?? null) && is_array($v['berries'] ?? []);
+    return is_string($s['name'] ?? null) && mb_strlen($s['name']) <= 200
+        && is_array($s['visits'] ?? null) && count(array_filter($s['visits'], $visit)) === count($s['visits'])
+        && $place($s['lat'] ?? null, 90) && $place($s['lng'] ?? null, 180) && (($s['lat'] ?? null) === null) === (($s['lng'] ?? null) === null);
+}
+
 db()->beginTransaction();
 foreach (array_slice($in['spots'] ?? [], 0, 2000) as $s) {
     $id = $s['id'] ?? null;
@@ -21,6 +31,8 @@ foreach (array_slice($in['spots'] ?? [], 0, 2000) as $s) {
     if ($row && ((int) $row['user_id'] !== $uid || (int) $row['updated_at'] >= $at)) continue; // someone else's, or not newer
 
     $deleted = !empty($s['deleted']);
+    if (!$deleted && !showable($s)) continue;
+    if (!$deleted && isset($s['lat'])) [$s['lat'], $s['lng']] = [(float) $s['lat'], (float) $s['lng']];
     $group = in_array((int) ($s['groupId'] ?? 0), $groups, true) ? (int) $s['groupId'] : null;
     $data = $deleted ? '{}' : json_encode(array_diff_key($s, $meta), JSON_UNESCAPED_UNICODE);
     $grow = strlen($data) - (int) ($row['size'] ?? 0);

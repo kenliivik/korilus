@@ -64,6 +64,7 @@ if ($action === 'verify') {
     }
     // Invites to the app are used up; group invites wait until the person accepts them in the app.
     q('DELETE FROM invites WHERE email = ? AND group_id IS NULL', [$email]);
+    q('DELETE FROM sessions WHERE expires_at < ?', [time()]);
     start_session($user['id']);
     reply(['user' => public_user($user)] + groups_reply($user));
 }

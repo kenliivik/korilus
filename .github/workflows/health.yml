@@ -1,0 +1,22 @@
+# Once a day: is the app up, does the API answer, and is the HTTPS certificate good for two more weeks?
+# A failed run is emailed to the repo owner by GitHub. Needs no secrets.
+name: Health check
+
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check korilus.dsgnr.ee
+        run: |
+          site=https://korilus.dsgnr.ee
+          curl -fsS --max-time 30 "$site/" | grep -q '<div id="app"' || { echo "::error::The app page did not load"; exit 1; }
+          curl -fsS --max-time 30 "$site/api/content.php" | jq -e '.version >= 0' > /dev/null || { echo "::error::api/content.php did not answer"; exit 1; }
+          curl -fsS --max-time 30 "$site/api/login.php" | jq -e 'has("user")' > /dev/null || { echo "::error::api/login.php did not answer"; exit 1; }
+          echo | openssl s_client -connect korilus.dsgnr.ee:443 -servername korilus.dsgnr.ee 2>/dev/null \
+            | openssl x509 -noout -checkend $((14 * 86400)) || { echo "::error::The HTTPS certificate expires within 14 days"; exit 1; }
+          echo "All good"

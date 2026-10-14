@@ -28,13 +28,18 @@ switch ($in['action'] ?? '') {
         // Nobody joins a group without accepting, and the answer is the same whether or not the address already has an account.
         $email = clean_email($in['email'] ?? '') ?? reply_error('email');
         if ($gid) $ownerOnly();
-        if (q('SELECT COUNT(*) FROM invites WHERE invited_by = ? AND created_at > ?', [$uid, time() - 86400])->fetchColumn() >= 20) reply_error('too_many', 429);
         $group = $gid ? q('SELECT name FROM `groups` WHERE id = ?', [$gid])->fetchColumn() : null;
         $who = $user['name'] ?: $user['email'];
         $invitee = q('SELECT id FROM users WHERE email = ?', [$email])->fetchColumn();
         if (($invitee && !$gid) || ($invitee && q('SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ?', [$gid, $invitee])->fetchColumn())) break;
-        // Only a new invitation sends an email, so the daily limit above also limits emails. To resend, uninvite and invite again.
+        // Only a new invitation sends an email. To resend, uninvite and invite again.
         if (q('SELECT 1 FROM invites WHERE email = ? AND group_id <=> ?', [$email, $gid ?: null])->fetchColumn()) break;
+        // The mail log keeps counting when an invite is withdrawn, so nobody can use invites to flood an inbox from Korilus's address:
+        // at most 20 invitation emails a day from one account and 3 a day to one address.
+        if (q('SELECT COUNT(*) FROM mail_log WHERE user_id = ? AND created_at > ?', [$uid, time() - 86400])->fetchColumn() >= 20
+            || q('SELECT COUNT(*) FROM mail_log WHERE email = ? AND created_at > ?', [$email, time() - 86400])->fetchColumn() >= 3) reply_error('too_many', 429);
+        q('DELETE FROM mail_log WHERE created_at < ?', [time() - 86400]);
+        q('INSERT INTO mail_log (user_id, email, created_at) VALUES (?, ?, ?)', [$uid, $email, time()]);
         q('INSERT INTO invites (email, group_id, invited_by, created_at) VALUES (?, ?, ?, ?)', [$email, $gid ?: null, $uid, time()]);
         send_mail($email, $invitee ? "$who kutsus sind Koriluse gruppi „{$group}”" : "$who kutsus sind Korilusse", $invitee
             ? "Tere!\n\n$who kutsus sind Koriluse gruppi „{$group}”. Kui kutse vastu võtad, näed marjakohti, mida grupi liikmed seal jagavad, ja saad ka ise oma kohti jagada.\n\n"

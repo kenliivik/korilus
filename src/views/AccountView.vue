@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import AppIcon from '../components/AppIcon.vue'
 import PageHeader from '../components/PageHeader.vue'
 import { store } from '../data/store.js'
-import { account, requestCode, verifyCode, logout, deleteAccount, saveName, groupAction, downloadData } from '../data/account.js'
+import { account, requestCode, verifyCode, logout, logoutAll, deleteAccount, saveName, groupAction, downloadData } from '../data/account.js'
 
 const router = useRouter()
 const messages = {
@@ -62,6 +62,12 @@ const signOut = () => run(async () => {
   await logout()
   step.value = 'email'
 })
+const signOutAll = () =>
+  confirm('Kas logid välja kõigis seadmetes? Ka kadunud telefon ei pääse siis enam su kontole.') &&
+  run(async () => {
+    await logoutAll()
+    step.value = 'email'
+  })
 const remove = () =>
   confirm('Kas kustutad konto? Serverist kaovad su konto, kohad ja grupid, mille sa lõid. Selles telefonis jäävad kohad alles.') &&
   run(async () => {
@@ -174,6 +180,7 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
       <RouterLink v-if="account.user.isAdmin" to="/admin" class="btn grain text-sage">Halda sisu</RouterLink>
       <button type="button" class="btn grain text-sage" :disabled="busy" @click="download">Laadi oma andmed alla</button>
       <button type="button" class="btn grain text-sage" :disabled="busy" @click="signOut">Logi välja</button>
+      <button type="button" class="btn grain text-sage" :disabled="busy" @click="signOutAll">Logi välja kõigis seadmetes</button>
       <button type="button" class="btn grain text-danger" :disabled="busy" @click="remove">
         <AppIcon name="trash" :size="20" /> Kustuta konto
       </button>
@@ -195,7 +202,7 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
       </p>
       <p>
         Sisselogimiseks saadame e-postiga ühekordse koodi. Et sa ei peaks iga kord uuesti sisse logima, kasutame üht vajalikku
-        küpsist.
+        küpsist. Kui saadad tagasisidet, hoiame rämpsposti tõkestamiseks su IP-aadressi 30 päeva.
       </p>
       <p>
         Saad oma andmed igal ajal alla laadida ja konto kustutada. Siis kaovad serverist su konto, kohad ja su loodud
