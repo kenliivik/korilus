@@ -1,83 +1,13 @@
 # Korilus
 
-Estonian-language PWA for wild berry and fruit seasons and foraging spots. Vue 3, Vite, Tailwind CSS v4.
+Estonian-language PWA for wild berry and fruit seasons and foraging spots. Vue 3, Vite, Tailwind CSS v4, with a small PHP API.
 
 ```
 npm install
 npm run dev                       # local dev server
+npm test                          # spot sync test
 npm run build && npm run preview  # production build, test install and offline
 ```
 
-## Deploy
-
-Every push to `main` builds the app and uploads `dist/` to `htdocs/korilus` on the Veebimajutus server
-(`.github/workflows/deploy.yml`) and then runs `api/migrate.php`, so new tables in `schema.sql` exist right away.
-It needs three secrets in the `production` environment (Settings → Environments → production; under "Deployment branches"
-allow only `main`, so a workflow on any other branch can't read the server key):
-
-- `SSH_HOST`: the SSH server address from Iseteenindus → Veebiserver → SSH kasutajad
-- `SSH_USER`: the SSH username
-- `SSH_PRIVATE_KEY`: a deploy-only private key without a passphrase; its `.pub` half is added under SSH kasutajad → Võtmed
-
-A run can also be started by hand from the Actions tab. A daily "Health check" run fails (and GitHub emails you)
-if the site or the API stops answering or the HTTPS certificate is about to expire.
-
-## Admin (content editor)
-
-`https://korilus.dsgnr.ee/admin` edits the berries and recipes for every user, with no deploy.
-Saved content lives in `api/data/content.json` on the server, with a dated copy of every version in
-`api/data/backups/` (to undo a bad edit, copy one back over `content.json`). Uploaded pictures go to `uploads/`.
-Neither folder is touched by deploys. Until something is saved, the app shows the berries bundled in `src/data/berries.js`.
-
-Server settings live in `api/data/config.php`, which is never in git or deployed (see `public/api/config.example.php`).
-Only a logged-in account marked as admin can use `/admin` (log in under Seaded → Konto first). Make an account admin
-with Actions → Server setup (fill in the email), or over SSH with `php ~/htdocs/korilus/api/create-user.php EMAIL --admin`.
-
-Local test of the PHP parts: `npm run build && php -S localhost:8000 -t dist`, then call `http://localhost:8000/api/content.php`.
-
-## Login, groups and spot sync (server setup)
-
-Logging in is optional: the app keeps working on the phone without it. When someone logs in (email + a 6-digit code
-typed into the app), their spots sync to the server and they can share spots with groups such as "Pere".
-It runs on the same Veebimajutus server with PHP and MariaDB, no other services. One-time setup:
-
-1. **Database.** In Iseteenindus → Andmebaasid, create a MariaDB database and a user for it. Note the database name,
-   user and password.
-2. **Mailbox.** Create a mailbox such as `korilus@dsgnr.ee` (Iseteenindus → E-post). The login codes are sent from it.
-   For mail to land in inboxes, check that dsgnr.ee has SPF, DKIM and DMARC records (Iseteenindus → DNS; DKIM may
-   already be on). A DMARC record can start as `v=DMARC1; p=none`.
-3. **Config file.** On your computer, make a file `config.php` like this (keep any keys already in it):
-
-   ```php
-   <?php
-   return [
-       'db' => ['dsn' => 'mysql:host=127.0.0.1;dbname=DATABASE_NAME;charset=utf8mb4', 'user' => 'DB_USER', 'pass' => 'DB_PASSWORD'],
-       'smtp' => ['host' => 'mail.veebimajutus.ee', 'port' => 465, 'user' => 'korilus@dsgnr.ee', 'pass' => 'MAILBOX_PASSWORD', 'from' => 'korilus@dsgnr.ee'],
-       'app_url' => 'https://korilus.dsgnr.ee', // the app's address, used in invitation emails
-       'signup_open' => false, // true lets anyone log in; false = only people who were invited
-   ];
-   ```
-
-   Use the SMTP server name Veebimajutus shows for the mailbox (on Veebimajutus that is port 465). Use `127.0.0.1` as the database host, since `localhost` doesn't connect there. Upload the file with
-   WinSCP or FileZilla (SFTP, port 1022) to `htdocs/korilus/api/data/config.php`. That folder is never overwritten by
-   the deploy and is not reachable from the web.
-4. **Tables and first user.** Log in with SSH (on Windows: `ssh -p 1022 USER@HOST` in PowerShell, or PuTTY) and run:
-
-   ```
-   php ~/htdocs/korilus/api/migrate.php
-   php ~/htdocs/korilus/api/create-user.php ken@dsgnr.ee --admin --name=Ken
-   ```
-
-   Without SSH, add each line once as a cron job in Iseteenindus → Cron (any time in the next minutes), wait for it
-   to run (the result comes by email), then delete the cron job. `migrate.php` is safe to run again after updates.
-5. Open the app → Seaded → Konto, log in with the code from the email, create a group and invite people by email.
-   Invited people can then log in with their own address.
-
-## Feedback
-
-Seaded → "Saada ettepanek või tagasiside" sends a message (with an optional email) to `api/feedback.php`, which keeps it
-in the `feedback` table and emails a copy to every admin account (or to `'feedback_to'` in config.php). Read and tick
-them off in `/admin` → Tagasiside. It works without login; a hidden honeypot field and a limit of 5 an hour per IP
-(50 a day in all) keep spam out. After updating, run Actions → Server setup once to add the table.
-
-Helper scripts, `schema.sql` and `api/data/` are blocked from the web in `public/api/.htaccess`.
+Every push to `main` is built and deployed by `.github/workflows/deploy.yml`.
+Server settings go in `api/data/config.php` on the server (see `public/api/config.example.php`); it is never in git.

@@ -1,5 +1,5 @@
 <?php
-// Copy to api/data/config.php on the server (never into git) and fill in. See README → Admin and Login.
+// Copy to api/data/config.php on the server (never into git) and fill in. Setup notes are kept outside the repo.
 return [
     // Login, groups and spot sync (leave out until the database exists).
     // 'db' => ['dsn' => 'mysql:host=127.0.0.1;dbname=DATABASE_NAME;charset=utf8mb4', 'user' => 'DB_USER', 'pass' => 'DB_PASSWORD'],
