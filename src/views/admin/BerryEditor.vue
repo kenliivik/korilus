@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import PageHeader from '../../components/PageHeader.vue'
 import AppIcon from '../../components/AppIcon.vue'
 import BerryGlyph from '../../components/BerryGlyph.vue'
+import { slugify } from '../../data/recipes.js'
 import { bundled, content, loadContent, saveContent, months, phases, statusText, dateLabel } from '../../data/berries.js'
 import { uploadImage } from '../../data/admin.js'
 import { account } from '../../data/account.js'
@@ -30,9 +31,8 @@ const message = ref('')
 })()
 
 // New berries get their id (and address /mari/<id>) from the name: "Põldmari" → "poldmari".
-const slug = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40)
 const newId = computed(() => {
-  const base = slug(form.value?.name ?? '') || 'mari'
+  const base = slugify(form.value?.name ?? '', 'mari').slice(0, 40)
   let id = base
   for (let n = 2; content.berries.some((b) => b.id === id); n++) id = `${base}-${n}`
   return id
@@ -40,7 +40,7 @@ const newId = computed(() => {
 
 // Tap a month to step it through: not in season → algus → tipp → lõpp.
 const next = { '.': 'a', a: 't', t: 'l', l: '.' }
-const cellColor = { a: 'bg-leaf/35', t: 'bg-sage text-milk', l: 'bg-muted/35', '.': 'grain shadow-neu-raised-sm' }
+const cellColor = { a: 'bg-leaf/35', t: 'bg-sage text-milk', l: 'hatch', '.': 'grain shadow-neu-raised-sm' }
 const tapMonth = (i) => (form.value.season = form.value.season.slice(0, i) + next[form.value.season[i]] + form.value.season.slice(i + 1))
 
 const item = computed(() => {

@@ -10,7 +10,6 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['apple-touch-icon-180x180.png', 'pwa-64x64.png'],
       manifest: {
         name: 'Korilus',
         short_name: 'Korilus',

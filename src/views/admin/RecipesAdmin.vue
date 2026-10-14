@@ -2,11 +2,12 @@
 import { ref } from 'vue'
 import PageHeader from '../../components/PageHeader.vue'
 import AppIcon from '../../components/AppIcon.vue'
-import { loadAllRecipes, recipeTypes } from '../../data/recipes.js'
+import { loadContent } from '../../data/berries.js'
+import { recipeTypes } from '../../data/recipes.js'
 
 // Every recipe, hidden ones too. Editing happens in RecipeEditor.
 const list = ref(null)
-loadAllRecipes().then((r) => (list.value = r))
+loadContent().then((c) => (list.value = c.recipes))
 </script>
 
 <template>
