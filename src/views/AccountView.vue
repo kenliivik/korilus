@@ -192,8 +192,8 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
     <summary class="cursor-pointer text-xl">Privaatsus</summary>
     <div class="mt-3 flex flex-col gap-3">
       <p>
-        Korilust haldab Ken eraviisiliselt, sõpradele ja tasuta. Andmete kohta saad küsida
-        <RouterLink to="/tagasiside" class="underline">tagasiside kaudu</RouterLink> või aadressil korilus@dsgnr.ee.
+        Korilust haldab Ken Liivik eraviisiliselt, sõpradele ja tasuta. Andmete kohta saad küsida
+        <RouterLink to="/tagasiside" class="underline">tagasiside kaudu</RouterLink>.
       </p>
       <p>Ilma kontota on kõik su andmed ainult selles telefonis.</p>
       <p>
