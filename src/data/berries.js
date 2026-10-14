@@ -6,6 +6,7 @@ import { reactive } from 'vue'
 // the rest was looked up on 2026-10-10 (RMK "Korilase nurgake", ERR, Looduskalender, Postimees, supertaim.ee).
 // `season` has one character per month, January first: a = algus, t = tipp, l = lõpp, . = not in season.
 // Põldmari (põldmurakas) and the two sõstrad were added on 2026-10-12 (RMK, Postimees, Looduspere, bio.edu.ee, Aiasõber, Maheklubi).
+// Pirn and kõrvits were added on 2026-10-14 from general Estonian garden guidance; edit them in /admin if a date is off.
 // Each bundled id has an illustration in src/assets/berries/<id>.webp; berries added in /admin may have an `image`.
 export const bundled = [
   {
@@ -126,6 +127,31 @@ export const bundled = [
     season: '......tl....',
     dates: { Algus: 'juuli', Tipp: 'juuli', Lõpp: 'august' },
     tips: ['Marjad kasvavad kobaratena, korja terve kobar korraga', 'Kuival ja kergel mullal vajab põõsas valmimise ajal lisakastmist'],
+  },
+  {
+    id: 'pirn',
+    name: 'Pirn',
+    latin: 'Pyrus communis',
+    season: '.......atl..',
+    dates: { Algus: 'august (suvepirnid)', Tipp: 'september', Lõpp: 'oktoober (talvepirnid)' },
+    tips: [
+      'Korja veidi enne täisküpsust, kui vars tuleb vilja kergelt üles tõstes oksast lahti',
+      'Lase toas paar päeva järelvalmida, puu otsas üleküpsenud pirn läheb seest pruuniks ja jahuseks',
+      'Talvepirnid saavad maitsvaks alles hoidlas seistes',
+    ],
+  },
+  {
+    id: 'korvits',
+    name: 'Kõrvits',
+    latin: 'Cucurbita maxima',
+    season: '.......atl..',
+    dates: { Algus: 'augusti lõpp', Tipp: 'september', Lõpp: 'enne esimesi öökülmi' },
+    tips: [
+      'Küps kõrvits kõlab koputades õõnsalt ja koor ei anna küünele järele',
+      'Lõika vars 5–10 cm pikkuselt, ilma varreta kõrvits ei säili',
+      'Korja enne öökülmi, külma saanud kõrvits hakkab kiiresti mädanema',
+      'Lase paar nädalat soojas järelvalmida, siis säilib jahedas talve läbi',
+    ],
   },
 ]
 
