@@ -1,5 +1,5 @@
 # Builds the app and uploads it to the Veebimajutus server on every push to main.
-# Needs repo secrets SSH_HOST, SSH_USER and SSH_PRIVATE_KEY (see README).
+# Needs repo secrets SSH_HOST, SSH_USER and SSH_PRIVATE_KEY.
 name: Deploy
 
 on:
@@ -12,7 +12,7 @@ concurrency: deploy
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # The server key is kept in the "production" environment, which only main may use (see README → Deploy).
+    # The server key is kept in the "production" environment, which only main may use.
     environment: production
     steps:
       - uses: actions/checkout@v4
