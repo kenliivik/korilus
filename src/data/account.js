@@ -111,7 +111,7 @@ async function push() {
   }
 }
 
-function merge(spots) {
+export function merge(spots) {
   const shared = []
   for (const { mine, owner, deleted, ...spot } of spots) {
     if (!mine) {

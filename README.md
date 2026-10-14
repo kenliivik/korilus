@@ -60,14 +60,14 @@ It runs on the same Veebimajutus server with PHP and MariaDB, no other services.
    ```php
    <?php
    return [
-       'db' => ['dsn' => 'mysql:host=localhost;dbname=DATABASE_NAME;charset=utf8mb4', 'user' => 'DB_USER', 'pass' => 'DB_PASSWORD'],
-       'smtp' => ['host' => 'mail.veebimajutus.ee', 'port' => 587, 'user' => 'korilus@dsgnr.ee', 'pass' => 'MAILBOX_PASSWORD', 'from' => 'korilus@dsgnr.ee'],
+       'db' => ['dsn' => 'mysql:host=127.0.0.1;dbname=DATABASE_NAME;charset=utf8mb4', 'user' => 'DB_USER', 'pass' => 'DB_PASSWORD'],
+       'smtp' => ['host' => 'mail.veebimajutus.ee', 'port' => 465, 'user' => 'korilus@dsgnr.ee', 'pass' => 'MAILBOX_PASSWORD', 'from' => 'korilus@dsgnr.ee'],
        'app_url' => 'https://korilus.dsgnr.ee', // the app's address, used in invitation emails
        'signup_open' => false, // true lets anyone log in; false = only people who were invited
    ];
    ```
 
-   Use the SMTP server name Veebimajutus shows for the mailbox (port 587 with STARTTLS, or 465). Upload the file with
+   Use the SMTP server name Veebimajutus shows for the mailbox (on Veebimajutus that is port 465). Use `127.0.0.1` as the database host, since `localhost` doesn't connect there. Upload the file with
    WinSCP or FileZilla (SFTP, port 1022) to `htdocs/korilus/api/data/config.php`. That folder is never overwritten by
    the deploy and is not reachable from the web.
 4. **Tables and first user.** Log in with SSH (on Windows: `ssh -p 1022 USER@HOST` in PowerShell, or PuTTY) and run:
