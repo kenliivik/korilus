@@ -51,6 +51,9 @@ async function send() {
     </label>
     <p v-else class="text-base italic text-muted">Vastame aadressile {{ account.user.email }}.</p>
     <input v-model="website" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
+    <p class="text-base italic text-muted">
+      Rämpsposti tõkestamiseks hoiame su IP-aadressi 30 päeva. Vaata ka <RouterLink to="/konto" class="underline">privaatsust</RouterLink>.
+    </p>
     <button type="submit" class="btn bg-sage text-milk" :disabled="busy">{{ busy ? 'Saadan…' : 'Saada' }}</button>
     <p v-if="error" role="alert" class="text-lg text-danger">{{ error }}</p>
   </form>
