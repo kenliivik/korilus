@@ -1,6 +1,1 @@
-{
-  "current": "",
-  "inky": ".map-print{--map-ink:grayscale(0.4) sepia(0.5) hue-rotate(25deg) saturate(0.8) contrast(1.05) brightness(1.02);--map-paper:0.5}",
-  "water": ".map-print{--map-ink:grayscale(0.25) sepia(0.45) hue-rotate(20deg) saturate(0.65) contrast(1) brightness(1.03);--map-paper:0.5}",
-  "print": ".map-print{--map-ink:grayscale(0.5) sepia(0.6) hue-rotate(30deg) saturate(0.7) contrast(1.15) brightness(1);--map-paper:0.6}"
-}
+{"current":""}
