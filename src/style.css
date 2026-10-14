@@ -120,38 +120,37 @@
 /*
  * Maps as an old printed plate: the OpenStreetMap tiles are washed toward sepia and sage, and the same paper grain
  * as the page lies over them. Plain CSS filters, so the tiles still come straight from OSM and pan smoothly on phones.
+ * Not in a layer, so these win over leaflet.css.
  */
-@layer components {
-  .leaflet-container.map-print {
-    background: var(--color-milk);
-    font-family: var(--font-serif);
-  }
-  .map-print .leaflet-tile-pane {
-    filter: var(--map-ink, grayscale(0.55) sepia(0.55) hue-rotate(28deg) saturate(0.75) contrast(0.92) brightness(1.03));
-  }
-  /* Paper over the tiles (and the pins, like ink on the same sheet); the controls stay above it. */
-  .map-print::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 500;
-    pointer-events: none;
-    mix-blend-mode: multiply;
-    opacity: var(--map-paper, 0.55);
-    background:
-      var(--grain),
-      radial-gradient(ellipse at center, transparent 55%, rgb(184 162 115 / 0.45) 100%),
-      rgb(244 236 210 / 0.6);
-  }
-  .map-print .leaflet-control-attribution {
-    background: rgb(253 251 240 / 0.85);
-    color: var(--color-muted);
-    font-size: 0.75rem;
-  }
-  .map-print .leaflet-control-attribution a {
-    color: var(--color-sage);
-  }
-  .map-print .leaflet-marker-icon {
-    filter: drop-shadow(1px 2px 1.5px rgb(103 98 70 / 0.45));
-  }
+.leaflet-container.map-print {
+  background: var(--color-milk);
+  font-family: var(--font-serif);
+}
+.map-print .leaflet-tile-pane {
+  filter: var(--map-ink, grayscale(0.55) sepia(0.55) hue-rotate(28deg) saturate(0.75) contrast(0.92) brightness(1.03));
+}
+/* Paper over the tiles (and the pins, like ink on the same sheet); the controls stay above it. */
+.map-print::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: var(--map-paper, 0.55);
+  background:
+    var(--grain),
+    radial-gradient(ellipse at center, transparent 55%, rgb(184 162 115 / 0.45) 100%),
+    rgb(244 236 210 / 0.6);
+}
+.map-print .leaflet-control-attribution {
+  background: rgb(253 251 240 / 0.85);
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}
+.map-print .leaflet-control-attribution a {
+  color: var(--color-sage);
+}
+.map-print .leaflet-marker-icon {
+  filter: drop-shadow(1px 2px 1.5px rgb(103 98 70 / 0.45));
 }

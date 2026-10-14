@@ -8,6 +8,7 @@ import 'leaflet/dist/leaflet.css'
 export function createMap(el) {
   el.classList.add('map-print') // botanical tile wash, see style.css
   const map = L.map(el, { zoomControl: false }).setView([58.6, 25], 7) // Estonia
+  map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>') // without the flag icon
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     crossOrigin: true,

@@ -21,7 +21,7 @@ for (const [vname, css] of Object.entries(variants)) {
     const ctx = await browser.newContext({ ...opts, serviceWorkers: 'block', geolocation: { latitude: 58.392, longitude: 26.62 }, permissions: ['geolocation'] })
     await ctx.addInitScript((s) => localStorage.setItem('korilus', JSON.stringify(s)), state)
     for (const [sname, path] of shots) {
-      if (vname !== 'current' && sname !== 'list') continue
+      if (vname !== 'current' && sname === 'new') continue
       const page = await ctx.newPage()
       await page.goto(base + path)
       if (css) await page.addStyleTag({ content: css })
