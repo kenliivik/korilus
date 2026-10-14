@@ -1,34 +1,12 @@
 <?php
-// Admin access for /admin: a logged-in user with is_admin (once the database is set up), or one password (config admin_password_hash). Logging in sets a signed
-// HttpOnly cookie for 30 days. Changing the password logs every device out.
-require_once __DIR__ . '/store.php';
-
-const ADMIN_COOKIE = 'korilus_admin';
-
-function admin_sig($expires) {
-    return hash_hmac('sha256', "admin|$expires", (string) config('admin_password_hash'));
-}
+// Admin access for /admin and its endpoints: a logged-in account with is_admin (see create-user.php --admin).
+require_once __DIR__ . '/session.php';
 
 function is_admin() {
-    [$expires, $sig] = explode('.', $_COOKIE[ADMIN_COOKIE] ?? '', 2) + ['', ''];
-    if (config('admin_password_hash') && (int) $expires > time() && hash_equals(admin_sig($expires), $sig)) return true;
-    if (!config('db')) return false;
-    require_once __DIR__ . '/session.php';
-    return (bool) (current_user()['is_admin'] ?? false);
+    return config('db') && (bool) (current_user()['is_admin'] ?? false);
 }
 
-function set_admin_cookie($on) {
-    $expires = $on ? time() + 30 * 86400 : 1;
-    setcookie(ADMIN_COOKIE, $on ? $expires . '.' . admin_sig($expires) : '', [
-        'expires' => $expires, 'path' => '/api/', 'httponly' => true, 'samesite' => 'Strict',
-        'secure' => !in_array($_SERVER['HTTPS'] ?? '', ['', 'off']),
-    ]);
-}
-
-// Sends 401 and stops unless the request comes from the logged-in admin.
+// Sends 401 and stops unless the request comes from a logged-in admin.
 function require_admin() {
-    if (is_admin()) return;
-    http_response_code(401);
-    header('Content-Type: application/json');
-    exit('{"error":"login required"}');
+    is_admin() || reply_error('login required', 401);
 }
