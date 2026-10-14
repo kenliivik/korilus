@@ -28,7 +28,6 @@ for (const [vname, css] of Object.entries(variants)) {
       await page.waitForSelector('.leaflet-tile-loaded')
       await page.waitForTimeout(2500)
       await page.screenshot({ path: `shots/${vname}-${sname}-${dname}.png` })
-      if (sname === 'list' && vname === 'current') {
       await page.close()
     }
     await ctx.close()
