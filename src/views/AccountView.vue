@@ -191,22 +191,38 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
   <details class="grain card text-lg">
     <summary class="cursor-pointer text-xl">Privaatsus</summary>
     <div class="mt-3 flex flex-col gap-3">
+      <p>
+        Korilust haldab Ken eraviisiliselt, sõpradele ja tasuta. Andmete kohta saad küsida
+        <RouterLink to="/tagasiside" class="underline">tagasiside kaudu</RouterLink> või aadressil korilus@dsgnr.ee.
+      </p>
       <p>Ilma kontota on kõik su andmed ainult selles telefonis.</p>
       <p>
         Kui logid sisse, hoiame Koriluse serveris (Veebimajutus, Eestis) su e-posti aadressi, nime, marjakohti koos
         märkmetega ja gruppe, kuhu kuulud. Nii jäävad kohad alles ka uues telefonis ja saad neid jagada.
       </p>
       <p>
-        Grupiga jagatud kohti ja su nime näevad selle grupi liikmed. Kohti, mis on ainult sinu, ei näe keegi teine. Andmeid ei
-        müüda ega anta kellelegi edasi. Reklaame ega jälgimist pole.
+        Grupiga jagatud kohti ja su nime näevad selle grupi liikmed. Kohti, mis on ainult sinu, ei näe keegi teine. Andmeid
+        kasutame ainult selleks, et Korilus töötaks: neid ei müüda ega anta kellelegi edasi. Reklaame ega jälgimist pole.
       </p>
       <p>
-        Sisselogimiseks saadame e-postiga ühekordse koodi. Et sa ei peaks iga kord uuesti sisse logima, kasutame üht vajalikku
-        küpsist. Kui saadad tagasisidet, hoiame rämpsposti tõkestamiseks su IP-aadressi 30 päeva.
+        Sisselogimiseks saadame e-postiga ühekordse koodi. Arvamiskatsete piiramiseks hoiame koodi ja su IP-aadressi
+        ööpäeva. Et sa ei peaks iga kord uuesti sisse logima, kasutame üht vajalikku küpsist.
+      </p>
+      <p>
+        Kui kutsud sõbra, hoiame tema e-posti aadressi, kuni ta kutse vastu võtab, kuid kõige rohkem 90 päeva. Tagasiside
+        hoiame, kuni oleme selle läbi vaadanud, ja selle saatja IP-aadressi 30 päeva.
+      </p>
+      <p>
+        Meeldetuletuste jaoks hoiame serveris su telefoni teavitusaadressi (selle annab Google, Apple või Mozilla) ja
+        valitud marjad, ilma nime ja e-postita. Kui eemaldad kõik meeldetuletused, kustub see.
+      </p>
+      <p>
+        Kaart tuleb OpenStreetMapist, nii et kaarti vaadates näeb OpenStreetMap Foundation (Suurbritannia) su IP-aadressi.
+        Veebimajutus hoiab tavapäraseid serverilogisid.
       </p>
       <p>
         Saad oma andmed igal ajal alla laadida ja konto kustutada. Siis kaovad serverist su konto, kohad ja su loodud
-        grupid.
+        grupid. Kui oleme midagi valesti teinud, võid pöörduda ka Andmekaitse Inspektsiooni poole (aki.ee).
       </p>
     </div>
   </details>

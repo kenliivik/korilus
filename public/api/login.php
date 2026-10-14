@@ -23,6 +23,8 @@ if ($action === 'logout') {
 
 $email = clean_email($in['email'] ?? '') ?? reply_error('email');
 q('DELETE FROM login_codes WHERE created_at < ?', [time() - 86400]);
+// Invites nobody accepted are forgotten after 90 days, as the privacy note says.
+q('DELETE FROM invites WHERE created_at < ?', [time() - 90 * 86400]);
 
 if ($action === 'code') {
     // At most 5 codes an hour per address (one per 30 s) and 20 tries an hour per IP.
