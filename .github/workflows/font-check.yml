@@ -16,4 +16,4 @@ jobs:
           curl -sS $B$CSS | grep -o '@font-face{[^}]*}' 
           curl -sS $B$CSS | grep -o 'font-family:[^;}]*' | sort | uniq -c
       - if: always()
-        run: while IFS= read -r l; do echo "::notice::$l"; done < out.txt
+        run: split -l 25 out.txt part_; for f in part_*; do echo "::notice::$(sed ':a;N;$!ba;s/\n/ ¦ /g' $f)"; done
