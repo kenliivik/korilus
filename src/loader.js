@@ -1,9 +1,9 @@
 import { bundled } from './data/berries.js'
 
-// The loading screen in index.html. It writes "Korilus" and a random picking tip in, letter by letter,
+// The loading screen in index.html. It writes a random picking tip in under the logo, letter by letter,
 // and on the first open of a visit stays at least MIN_MS from page start so the writing can finish.
 // Later reloads in the same visit skip the wait.
-const MIN_MS = 2200
+const MIN_MS = 1800
 const loader = document.getElementById('loader')
 const storage = (() => {
   try {
@@ -39,23 +39,17 @@ function write(el, text, start, step) {
 if (loader && !seen) {
   const berry = bundled[Math.floor(Math.random() * bundled.length)]
   const tip = berry.tips[Math.floor(Math.random() * berry.tips.length)]
-  const h1 = loader.querySelector('h1')
   const p = loader.querySelector('p')
   const name = document.createElement('b')
   // Write only once the fonts are in, so letters don't change shape halfway.
   const fonts = Promise.all(['1em "IM Fell Double Pica SC"', 'italic 1em "IM Fell Double Pica"'].map((f) => document.fonts.load(f)))
   Promise.race([fonts, new Promise((r) => setTimeout(r, 500))]).finally(() => {
-    h1.textContent = ''
-    write(h1, 'Korilus', 0, 90)
-    write(name, berry.name, 650, 40)
+    write(name, berry.name, 0, 40)
     // Long tips write faster, so every tip is done in about a second.
-    write(p, tip, 650 + berry.name.length * 40, Math.min(25, 1100 / tip.length))
+    write(p, tip, berry.name.length * 40, Math.min(25, 1100 / tip.length))
     p.prepend(name)
-    h1.classList.add('written')
     p.classList.add('written')
   })
-} else if (loader) {
-  loader.querySelector('h1').classList.add('written')
 }
 
 export function hideLoader() {

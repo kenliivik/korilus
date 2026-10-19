@@ -28,15 +28,16 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>Korilus</title>
     <!-- Loading screen: plain HTML and CSS so it shows on the first paint, before any JavaScript.
-         src/loader.js writes the wordmark and a picking tip in, letter by letter, and hides it. -->
+         src/loader.js writes a picking tip in, letter by letter, and hides it.
+         The logo is public/logo.png: replace that file to change it (any size, it is scaled to fit 14rem × 6rem). -->
     <style>
       #loader { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; padding: 2rem; background: #fdfbf0; color: #465940; font-family: "IM Fell Double Pica", Georgia, serif; text-align: center; transition: opacity 0.35s ease; }
       #loader.done { opacity: 0; pointer-events: none; }
-      #loader h1 { margin: 0; font-family: "IM Fell Double Pica SC", Georgia, serif; font-size: 3rem; font-weight: 400; letter-spacing: 0.04em; }
+      #loader img { display: block; width: auto; height: auto; max-width: 14rem; max-height: 6rem; }
       #loader p { max-width: 18rem; min-height: 4.5em; margin: 0; color: #676246; font-style: italic; font-size: 1.125rem; line-height: 1.4; }
       #loader p b { display: block; font-style: normal; font-weight: 400; font-family: "IM Fell Double Pica SC", Georgia, serif; }
-      /* Hidden until the script writes them in. */
-      #loader h1, #loader p { visibility: hidden; }
+      /* Hidden until the script writes it in. */
+      #loader p { visibility: hidden; }
       #loader .written { visibility: visible; }
       /* Each letter soaks in like fresh ink: blurred and faint, then sharp. */
       #loader .written span { display: inline-block; white-space: nowrap; }
@@ -51,7 +52,7 @@
   </head>
   <body>
     <div id="loader" class="paper" role="status">
-      <h1>Korilus</h1>
+      <img src="/logo.png" alt="Korilus" />
       <p></p>
     </div>
     <div id="app"></div>
