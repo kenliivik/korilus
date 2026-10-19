@@ -11,7 +11,7 @@ defineProps({
 <template>
   <RouterLink
     :to="to"
-    class="grain flex items-center gap-4 rounded-card p-4 text-sage shadow-neu-raised transition-shadow active:shadow-neu-inset"
+    class="grain flex items-center gap-4 rounded-card p-4 text-sage shadow-neu-raised press active:shadow-neu-inset"
   >
     <span class="grain grid size-11 shrink-0 place-items-center rounded-full shadow-neu-inset">
       <AppIcon :name="icon" />

@@ -23,7 +23,7 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
 
   <section class="flex flex-col gap-3">
     <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Konto</h2>
-    <RouterLink to="/konto" class="grain card flex items-center justify-between gap-3 text-lg transition-shadow active:shadow-neu-inset">
+    <RouterLink to="/konto" class="grain card flex items-center justify-between gap-3 text-lg press active:shadow-neu-inset">
       <span class="truncate">{{ account.user ? account.user.email : 'Logi sisse ja jaga kohti perega' }}</span>
       <AppIcon name="arrow" :size="20" />
     </RouterLink>

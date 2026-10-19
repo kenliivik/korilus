@@ -150,7 +150,7 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
         v-for="g in account.groups"
         :key="g.id"
         :to="`/grupid/${g.id}`"
-        class="grain card flex items-center justify-between transition-shadow active:shadow-neu-inset"
+        class="grain card flex items-center justify-between press active:shadow-neu-inset"
       >
         <span class="flex flex-col">
           <span class="text-xl">{{ g.name }}</span>

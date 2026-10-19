@@ -13,7 +13,7 @@ defineProps({
 <template>
   <RouterLink
     :to="to"
-    class="grain flex flex-col items-center gap-2 rounded-card px-1 pb-3 shadow-neu-raised lg:gap-3 lg:pb-6 transition-shadow hover:shadow-neu-inset active:shadow-neu-inset"
+    class="grain press flex flex-col items-center gap-2 rounded-card px-1 pb-3 shadow-neu-raised lg:gap-3 lg:pb-6 hover:shadow-neu-inset active:shadow-neu-inset"
   >
     <!-- The illustration spills over the top edge of the card (Ken's Figma mock, 2026-10-12). -->
     <BerryGlyph :name="glyph" :image="image" :size="100" class="-mt-8 lg:-mt-16 lg:size-48!" />
