@@ -1,0 +1,16 @@
+name: Font check
+on: push
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          B=https://korilus.dsgnr.ee
+          curl -sS $B/ > i.html
+          CSS=$(grep -o '/assets/[^"]*\.css' i.html | head -1)
+          echo "css=$CSS"
+          for u in / $CSS /fonts/im-fell-double-pica.woff2 /fonts/la-belle-aurore.woff2; do
+            echo "=== $u"; curl -sS -D - -o body.bin "$B$u" | tr -d '\r'; wc -c body.bin; file body.bin
+          done
+          curl -sS $B$CSS | grep -o '@font-face{[^}]*}' 
+          curl -sS $B$CSS | grep -o 'font-family:[^;}]*' | sort | uniq -c
