@@ -6,14 +6,8 @@ jobs:
     steps:
       - run: |
           exec > out.txt 2>&1
-          B=https://korilus.dsgnr.ee
-          curl -sS $B/ > i.html
-          CSS=$(grep -o '/assets/[^"]*\.css' i.html | head -1)
-          echo "css=$CSS"
-          for u in / $CSS /fonts/im-fell-double-pica.woff2 /fonts/la-belle-aurore.woff2; do
-            echo "=== $u"; curl -sS -D - -o body.bin "$B$u" | tr -d '\r'; wc -c body.bin; file body.bin
+          for u in https://dsgnr.ee/korilus/ https://www.korilus.dsgnr.ee/ http://korilus.dsgnr.ee/ https://dsgnr.ee/fonts/im-fell-double-pica.woff2; do
+            echo "=== $u"; curl -sS -m 20 -D - -o b.bin "$u" | tr -d '\r' | grep -i "^HTTP\|^location\|^content-type\|^content-security"; head -c 300 b.bin | tr '\n' ' '; echo
           done
-          curl -sS $B$CSS | grep -o '@font-face{[^}]*}' 
-          curl -sS $B$CSS | grep -o 'font-family:[^;}]*' | sort | uniq -c
       - if: always()
         run: split -l 25 out.txt part_; for f in part_*; do echo "::notice::$(sed ':a;N;$!ba;s/\n/ ¦ /g' $f)"; done
