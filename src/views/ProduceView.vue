@@ -40,8 +40,8 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
     </section>
 
     <section class="flex flex-col gap-3">
-      <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Valmimisaeg</h2>
-      <dl class="grain card grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-lg lg:text-xl">
+      <h2 class="ruled text-2xl leading-7 lg:text-3xl lg:leading-9">Valmimisaeg</h2>
+      <dl class="grain card grid grid-cols-[auto_1fr] gap-x-4 px-5 text-lg lg:text-xl [&>*]:border-b [&>*]:border-sage/12 [&>*]:py-1.5 [&>*:nth-last-child(-n+2)]:border-0">
         <template v-for="(value, label) in p.dates" :key="label">
           <dt class="text-muted">{{ dateLabel(label) }}</dt>
           <dd>{{ value }}</dd>
@@ -62,8 +62,8 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
 
     <div class="contents lg:flex lg:flex-col lg:gap-8">
     <section class="flex flex-col gap-3">
-      <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Korjaja nõuanded</h2>
-      <ul class="grain card flex list-inside list-disc flex-col gap-1 text-lg marker:text-leaf lg:gap-2 lg:p-6 lg:text-xl">
+      <h2 class="ruled text-2xl leading-7 lg:text-3xl lg:leading-9">Korjaja nõuanded</h2>
+      <ul class="grain card flex list-outside list-disc flex-col gap-1 pl-9 text-lg marker:text-leaf lg:gap-2 lg:p-6 lg:pl-11 lg:text-xl">
         <li v-for="tip in p.tips" :key="tip">{{ tip }}</li>
       </ul>
     </section>
@@ -77,7 +77,7 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
     </section>
 
     <section class="flex flex-col gap-3">
-      <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Minu kohad</h2>
+      <h2 class="ruled text-2xl leading-7 lg:text-3xl lg:leading-9">Minu kohad</h2>
       <ul v-if="foundAt.length" class="grain card flex flex-col gap-2 text-lg lg:p-6 lg:text-xl">
         <li v-for="f in foundAt" :key="f.id">
           <RouterLink :to="`/asukohad/${f.id}`" class="flex items-center gap-2">

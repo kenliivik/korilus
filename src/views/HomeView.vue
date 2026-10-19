@@ -25,23 +25,26 @@ const next = computed(() => comingSoon())
 
   <section v-if="ripe.length" class="mt-6 grid grid-cols-3 gap-x-3 gap-y-12 lg:mt-20 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-24 xl:grid-cols-5" aria-label="Praegu valmis korjamiseks">
     <BerryTile
-      v-for="p in ripe"
+      v-for="(p, i) in ripe"
       :key="p.id"
       :name="p.name"
       :glyph="p.id"
       :image="p.image"
       :to="`/mari/${p.id}`"
       :note="statusText[phaseIn(p)]"
+      class="settle"
+      :style="{ '--i': i }"
     />
   </section>
 
   <!-- What ripens next, so the page has something to look forward to off-season. -->
   <section v-if="next.length" class="mt-4 flex flex-col gap-3 lg:mt-16 lg:max-w-xl">
-    <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Varsti valmimas</h2>
+    <h2 class="ruled text-2xl leading-7 lg:text-3xl lg:leading-9">Varsti valmimas</h2>
     <ul class="grain card flex flex-col gap-1">
       <li v-for="{ p, month } in next" :key="p.id">
-        <RouterLink :to="`/mari/${p.id}`" class="flex items-center justify-between gap-3 text-lg lg:text-xl">
+        <RouterLink :to="`/mari/${p.id}`" class="flex items-center gap-3 text-lg lg:text-xl">
           <span class="flex items-center gap-3"><BerryGlyph :name="p.id" :image="p.image" :size="48" />{{ p.name }}</span>
+          <span class="leader" />
           <span class="font-hand text-base text-muted">{{ months[month] }}</span>
         </RouterLink>
       </li>

@@ -12,7 +12,7 @@ defineProps({
 <template>
   <RouterLink
     :to="`/retsept/${recipe.id}`"
-    class="grain flex items-center gap-4 rounded-card p-3 text-sage shadow-neu-raised transition-shadow active:shadow-neu-inset"
+    class="grain flex items-center gap-4 rounded-card p-3 text-sage shadow-neu-raised press active:shadow-neu-inset"
     :class="tile && 'lg:flex-col lg:gap-3 lg:px-4 lg:pb-6 lg:text-center'"
   >
     <img

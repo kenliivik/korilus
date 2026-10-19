@@ -110,7 +110,7 @@
     @apply rounded-card p-4 shadow-neu-raised;
   }
   .btn {
-    @apply flex items-center justify-center gap-2 rounded-full px-5 py-3 text-lg leading-6 shadow-neu-raised transition-shadow active:shadow-neu-inset;
+    @apply flex items-center justify-center gap-2 rounded-full px-5 py-3 text-lg leading-6 shadow-neu-raised transition-[box-shadow,scale] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] active:shadow-neu-inset motion-reduce:active:scale-100;
   }
   .field {
     @apply w-full rounded-2xl bg-milk px-4 py-3 text-lg text-sage shadow-neu-inset outline-none placeholder:text-muted/85 focus:ring-2 focus:ring-sage/40;
@@ -153,4 +153,63 @@
 }
 .map-print .leaflet-marker-icon {
   filter: drop-shadow(1px 2px 1.5px rgb(103 98 70 / 0.45));
+}
+
+/* Print details: ruled headings, dotted leaders, press feedback. */
+@layer components {
+  /* A section heading followed by a hairline that fades out to the right. */
+  .ruled {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+  }
+  .ruled::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    margin-top: 0.3em;
+    background: linear-gradient(to right, rgb(70 89 64 / 0.4), transparent);
+  }
+
+  /* Dotted leader between a name and its value, like an old index. */
+  .leader {
+    flex: 1;
+    min-width: 1.5rem;
+    align-self: center;
+    margin-top: 0.4em;
+    border-bottom: 1.5px dotted rgb(103 98 70 / 0.45);
+  }
+
+  /* Pressable cards give a little under the finger. */
+  .press {
+    transition: box-shadow 200ms ease, transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .press:active {
+    transform: scale(0.97);
+  }
+
+  /* Home tiles settle in one after another on first load. */
+  .settle {
+    animation: settle 420ms cubic-bezier(0.23, 1, 0.32, 1) backwards; /* not "both": a held transform would block .press */
+    animation-delay: calc(var(--i, 0) * 45ms);
+  }
+  @keyframes settle {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .settle {
+      animation-name: fade;
+    }
+    .press:active {
+      transform: none;
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
 }

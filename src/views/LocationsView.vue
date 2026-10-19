@@ -36,7 +36,7 @@ const groupName = (l) => account.groups.find((g) => g.id === l.groupId)?.name
       v-for="l in list.spots"
       :key="l.id"
       :to="`/asukohad/${l.id}`"
-      class="grain card flex flex-col gap-1 transition-shadow active:shadow-neu-inset"
+      class="grain card flex flex-col gap-1 press active:shadow-neu-inset"
     >
       <span class="text-xl lg:text-2xl">{{ l.name }}</span>
       <span v-if="l.shared" class="font-hand text-lg text-muted">{{ l.owner }}{{ groupName(l) ? ` · ${groupName(l)}` : '' }}</span>
