@@ -213,3 +213,15 @@
     }
   }
 }
+
+/* Desktop sidebar: a thin rule just inside its right edge, like the gutter of a bound plate. */
+@layer components {
+  .gutter::after {
+    content: "";
+    position: absolute;
+    inset-block: 2.5rem;
+    right: 0.75rem;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgb(70 89 64 / 0.25) 15%, rgb(70 89 64 / 0.25) 85%, transparent);
+  }
+}
