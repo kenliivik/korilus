@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import BerryTile from '../components/BerryTile.vue'
 import BerryGlyph from '../components/BerryGlyph.vue'
+import SeasonStrip from '../components/SeasonStrip.vue'
 import InstallHint from '../components/InstallHint.vue'
 import { inSeason, comingSoon, phaseIn, statusText, months } from '../data/berries.js'
 
@@ -21,6 +22,7 @@ const next = computed(() => comingSoon())
     <p class="italic leading-5 text-muted lg:text-xl">
       {{ ripe.length ? 'Need on praegu valmis:' : 'Praegu pole midagi korjata.' }}
     </p>
+    <SeasonStrip class="mt-4 lg:mt-8 lg:max-w-xl" />
   </section>
 
   <section v-if="ripe.length" class="mt-6 grid grid-cols-3 gap-x-3 gap-y-12 lg:mt-20 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-24 xl:grid-cols-5" aria-label="Praegu valmis korjamiseks">
@@ -32,6 +34,7 @@ const next = computed(() => comingSoon())
       :image="p.image"
       :to="`/mari/${p.id}`"
       :note="statusText[phaseIn(p)]"
+      :season="p.season"
       class="settle"
       :style="{ '--i': i }"
     />
