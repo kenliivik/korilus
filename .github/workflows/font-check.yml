@@ -5,6 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
+          exec > out.txt 2>&1
           B=https://korilus.dsgnr.ee
           curl -sS $B/ > i.html
           CSS=$(grep -o '/assets/[^"]*\.css' i.html | head -1)
@@ -14,3 +15,5 @@ jobs:
           done
           curl -sS $B$CSS | grep -o '@font-face{[^}]*}' 
           curl -sS $B$CSS | grep -o 'font-family:[^;}]*' | sort | uniq -c
+      - if: always()
+        run: while IFS= read -r l; do echo "::notice::$l"; done < out.txt
