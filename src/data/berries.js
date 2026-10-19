@@ -216,15 +216,7 @@ export const months = Array.from({ length: 12 }, (_, i) =>
 export const findProduce = (id) => produce.find((p) => p.id === id)
 export const phaseIn = (p, month = new Date().getMonth()) => p.season[month]
 export const inSeason = (month = new Date().getMonth()) => produce.filter((p) => p.season[month] !== '.')
-// What ripens next: everything starting within two months, or else the soonest ones (in October that's April's rhubarb).
-// [{ p, month }], soonest first.
-export function comingSoon(month = new Date().getMonth()) {
-  const ahead = produce.flatMap((p) => {
-    if (p.season[month] !== '.') return []
-    const d = [...Array(11).keys()].map((i) => i + 1).find((d) => p.season[(month + d) % 12] !== '.')
-    return d ? [{ p, d, month: (month + d) % 12 }] : []
-  })
-  const soonest = Math.min(...ahead.map((a) => a.d))
-  return ahead.filter((a) => a.d <= 2 || a.d === soonest).sort((a, b) => a.d - b.d)
-}
+// What starts ripening next month, so the home page has something to look forward to. Empty off-season.
+export const comingSoon = (month = new Date().getMonth()) =>
+  produce.filter((p) => p.season[month] === '.' && p.season[(month + 1) % 12] !== '.').map((p) => ({ p, month: (month + 1) % 12 }))
 
