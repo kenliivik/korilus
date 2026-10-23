@@ -29,7 +29,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,webp,woff2}'],
+        globPatterns: ['**/*.{js,css,html,png,svg,webp,woff2}'],
         importScripts: ['push-sw.js'],
         navigateFallbackDenylist: [/^\/api\//, /^\/uploads\//],
         // Berries and recipes from /admin: fresh when online, the last copy offline. Pictures never change.
