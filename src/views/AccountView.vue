@@ -209,7 +209,8 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
         ööpäeva. Et sa ei peaks iga kord uuesti sisse logima, kasutame üht vajalikku küpsist.
       </p>
       <p>
-        Kui kutsud sõbra, hoiame tema e-posti aadressi, kuni ta kutse vastu võtab, kuid kõige rohkem 90 päeva. Tagasiside
+        Kui kutsud sõbra, hoiame tema e-posti aadressi, kuni ta kutse vastu võtab, kuid kõige rohkem 90 päeva. Kui ta
+        liitub, jätame meelde, et te tunnete teineteist, et saaksite üksteist gruppi kutsuda e-posti sisestamata. Tagasiside
         hoiame, kuni oleme selle läbi vaadanud, ja selle saatja IP-aadressi 30 päeva.
       </p>
       <p>

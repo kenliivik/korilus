@@ -1,8 +1,9 @@
 <?php
 // GET: the user's groups and invitations. POST, each answered with the same:
 //   {action: "create", name} | {action: "invite", email, groupId?} (no groupId = invite to the app only)
+//   {action: "invite", userId, groupId} (someone from the user's people, see user_people)
 //   {action: "accept", groupId} | {action: "decline", groupId} (an invitation to the user)
-//   {action: "uninvite", groupId, email} | {action: "remove", groupId, userId} | {action: "leave", groupId} | {action: "delete", groupId}
+//   {action: "uninvite", groupId, inviteId} | {action: "remove", groupId, userId} | {action: "leave", groupId} | {action: "delete", groupId}
 require __DIR__ . '/session.php';
 require __DIR__ . '/mail.php';
 
@@ -26,7 +27,9 @@ switch ($in['action'] ?? '') {
 
     case 'invite':
         // Nobody joins a group without accepting, and the answer is the same whether or not the address already has an account.
-        $email = clean_email($in['email'] ?? '') ?? reply_error('email');
+        $picked = (int) ($in['userId'] ?? 0);
+        if ($picked && !in_array($picked, array_column(user_people($uid), 'id'), true)) reply_error('email');
+        $email = ($picked ? q('SELECT email FROM users WHERE id = ?', [$picked])->fetchColumn() : clean_email($in['email'] ?? '')) ?: reply_error('email');
         if ($gid) $ownerOnly();
         $group = $gid ? q('SELECT name FROM `groups` WHERE id = ?', [$gid])->fetchColumn() : null;
         $who = $user['name'] ?: $user['email'];
@@ -58,7 +61,7 @@ switch ($in['action'] ?? '') {
 
     case 'uninvite':
         $ownerOnly();
-        q('DELETE FROM invites WHERE group_id = ? AND email = ?', [$gid, clean_email($in['email'] ?? '')]);
+        q('DELETE FROM invites WHERE group_id = ? AND id = ?', [$gid, (int) ($in['inviteId'] ?? 0)]);
         break;
 
     case 'remove':

@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         'exported' => date('c'),
         'user' => public_user($user) + ['created' => date('c', $user['created_at'])],
         'groups' => user_groups($uid),
+        'people' => user_people($uid),
         'spots' => array_map(fn($r) => ['id' => $r['id'], 'groupId' => $r['group_id'], 'updated' => date('c', intdiv($r['updated_at'], 1000))]
             + json_decode($r['data'], true), q('SELECT * FROM spots WHERE user_id = ? AND deleted = 0', [$uid])->fetchAll()),
         'invitesSent' => q('SELECT email, group_id groupId, FROM_UNIXTIME(created_at) created FROM invites WHERE invited_by = ?', [$uid])->fetchAll(),
@@ -37,6 +38,7 @@ switch ($in['action'] ?? '') {
         q('DELETE FROM group_members WHERE user_id = ?', [$uid]);
         q('DELETE FROM spots WHERE user_id = ?', [$uid]);
         q('DELETE FROM invites WHERE invited_by = ? OR email = ?', [$uid, $user['email']]);
+        q('DELETE FROM contacts WHERE user_id = ? OR contact_id = ?', [$uid, $uid]);
         q('DELETE FROM login_codes WHERE email = ?', [$user['email']]);
         q('DELETE FROM feedback WHERE user_id = ?', [$uid]);
         q('DELETE FROM mail_log WHERE user_id = ?', [$uid]);

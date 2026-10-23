@@ -12,6 +12,9 @@ const router = useRouter()
 
 const group = computed(() => account.groups.find((g) => String(g.id) === props.id))
 const owner = computed(() => group.value?.role === 'owner')
+// People the owner knows who aren't in this group yet and haven't been invited to it.
+const pickable = computed(() => account.people.filter((p) =>
+  !group.value?.members.some((m) => m.id === p.id) && !group.value?.invites.some((i) => i.userId === p.id)))
 const spots = computed(() => [...store.locations, ...store.shared].filter((l) => l.groupId === group.value?.id).length)
 
 const name = ref('')
@@ -39,8 +42,9 @@ const invite = () => act({ action: 'invite', email: email.value }, () => {
   note.value = `Kutse läks teele: ${email.value}.`
   email.value = ''
 })
+const pick = (p) => act({ action: 'invite', userId: p.id }, () => (note.value = `Kutse läks teele: ${p.name}.`))
 const removeMember = (m) => confirm(`Kas eemaldad ${m.name} grupist?`) && act({ action: 'remove', userId: m.id })
-const uninvite = (e) => act({ action: 'uninvite', email: e })
+const uninvite = (i) => act({ action: 'uninvite', inviteId: i.id })
 const leave = () => confirm(`Kas lahkud grupist „${group.value.name}”? Kohad, mida sa seal jagasid, jäävad jälle ainult sulle.`) &&
   act({ action: 'leave' }, () => router.replace('/konto'))
 const remove = () => confirm(`Kas kustutad grupi „${group.value.name}”? Kõik grupiga jagatud kohad jäävad jälle ainult nende omanikele.`) &&
@@ -82,15 +86,21 @@ const remove = () => confirm(`Kas kustutad grupi „${group.value.name}”? Kõi
             Eemalda
           </button>
         </li>
-        <li v-for="e in group.invites" :key="e" class="flex items-center justify-between gap-3 text-muted">
-          <span class="flex min-w-0 flex-col"><span class="truncate">{{ e }}</span><span class="text-base italic">kutse saadetud</span></span>
-          <button type="button" class="text-base underline underline-offset-4" :disabled="busy" @click="uninvite(e)">Tühista</button>
+        <li v-for="i in group.invites" :key="i.id" class="flex items-center justify-between gap-3 text-muted">
+          <span class="flex min-w-0 flex-col"><span class="truncate">{{ i.name ?? i }}</span><span class="text-base italic">kutse saadetud</span></span>
+          <button type="button" class="text-base underline underline-offset-4" :disabled="busy" @click="uninvite(i)">Tühista</button>
         </li>
       </ul>
     </section>
 
     <section v-if="owner" class="flex flex-col gap-3">
       <h2 class="text-2xl leading-7">Kutsu keegi</h2>
+      <ul v-if="pickable.length" class="grain card flex flex-col gap-3 text-lg">
+        <li v-for="p in pickable" :key="p.id" class="flex items-center justify-between gap-3">
+          <span class="truncate">{{ p.name }}</span>
+          <button type="button" class="text-base underline underline-offset-4" :disabled="busy" @click="pick(p)">Kutsu</button>
+        </li>
+      </ul>
       <form class="flex gap-2" @submit.prevent="invite">
         <input v-model.trim="email" type="email" required class="field" placeholder="e-post" />
         <button type="submit" class="btn bg-sage px-4 text-milk" :disabled="busy">Kutsu</button>

@@ -60,16 +60,31 @@ function user_groups($uid) {
         $g['members'] = array_map(fn($m) => ['id' => (int) $m['id'], 'email' => (int) $m['id'] === (int) $uid ? $m['email'] : ''] + $m, q(
             'SELECT u.id, u.name, u.email, m.role FROM group_members m JOIN users u ON u.id = m.user_id WHERE m.group_id = ? ORDER BY m.role DESC, u.name',
             [$g['id']])->fetchAll());
-        $g['invites'] = $g['role'] === 'owner'
-            ? q('SELECT email FROM invites WHERE group_id = ? ORDER BY email', [$g['id']])->fetchAll(PDO::FETCH_COLUMN) : [];
+        // An invited person with an account shows by name, so picking a co-member never reveals their email.
+        $g['invites'] = $g['role'] === 'owner' ? array_map(fn($i) => ['id' => (int) $i['id'], 'userId' => $i['userId'] ? (int) $i['userId'] : null] + $i, q(
+            'SELECT i.id, u.id userId, COALESCE(u.name, i.email) name FROM invites i LEFT JOIN users u ON u.email = i.email WHERE i.group_id = ? ORDER BY name',
+            [$g['id']])->fetchAll()) : [];
     }
     return $groups;
 }
 
-// What the app shows a logged-in user: their groups and the group invitations waiting for them to accept.
+// People the user can add to a group without typing an email: whoever they invited or were invited by, and the members of their groups.
+function user_people($uid) {
+    try {
+        return array_map(fn($p) => ['id' => (int) $p['id'], 'name' => $p['name']], q(
+            'SELECT id, name FROM users WHERE id <> ? AND (id IN (SELECT contact_id FROM contacts WHERE user_id = ?)
+             OR id IN (SELECT b.user_id FROM group_members a JOIN group_members b ON b.group_id = a.group_id WHERE a.user_id = ?)) ORDER BY name',
+            [$uid, $uid, $uid])->fetchAll());
+    } catch (PDOException) {
+        return []; // until migrate.php has made the contacts table
+    }
+}
+
+// What the app shows a logged-in user: their groups, the group invitations waiting for them to accept, and the people they know.
 function groups_reply($user) {
     return [
         'groups' => user_groups($user['id']),
+        'people' => user_people($user['id']),
         'invitations' => array_map(fn($i) => ['groupId' => (int) $i['groupId']] + $i, q(
             'SELECT i.group_id groupId, g.name, COALESCE(u.name, \'\') `from` FROM invites i JOIN `groups` g ON g.id = i.group_id LEFT JOIN users u ON u.id = i.invited_by
              WHERE i.email = ? ORDER BY g.name', [$user['email']])->fetchAll()),
