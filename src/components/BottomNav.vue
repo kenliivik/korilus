@@ -35,7 +35,7 @@ const items = [
 
   <!-- Desktop: full-height sidebar flush to the left edge, with labels. Settings sit at the bottom. -->
   <nav class="grain fixed inset-y-0 left-0 hidden w-64 flex-col gap-2 px-6 py-10 shadow-neu-raised lg:flex" aria-label="Peamenüü">
-    <RouterLink to="/" class="mb-10 px-2"><img src="/logo.svg" alt="Korilus" class="h-10 w-auto" /></RouterLink>
+    <RouterLink to="/" class="mb-10 px-2"><img src="/logo.svg" alt="Korilus" class="h-12 w-auto" /></RouterLink>
     <RouterLink
       v-for="item in items"
       :key="item.id"

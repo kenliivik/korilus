@@ -12,7 +12,7 @@ const next = computed(() => comingSoon())
 
 <template>
   <header class="flex items-center justify-between lg:-mb-6 lg:h-0 lg:items-start lg:justify-end">
-    <h1 class="lg:hidden"><img src="/logo.svg" alt="Korilus" class="h-8 w-auto" /></h1>
+    <h1 class="lg:hidden"><img src="/logo.svg" alt="Korilus" class="h-10 w-auto" /></h1>
     <span class="font-hand text-lg text-muted lg:mt-8 lg:text-3xl">{{ month }}</span>
   </header>
 
