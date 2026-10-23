@@ -9,7 +9,8 @@ const saved = JSON.parse(localStorage.getItem(KEY)) ?? {}
 
 export const account = reactive({
   user: saved.user ?? null, // { id, email, name, isAdmin }
-  groups: saved.groups ?? [], // { id, name, role, members: [{ id, name, email (own only), role }], invites: [email] }
+  groups: saved.groups ?? [], // { id, name, role, members: [{ id, name, email (own only), role }], invites: [{ id, userId, name }] }
+  people: saved.people ?? [], // who the user can add to a group without an email: { id, name }
   invitations: [], // groups the user was invited to: { groupId, name, from }
   syncedAt: saved.syncedAt ?? 0, // when this phone last synced (0 = not since logging in)
   syncing: false,
@@ -17,8 +18,8 @@ export const account = reactive({
 })
 
 watch(
-  () => [account.user, account.groups, account.syncedAt],
-  () => localStorage.setItem(KEY, JSON.stringify({ user: account.user, groups: account.groups, syncedAt: account.syncedAt })),
+  () => [account.user, account.groups, account.people, account.syncedAt],
+  () => localStorage.setItem(KEY, JSON.stringify({ user: account.user, groups: account.groups, people: account.people, syncedAt: account.syncedAt })),
   { deep: true },
 )
 
@@ -35,13 +36,14 @@ export async function api(file, body) {
   if (!res.ok) throw new Error(data.error || 'network')
   if (data.user !== undefined) account.user = data.user
   if (data.groups) account.groups = data.groups
+  if (data.people) account.people = data.people
   if (data.invitations) account.invitations = data.invitations
   return data
 }
 
 // Logged out (or the session ended): the spots stay on this phone, the shared ones go.
 function forget() {
-  Object.assign(account, { user: null, groups: [], invitations: [], syncedAt: 0, error: '' })
+  Object.assign(account, { user: null, groups: [], people: [], invitations: [], syncedAt: 0, error: '' })
   store.shared = []
 }
 

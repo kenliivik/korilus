@@ -80,6 +80,15 @@ CREATE TABLE IF NOT EXISTS feedback (
   INDEX (user_id)
 ) DEFAULT CHARSET = utf8mb4;
 
+-- People who know each other because one invited the other (both directions), so they can add each other to groups without typing an email.
+CREATE TABLE IF NOT EXISTS contacts (
+  user_id INT UNSIGNED NOT NULL,
+  contact_id INT UNSIGNED NOT NULL,
+  created_at INT UNSIGNED NOT NULL,
+  PRIMARY KEY (user_id, contact_id),
+  INDEX (contact_id)
+) DEFAULT CHARSET = utf8mb4;
+
 -- Invitation emails sent, so the daily limits hold even when an invite is withdrawn and sent again.
 CREATE TABLE IF NOT EXISTS mail_log (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

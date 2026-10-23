@@ -64,6 +64,12 @@ if ($action === 'verify') {
         q('INSERT INTO users (email, name, created_at) VALUES (?, ?, ?)', [$email, mb_substr(strstr($email, '@', true), 0, 60), time()]);
         $user = q('SELECT * FROM users WHERE email = ?', [$email])->fetch();
     }
+    // Whoever invited this person and they now know each other (see contacts in schema.sql).
+    try {
+        foreach (q('SELECT DISTINCT invited_by FROM invites WHERE email = ?', [$email])->fetchAll(PDO::FETCH_COLUMN) as $by) {
+            q('INSERT IGNORE INTO contacts (user_id, contact_id, created_at) VALUES (?, ?, ?), (?, ?, ?)', [$by, $user['id'], time(), $user['id'], $by, time()]);
+        }
+    } catch (PDOException) {} // until migrate.php has made the contacts table
     // Invites to the app are used up; group invites wait until the person accepts them in the app.
     q('DELETE FROM invites WHERE email = ? AND group_id IS NULL', [$email]);
     q('DELETE FROM sessions WHERE expires_at < ?', [time()]);
