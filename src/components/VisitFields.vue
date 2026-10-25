@@ -26,7 +26,7 @@ const toggle = (id) =>
         :key="p.id"
         type="button"
         :aria-pressed="visit.berries.includes(p.id)"
-        class="rounded-full px-3 py-1.5 text-base transition-shadow"
+        class="press rounded-full px-3 py-1.5 text-base"
         :class="visit.berries.includes(p.id) ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-neu-raised-sm'"
         @click="toggle(p.id)"
       >

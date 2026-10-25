@@ -41,8 +41,12 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
       @click="toggleNotify(t.key)"
     >
       {{ t.label }}
-      <span class="flex w-14 rounded-full p-1 shadow-neu-inset" :class="store.notify[t.key] ? 'justify-end bg-leaf/30' : 'grain'">
-        <span class="size-5 rounded-full shadow-neu-raised-sm" :class="store.notify[t.key] ? 'bg-sage' : 'grain'" />
+      <span class="flex w-14 rounded-full p-1 shadow-neu-inset transition-colors duration-200" :class="store.notify[t.key] ? 'bg-leaf/30' : 'grain'">
+        <!-- The knob slides across: 3.5rem track − 0.5rem padding − 1.25rem knob = 1.75rem. -->
+        <span
+          class="size-5 rounded-full shadow-neu-raised-sm transition-[translate,background-color] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
+          :class="store.notify[t.key] ? 'translate-x-7 bg-sage' : 'grain'"
+        />
       </span>
     </button>
     <p v-if="pushState === 'denied'" class="text-base italic text-muted">Teated on selles telefonis keelatud. Luba need telefoni seadetes Koriluse juures.</p>
