@@ -199,8 +199,9 @@
       transform: translateY(10px);
     }
   }
-  /* Each page fades in when you move between them. Opacity only: a transform would unpin the fixed "+" button. */
-  .page-in {
+  /* Fades in on mount: each page (keyed by path), a new month or a filtered list.
+     Opacity only: on <main> a transform would unpin the fixed "+" button. */
+  .fade-in {
     animation: fade 180ms ease-out;
   }
 

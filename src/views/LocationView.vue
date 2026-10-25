@@ -9,6 +9,7 @@ import { directionsUrl } from '../components/map.js'
 import { findProduce } from '../data/berries.js'
 import { findLocation, berriesAt, averageRating, today, formatDate, touch } from '../data/store.js'
 import { account } from '../data/account.js'
+import { ask } from '../data/confirm.js'
 
 const props = defineProps({ id: { type: String, required: true } })
 
@@ -53,8 +54,8 @@ function saveVisit() {
   showSaved(editing.value.visit)
   editing.value = null
 }
-function deleteVisit() {
-  if (!confirm('Kas kustutad selle käigu?')) return
+async function deleteVisit() {
+  if (!(await ask('Kas kustutad selle käigu?'))) return
   loc.value.visits.splice(editing.value.i, 1)
   touch(loc.value)
   editing.value = null
@@ -79,7 +80,7 @@ async function copyCoords() {
     <div class="contents lg:flex lg:flex-col lg:gap-6">
     <section v-if="loc.lat != null" class="flex flex-col gap-3">
       <SpotMap :spots="[loc]" small />
-      <button type="button" class="self-center text-base text-muted" @click="copyCoords">
+      <button type="button" class="self-center text-base text-muted" aria-live="polite" @click="copyCoords">
         {{ copied ? 'Koordinaadid kopeeritud' : `${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}` }}
       </button>
     </section>
@@ -93,7 +94,7 @@ async function copyCoords() {
       </button>
     </div>
 
-    <form v-if="draft" class="grain card flex flex-col gap-4" @submit.prevent="addVisit">
+    <form v-if="draft" class="grain card settle flex flex-col gap-4" @submit.prevent="addVisit">
       <h2 class="text-2xl leading-7">Uus käik</h2>
       <VisitFields v-model="draft" />
       <button type="submit" class="btn bg-sage text-milk">Salvesta</button>
@@ -112,7 +113,7 @@ async function copyCoords() {
       <template v-for="[year, visits] in years" :key="year">
         <h3 class="mt-3 font-hand text-xl text-muted">{{ year }}</h3>
         <template v-for="(v, i) in visits" :key="i">
-          <form v-if="editing && loc.visits[editing.i] === v" class="grain card my-2 flex flex-col gap-4" @submit.prevent="saveVisit">
+          <form v-if="editing && loc.visits[editing.i] === v" class="grain card settle my-2 flex flex-col gap-4" @submit.prevent="saveVisit">
             <VisitFields v-model="editing.visit" />
             <button type="submit" class="btn bg-sage text-milk">Salvesta</button>
             <div class="grid grid-cols-2 gap-4">

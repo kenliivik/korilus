@@ -7,6 +7,7 @@ import VisitFields from '../components/VisitFields.vue'
 import PickMap from '../components/PickMap.vue'
 import { store, today, touch, removeLocation } from '../data/store.js'
 import { account } from '../data/account.js'
+import { ask } from '../data/confirm.js'
 
 // New spot (no id) or editing an existing one ("Muuda").
 const props = defineProps({ id: { type: String, default: '' } })
@@ -53,8 +54,8 @@ function save() {
 }
 
 // Deleting lives here, out of the way, rather than next to "Muuda" on the spot page.
-function remove() {
-  if (!confirm(`Kas kustutad „${existing.name}” koos kõigi märkmetega?`)) return
+async function remove() {
+  if (!(await ask(`Kas kustutad „${existing.name}” koos kõigi märkmetega?`))) return
   removeLocation(existing)
   router.replace('/asukohad')
 }

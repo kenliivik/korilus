@@ -5,6 +5,7 @@ import AppIcon from '../components/AppIcon.vue'
 import PageHeader from '../components/PageHeader.vue'
 import { store } from '../data/store.js'
 import { account, requestCode, verifyCode, logout, logoutAll, deleteAccount, saveName, groupAction, downloadData } from '../data/account.js'
+import { ask } from '../data/confirm.js'
 
 const router = useRouter()
 const messages = {
@@ -62,14 +63,14 @@ const signOut = () => run(async () => {
   await logout()
   step.value = 'email'
 })
-const signOutAll = () =>
-  confirm('Kas logid välja kõigis seadmetes? Ka kadunud telefon ei pääse siis enam su kontole.') &&
+const signOutAll = async () =>
+  (await ask('Kas logid välja kõigis seadmetes? Ka kadunud telefon ei pääse siis enam su kontole.', 'Logi välja')) &&
   run(async () => {
     await logoutAll()
     step.value = 'email'
   })
-const remove = () =>
-  confirm('Kas kustutad konto? Serverist kaovad su konto, kohad ja grupid, mille sa lõid. Selles telefonis jäävad kohad alles.') &&
+const remove = async () =>
+  (await ask('Kas kustutad konto? Serverist kaovad su konto, kohad ja grupid, mille sa lõid. Selles telefonis jäävad kohad alles.')) &&
   run(async () => {
     await deleteAccount()
     router.replace('/seaded')

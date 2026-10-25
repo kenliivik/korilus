@@ -1,4 +1,5 @@
 <script setup>
+import { ask } from '../../data/confirm.js'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import PageHeader from '../../components/PageHeader.vue'
@@ -87,7 +88,7 @@ async function save() {
 }
 
 async function remove() {
-  if (!confirm(`Kas kustutad „${draft.value.title}”?`)) return
+  if (!(await ask(`Kas kustutad „${draft.value.title}”?`))) return
   busy.value = true
   try {
     await saveContent({ collection: 'recipes', action: 'delete', id: props.id })

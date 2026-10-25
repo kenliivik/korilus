@@ -1,5 +1,6 @@
 <script setup>
 import BottomNav from './components/BottomNav.vue'
+import ConfirmDialog from './components/ConfirmDialog.vue'
 import './data/account.js' // starts spot sync when logged in
 </script>
 
@@ -9,11 +10,12 @@ import './data/account.js' // starts spot sync when logged in
          doc pages (admin) keep their content to a readable column. Keyed by path so each page fades in anew. -->
     <main
       :key="$route.path"
-      class="page-in mx-auto flex max-w-[430px] flex-col gap-6 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-32 lg:pb-12"
+      class="fade-in mx-auto flex max-w-[430px] flex-col gap-6 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-32 lg:pb-12"
       :class="{ 'lg:max-w-6xl lg:px-12 lg:pt-12': $route.meta.wide, 'lg:*:max-w-3xl': $route.meta.doc }"
     >
       <RouterView />
     </main>
     <BottomNav :active="$route.meta.tab" />
+    <ConfirmDialog />
   </div>
 </template>

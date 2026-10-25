@@ -5,6 +5,7 @@ import PageHeader from '../components/PageHeader.vue'
 import AppIcon from '../components/AppIcon.vue'
 import { store } from '../data/store.js'
 import { account, groupAction } from '../data/account.js'
+import { ask } from '../data/confirm.js'
 
 // One group (members, invites, leave or delete), or with no id the "new group" form.
 const props = defineProps({ id: { type: String, default: '' } })
@@ -43,11 +44,11 @@ const invite = () => act({ action: 'invite', email: email.value }, () => {
   email.value = ''
 })
 const pick = (p) => act({ action: 'invite', userId: p.id }, () => (note.value = `Kutse läks teele: ${p.name}.`))
-const removeMember = (m) => confirm(`Kas eemaldad ${m.name} grupist?`) && act({ action: 'remove', userId: m.id })
+const removeMember = async (m) => (await ask(`Kas eemaldad ${m.name} grupist?`, 'Eemalda')) && act({ action: 'remove', userId: m.id })
 const uninvite = (i) => act({ action: 'uninvite', inviteId: i.id })
-const leave = () => confirm(`Kas lahkud grupist „${group.value.name}”? Kohad, mida sa seal jagasid, jäävad jälle ainult sulle.`) &&
+const leave = async () => (await ask(`Kas lahkud grupist „${group.value.name}”? Kohad, mida sa seal jagasid, jäävad jälle ainult sulle.`, 'Lahku')) &&
   act({ action: 'leave' }, () => router.replace('/konto'))
-const remove = () => confirm(`Kas kustutad grupi „${group.value.name}”? Kõik grupiga jagatud kohad jäävad jälle ainult nende omanikele.`) &&
+const remove = async () => (await ask(`Kas kustutad grupi „${group.value.name}”? Kõik grupiga jagatud kohad jäävad jälle ainult nende omanikele.`)) &&
   act({ action: 'delete' }, () => router.replace('/konto'))
 </script>
 
