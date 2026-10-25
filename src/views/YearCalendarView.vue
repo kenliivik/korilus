@@ -61,17 +61,17 @@ const cellColor = { a: 'bg-leaf/35', t: 'bg-sage', l: 'hatch', '.': '' }
     <h2 class="ruled text-2xl leading-7">Kuu kaupa</h2>
     <div class="grain card flex flex-col gap-3">
       <div class="flex items-center justify-between">
-        <button type="button" aria-label="Eelmine kuu" class="grain grid size-9 place-items-center rounded-full shadow-neu-raised-sm" @click="step(-1)">
+        <button type="button" aria-label="Eelmine kuu" class="grain press grid size-9 place-items-center rounded-full shadow-neu-raised-sm active:shadow-neu-inset" @click="step(-1)">
           <AppIcon name="back" :size="18" />
         </button>
         <span class="text-xl">{{ months[selected] }}<span v-if="selected === now" class="font-hand text-base text-muted"> · see kuu</span></span>
-        <button type="button" aria-label="Järgmine kuu" class="grain grid size-9 place-items-center rounded-full shadow-neu-raised-sm" @click="step(1)">
+        <button type="button" aria-label="Järgmine kuu" class="grain press grid size-9 place-items-center rounded-full shadow-neu-raised-sm active:shadow-neu-inset" @click="step(1)">
           <AppIcon name="arrow" :size="18" />
         </button>
       </div>
       <ul v-if="inSeason(selected).length" class="flex flex-col gap-1">
         <li v-for="p in inSeason(selected)" :key="p.id">
-          <RouterLink :to="`/mari/${p.id}`" class="flex items-center gap-3 text-lg lg:text-xl">
+          <RouterLink :to="`/mari/${p.id}`" class="press flex items-center gap-3 text-lg lg:text-xl">
             <span class="flex items-center gap-3"><BerryGlyph :name="p.id" :image="p.image" :size="64" class="hidden lg:block" />{{ p.name }}</span><span class="leader" /><span class="font-hand text-base text-muted">{{ statusText[p.season[selected]] }}</span>
           </RouterLink>
         </li>

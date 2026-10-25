@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import PageHeader from '../components/PageHeader.vue'
 import AppIcon from '../components/AppIcon.vue'
 import StarRating from '../components/StarRating.vue'
@@ -25,11 +25,21 @@ const years = computed(() =>
 // Newest visit first; dates are YYYY-MM-DD so they sort as text.
 const sortVisits = () => loc.value.visits.sort((a, b) => b.date.localeCompare(a.date))
 
+// The visit just added or edited lights up in the log and scrolls into view.
+const justSaved = ref(null)
+async function showSaved(v) {
+  justSaved.value = v
+  await nextTick()
+  document.querySelector('.just-saved')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  setTimeout(() => justSaved.value === v && (justSaved.value = null), 1400)
+}
+
 const draft = ref(null)
 function addVisit() {
   loc.value.visits.push(draft.value)
   sortVisits()
   touch(loc.value)
+  showSaved(draft.value)
   draft.value = null
 }
 
@@ -40,6 +50,7 @@ function saveVisit() {
   loc.value.visits[editing.value.i] = editing.value.visit
   sortVisits()
   touch(loc.value)
+  showSaved(editing.value.visit)
   editing.value = null
 }
 function deleteVisit() {
@@ -116,7 +127,7 @@ async function copyCoords() {
             :type="loc.shared ? undefined : 'button'"
             :aria-label="loc.shared ? undefined : `Muuda käiku ${formatDate(v.date)}`"
             class="grid grid-cols-[4.5rem_1fr] gap-x-3 border-b border-sage/15 py-3 text-left"
-            :class="!loc.shared && 'press'"
+            :class="[!loc.shared && 'press', v === justSaved && 'just-saved']"
             @click="loc.shared || editVisit(v)"
           >
             <span class="font-hand text-lg leading-7 whitespace-nowrap text-muted">{{ shortDate(v.date) }}</span>

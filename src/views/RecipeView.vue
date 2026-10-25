@@ -57,7 +57,9 @@ const saved = computed(() => store.savedRecipes.includes(props.id))
       :aria-pressed="saved"
       @click="toggleSavedRecipe(r.id)"
     >
-      {{ saved ? 'Lemmikutes ✓' : 'Lisa lemmikuks' }}
+      <Transition name="swap" mode="out-in">
+        <span :key="saved">{{ saved ? 'Lemmikutes ✓' : 'Lisa lemmikuks' }}</span>
+      </Transition>
     </button>
     </aside>
 

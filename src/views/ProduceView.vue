@@ -53,7 +53,9 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
 
     <button type="button" class="btn" :class="reminded ? 'grain text-sage' : 'bg-sage text-milk'" @click="remind">
       <AppIcon name="bell" :size="20" />
-      {{ reminded ? 'Annan teada ✓' : 'Anna teada, kui valmib' }}
+      <Transition name="swap" mode="out-in">
+        <span :key="reminded">{{ reminded ? 'Annan teada ✓' : 'Anna teada, kui valmib' }}</span>
+      </Transition>
     </button>
     <p v-if="noPush" class="italic text-muted">
       Jätsin meelde, aga see telefon ei luba teateid saata. iPhone'is lisa Korilus enne avakuvale (Jaga → Lisa avakuvale).
@@ -80,7 +82,7 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
       <h2 class="ruled text-2xl leading-7 lg:text-3xl lg:leading-9">Minu kohad</h2>
       <ul v-if="foundAt.length" class="grain card flex flex-col gap-2 text-lg lg:p-6 lg:text-xl">
         <li v-for="f in foundAt" :key="f.id">
-          <RouterLink :to="`/asukohad/${f.id}`" class="flex items-center gap-2">
+          <RouterLink :to="`/asukohad/${f.id}`" class="press flex items-center gap-2">
             <AppIcon name="pin" :size="18" />{{ f.name }} <span class="ml-auto text-base text-muted">{{ formatDate(f.date) }}</span>
           </RouterLink>
         </li>

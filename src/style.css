@@ -110,7 +110,7 @@
     @apply rounded-card p-4 shadow-neu-raised;
   }
   .btn {
-    @apply flex items-center justify-center gap-2 rounded-full px-5 py-3 text-lg leading-6 shadow-neu-raised transition-[box-shadow,scale] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] active:shadow-neu-inset motion-reduce:active:scale-100;
+    @apply flex items-center justify-center gap-2 rounded-full px-5 py-3 text-lg leading-6 shadow-neu-raised transition-[box-shadow,scale] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] active:shadow-neu-inset motion-reduce:active:scale-100 disabled:opacity-50 disabled:active:scale-100 disabled:active:shadow-neu-raised;
   }
   .field {
     @apply w-full rounded-2xl bg-milk px-4 py-3 text-lg text-sage shadow-neu-inset outline-none placeholder:text-muted/85 focus:ring-2 focus:ring-sage/40;
@@ -199,6 +199,31 @@
       transform: translateY(10px);
     }
   }
+  /* Each page fades in when you move between them. Opacity only: a transform would unpin the fixed "+" button. */
+  .page-in {
+    animation: fade 180ms ease-out;
+  }
+
+  /* A button label that changes ("Lisa lemmikuks" → "Lemmikutes ✓") rises in, with <Transition name="swap">. */
+  .swap-enter-active {
+    transition: opacity 180ms ease-out, translate 180ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .swap-enter-from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+
+  /* A visit just saved lights up for a moment, so you can see where it landed in the log. */
+  .just-saved {
+    animation: just-saved 1400ms ease-out;
+  }
+  @keyframes just-saved {
+    from,
+    30% {
+      background-color: rgb(110 130 99 / 0.22);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .settle {
       animation-name: fade;
@@ -206,11 +231,20 @@
     .press:active {
       transform: none;
     }
+    .swap-enter-from {
+      translate: none;
+    }
   }
   @keyframes fade {
     from {
       opacity: 0;
     }
+  }
+
+  /* Keyboard focus shows as an ink ring; taps and clicks don't. */
+  :focus-visible {
+    outline: 2px solid var(--color-sage);
+    outline-offset: 3px;
   }
 }
 

@@ -42,7 +42,7 @@ const next = computed(() => comingSoon())
     <h2 class="ruled text-2xl leading-7 lg:text-3xl lg:leading-9">Varsti valmimas</h2>
     <ul class="grain card flex flex-col gap-1">
       <li v-for="{ p, month } in next" :key="p.id">
-        <RouterLink :to="`/mari/${p.id}`" class="flex items-center gap-3 text-lg lg:text-xl">
+        <RouterLink :to="`/mari/${p.id}`" class="press flex items-center gap-3 text-lg lg:text-xl">
           <span class="flex items-center gap-3"><BerryGlyph :name="p.id" :image="p.image" :size="48" />{{ p.name }}</span>
           <span class="leader" />
           <span class="font-hand text-base text-muted">{{ months[month] }}</span>

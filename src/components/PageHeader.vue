@@ -17,7 +17,7 @@ const goBack = () => (history.state?.back ? router.back() : router.push(props.ba
       v-if="back"
       type="button"
       aria-label="Tagasi"
-      class="grain grid size-11 shrink-0 place-items-center rounded-full text-sage shadow-neu-raised-sm active:shadow-neu-inset"
+      class="grain grid size-11 shrink-0 place-items-center rounded-full text-sage shadow-neu-raised-sm press active:shadow-neu-inset"
       @click="goBack"
     >
       <AppIcon name="back" :size="20" />
