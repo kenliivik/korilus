@@ -213,3 +213,36 @@
     }
   }
 }
+
+/* Spot names beside the pins, handwritten in ink with a paper halo so they read over forest and roads. */
+.map-print .leaflet-tooltip.pin-label {
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  font-family: var(--font-hand);
+  font-size: 1.125rem;
+  line-height: 1;
+  color: var(--color-sage);
+  text-shadow: 0 0 3px var(--color-milk), 0 0 3px var(--color-milk), 0 0 6px var(--color-milk);
+}
+.map-print .leaflet-tooltip.pin-label::before {
+  display: none;
+}
+
+/* A newly placed pin drops onto the sheet. The svg moves, not the marker, which Leaflet positions with transform. */
+.pin-drop svg {
+  animation: pin-drop 280ms cubic-bezier(0.23, 1, 0.32, 1) backwards;
+  transform-origin: bottom center;
+}
+@keyframes pin-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.92);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pin-drop svg {
+    animation-name: fade;
+  }
+}

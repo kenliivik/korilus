@@ -1,17 +1,18 @@
 <script setup>
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import L from 'leaflet'
-import { createMap, pin } from './map.js'
+import { createMap, pin, droppedPin } from './map.js'
 
 // Tap the map to put the spot there (e.g. adding it at home after the forest trip).
 const coords = defineModel({ type: Object, default: null }) // { lat, lng } or null
 const el = ref()
-let map, marker, tapped = false
+let map, marker, tapped = false, ready = false
 
 function show(c) {
-  if (!c) return marker?.remove()
-  marker ??= L.marker([c.lat, c.lng], { icon: pin })
-  marker.setLatLng([c.lat, c.lng]).addTo(map)
+  marker?.remove()
+  if (!c) return
+  // A fresh marker each time, so the pin drops in again where you tapped (the saved spot just sits there).
+  marker = L.marker([c.lat, c.lng], { icon: ready ? droppedPin : pin }).addTo(map)
   if (!tapped) map.setView([c.lat, c.lng], Math.max(map.getZoom(), 14)) // GPS: zoom in on it
   tapped = false
 }
@@ -20,9 +21,11 @@ onMounted(() => {
   map = createMap(el.value)
   map.on('click', (e) => {
     tapped = true
+    navigator.vibrate?.(8) // a small tick on Android phones
     coords.value = { lat: e.latlng.lat, lng: e.latlng.lng }
   })
   show(coords.value)
+  ready = true
 })
 watch(coords, show) // GPS or a tap moved the spot
 onBeforeUnmount(() => map?.remove())

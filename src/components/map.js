@@ -51,4 +51,5 @@ const icon = (className) => L.divIcon({
   iconAnchor: [14, 28],
 })
 export const pin = icon('text-sage')
+export const droppedPin = icon('text-sage pin-drop') // the pin you just placed on the form's map
 export const sharedPin = icon('text-muted')
