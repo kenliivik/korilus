@@ -16,9 +16,11 @@ $meta = ['id' => 0, 'updatedAt' => 0, 'groupId' => 0, 'deleted' => 0, 'mine' => 
 // (or none, for spots saved before a place was required).
 function showable($s) {
     $place = fn($v, $max) => $v === null || (is_numeric($v) && abs($v) <= $max);
-    $visit = fn($v) => is_array($v) && is_string($v['date'] ?? null) && is_array($v['berries'] ?? []);
+    // A JSON object is an array in PHP too, but the app needs real lists (it calls .map and .flatMap on them).
+    $list = fn($v) => is_array($v) && array_values($v) === $v;
+    $visit = fn($v) => is_array($v) && is_string($v['date'] ?? null) && $list($v['berries'] ?? []);
     return is_string($s['name'] ?? null) && mb_strlen($s['name']) <= 200
-        && is_array($s['visits'] ?? null) && count(array_filter($s['visits'], $visit)) === count($s['visits'])
+        && $list($s['visits'] ?? null) && count(array_filter($s['visits'], $visit)) === count($s['visits'])
         && $place($s['lat'] ?? null, 90) && $place($s['lng'] ?? null, 180) && (($s['lat'] ?? null) === null) === (($s['lng'] ?? null) === null);
 }
 
