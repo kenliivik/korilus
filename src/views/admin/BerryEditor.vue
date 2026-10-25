@@ -1,4 +1,5 @@
 <script setup>
+import { ask } from '../../data/confirm.js'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import PageHeader from '../../components/PageHeader.vue'
@@ -89,8 +90,8 @@ function save() {
   run({ collection: 'berries', action: 'save', item: item.value })
 }
 
-function remove() {
-  if (confirm(`Kas kustutad „${form.value.name}”? Marja saab ka lihtsalt peita.`)) run({ collection: 'berries', action: 'delete', id: form.value.id })
+async function remove() {
+  if (await ask(`Kas kustutad „${form.value.name}”? Marja saab ka lihtsalt peita.`)) run({ collection: 'berries', action: 'delete', id: form.value.id })
 }
 </script>
 

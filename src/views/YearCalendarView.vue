@@ -46,7 +46,7 @@ const cellColor = { a: 'bg-leaf/35', t: 'bg-sage', l: 'hatch', '.': '' }
       <span
         v-for="(c, i) in p.season"
         :key="i"
-        class="mx-px h-6 rounded-sm lg:mx-0.5 lg:h-8"
+        class="mx-px h-6 cursor-pointer rounded-sm lg:mx-0.5 lg:h-8"
         @click="selected = i"
         :class="cellColor[c] || (i === selected && 'bg-sage/8')"
         :title="c !== '.' ? `${months[i]}: ${phases[c]}` : undefined"
@@ -69,7 +69,7 @@ const cellColor = { a: 'bg-leaf/35', t: 'bg-sage', l: 'hatch', '.': '' }
           <AppIcon name="arrow" :size="18" />
         </button>
       </div>
-      <ul v-if="inSeason(selected).length" class="flex flex-col gap-1">
+      <ul v-if="inSeason(selected).length" :key="selected" class="fade-in flex flex-col gap-1">
         <li v-for="p in inSeason(selected)" :key="p.id">
           <RouterLink :to="`/mari/${p.id}`" class="press flex items-center gap-3 text-lg lg:text-xl">
             <span class="flex items-center gap-3"><BerryGlyph :name="p.id" :image="p.image" :size="64" class="hidden lg:block" />{{ p.name }}</span><span class="leader" /><span class="font-hand text-base text-muted">{{ statusText[p.season[selected]] }}</span>
