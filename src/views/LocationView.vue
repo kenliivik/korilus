@@ -1,6 +1,5 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import PageHeader from '../components/PageHeader.vue'
 import AppIcon from '../components/AppIcon.vue'
 import StarRating from '../components/StarRating.vue'
@@ -8,14 +7,15 @@ import VisitFields from '../components/VisitFields.vue'
 import SpotMap from '../components/SpotMap.vue'
 import { directionsUrl } from '../components/map.js'
 import { findProduce } from '../data/berries.js'
-import { findLocation, berriesAt, averageRating, today, formatDate, touch, removeLocation } from '../data/store.js'
+import { findLocation, berriesAt, averageRating, today, formatDate, touch } from '../data/store.js'
 import { account } from '../data/account.js'
 
 const props = defineProps({ id: { type: String, required: true } })
-const router = useRouter()
 
 const loc = computed(() => findLocation(props.id))
 const groupName = computed(() => account.groups.find((g) => g.id === loc.value?.groupId)?.name)
+// "14. sept" for the ledger margin; the year is the heading above.
+const shortDate = (d) => new Date(`${d}T12:00`).toLocaleDateString('et-EE', { day: 'numeric', month: 'short' })
 const names = (ids) => ids.map((id) => findProduce(id)?.name).join(', ')
 // Visits grouped by year (newest first), so seasons can be compared.
 const years = computed(() =>
@@ -49,10 +49,11 @@ function deleteVisit() {
   editing.value = null
 }
 
-function remove() {
-  if (!confirm(`Kas kustutad „${loc.value.name}” koos kõigi märkmetega?`)) return
-  removeLocation(loc.value)
-  router.replace('/asukohad')
+const copied = ref(false)
+async function copyCoords() {
+  await navigator.clipboard?.writeText(`${loc.value.lat.toFixed(5)}, ${loc.value.lng.toFixed(5)}`)
+  copied.value = true
+  setTimeout(() => (copied.value = false), 1800)
 }
 </script>
 
@@ -62,54 +63,45 @@ function remove() {
     <p v-if="loc.shared" class="font-hand text-xl text-muted">{{ loc.owner }} jagas seda{{ groupName ? ` grupis „${groupName}”` : '' }}</p>
     <p v-else-if="groupName" class="font-hand text-xl text-muted">Näevad ka grupi „{{ groupName }}” liikmed</p>
 
-    <!-- Desktop: overview and actions on the left, the visit log on the right. On phones the wrappers dissolve
-         and the actions (order-1) drop below the log as before. -->
+    <!-- Desktop: map, actions and overview on the left, the visit log on the right. On phones the wrappers dissolve. -->
     <div class="contents lg:grid lg:grid-cols-2 lg:items-start lg:gap-10">
     <div class="contents lg:flex lg:flex-col lg:gap-6">
-    <section class="flex flex-col gap-3">
-      <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Ülevaade</h2>
-      <dl class="grain card grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-1 text-lg">
-        <dt class="text-muted">Marjad</dt>
-        <dd>{{ names(berriesAt(loc)) || '–' }}</dd>
-        <dt class="text-muted">Hinne</dt>
-        <dd><StarRating :model-value="averageRating(loc)" readonly /></dd>
-        <dt class="text-muted">Käidud</dt>
-        <dd>{{ loc.visits.length }} korda</dd>
-      </dl>
-    </section>
-
     <section v-if="loc.lat != null" class="flex flex-col gap-3">
       <SpotMap :spots="[loc]" small />
-      <a :href="directionsUrl(loc)" target="_blank" rel="noopener" class="btn grain text-sage">
-        <AppIcon name="pin" :size="20" /> Juhata kohale
-      </a>
-      <p class="text-center text-base text-muted">{{ loc.lat.toFixed(5) }}, {{ loc.lng.toFixed(5) }}</p>
+      <button type="button" class="self-center text-base text-muted" @click="copyCoords">
+        {{ copied ? 'Koordinaadid kopeeritud' : `${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}` }}
+      </button>
     </section>
 
-    <template v-if="!loc.shared">
-      <form v-if="draft" class="grain card order-1 flex flex-col gap-4 lg:order-none" @submit.prevent="addVisit">
-        <h2 class="text-2xl leading-7">Uus käik</h2>
-        <VisitFields v-model="draft" />
-        <button type="submit" class="btn bg-sage text-milk">Salvesta</button>
-        <button type="button" class="btn grain text-sage" @click="draft = null">Tühista</button>
-      </form>
-      <button v-else type="button" class="btn order-1 bg-sage text-milk lg:order-none" @click="draft = { date: today(), berries: [], note: '', rating: 0 }">
-        <AppIcon name="plus" :size="20" /> Pane käik kirja
+    <div class="grid gap-3" :class="!loc.shared && 'grid-cols-2'">
+      <a v-if="loc.lat != null" :href="directionsUrl(loc)" target="_blank" rel="noopener" class="btn grain text-sage">
+        <AppIcon name="pin" :size="20" /> Juhata kohale
+      </a>
+      <button v-if="!loc.shared && !draft" type="button" class="btn bg-sage text-milk" @click="draft = { date: today(), berries: [], note: '', rating: 0 }">
+        <AppIcon name="plus" :size="20" /> Käisin siin
       </button>
-
-      <div class="order-1 grid grid-cols-2 gap-4 lg:order-none">
-        <RouterLink :to="`/asukohad/${loc.id}/muuda`" class="btn grain text-sage"><AppIcon name="edit" :size="20" /> Muuda</RouterLink>
-        <button type="button" class="btn grain text-danger" @click="remove"><AppIcon name="trash" :size="20" /> Kustuta</button>
-      </div>
-    </template>
     </div>
 
-    <section class="flex flex-col gap-3">
-      <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Varasemad käigud</h2>
+    <form v-if="draft" class="grain card flex flex-col gap-4" @submit.prevent="addVisit">
+      <h2 class="text-2xl leading-7">Uus käik</h2>
+      <VisitFields v-model="draft" />
+      <button type="submit" class="btn bg-sage text-milk">Salvesta</button>
+      <button type="button" class="btn grain text-sage" @click="draft = null">Tühista</button>
+    </form>
+
+    <dl class="flex flex-col gap-2 text-lg">
+      <div class="flex items-baseline gap-2"><dt class="text-muted">Marjad</dt><span class="leader" /><dd>{{ names(berriesAt(loc)) || '–' }}</dd></div>
+      <div class="flex items-baseline gap-2"><dt class="text-muted">Hinne</dt><span class="leader" /><dd><StarRating :model-value="averageRating(loc)" readonly /></dd></div>
+      <div class="flex items-baseline gap-2"><dt class="text-muted">Käidud</dt><span class="leader" /><dd>{{ loc.visits.length }} korda</dd></div>
+    </dl>
+    </div>
+
+    <section class="flex flex-col">
+      <h2 class="ruled mb-2 text-2xl leading-7 lg:text-3xl lg:leading-9">Käigud</h2>
       <template v-for="[year, visits] in years" :key="year">
-        <h3 class="font-hand text-xl text-muted">{{ year }}</h3>
+        <h3 class="mt-3 font-hand text-xl text-muted">{{ year }}</h3>
         <template v-for="(v, i) in visits" :key="i">
-          <form v-if="editing && loc.visits[editing.i] === v" class="grain card flex flex-col gap-4" @submit.prevent="saveVisit">
+          <form v-if="editing && loc.visits[editing.i] === v" class="grain card my-2 flex flex-col gap-4" @submit.prevent="saveVisit">
             <VisitFields v-model="editing.visit" />
             <button type="submit" class="btn bg-sage text-milk">Salvesta</button>
             <div class="grid grid-cols-2 gap-4">
@@ -117,23 +109,31 @@ function remove() {
               <button type="button" class="btn grain text-danger" @click="deleteVisit"><AppIcon name="trash" :size="20" /> Kustuta käik</button>
             </div>
           </form>
+          <!-- A ledger row, like a page of a field notebook: date in the margin, then what was found. -->
           <component
             :is="loc.shared ? 'article' : 'button'"
             v-else
             :type="loc.shared ? undefined : 'button'"
             :aria-label="loc.shared ? undefined : `Muuda käiku ${formatDate(v.date)}`"
-            class="grain card flex flex-col gap-1 text-left"
-            :class="!loc.shared && 'transition-shadow active:shadow-neu-inset'"
+            class="grid grid-cols-[4.5rem_1fr] gap-x-3 border-b border-sage/15 py-3 text-left"
+            :class="!loc.shared && 'press'"
             @click="loc.shared || editVisit(v)"
           >
-            <span class="flex w-full items-center justify-between">{{ formatDate(v.date, false) }} <StarRating :model-value="v.rating" readonly :size="14" /></span>
-            <span class="text-muted">{{ names(v.berries) }}</span>
-            <span v-if="v.note" class="italic">„{{ v.note }}”</span>
+            <span class="font-hand text-lg leading-7 whitespace-nowrap text-muted">{{ shortDate(v.date) }}</span>
+            <span class="flex flex-col gap-0.5">
+              <span class="flex items-center justify-between gap-2">{{ names(v.berries) || '–' }} <StarRating v-if="v.rating" :model-value="v.rating" readonly :size="14" /></span>
+              <span v-if="v.note" class="italic text-muted">„{{ v.note }}”</span>
+            </span>
           </component>
         </template>
       </template>
+      <p v-if="!loc.visits.length" class="italic text-muted">Siin pole veel käidud.</p>
     </section>
     </div>
+
+    <RouterLink v-if="!loc.shared" :to="`/asukohad/${loc.id}/muuda`" class="btn grain text-sage lg:self-start">
+      <AppIcon name="edit" :size="20" /> Muuda kohta
+    </RouterLink>
   </template>
 
   <PageHeader v-else title="Seda kohta ei leitud" back="/asukohad" />

@@ -5,7 +5,7 @@ import PageHeader from '../components/PageHeader.vue'
 import AppIcon from '../components/AppIcon.vue'
 import VisitFields from '../components/VisitFields.vue'
 import PickMap from '../components/PickMap.vue'
-import { store, today, touch } from '../data/store.js'
+import { store, today, touch, removeLocation } from '../data/store.js'
 import { account } from '../data/account.js'
 
 // New spot (no id) or editing an existing one ("Muuda").
@@ -51,6 +51,13 @@ function save() {
   }))
   router.replace('/asukohad')
 }
+
+// Deleting lives here, out of the way, rather than next to "Muuda" on the spot page.
+function remove() {
+  if (!confirm(`Kas kustutad „${existing.name}” koos kõigi märkmetega?`)) return
+  removeLocation(existing)
+  router.replace('/asukohad')
+}
 </script>
 
 <template>
@@ -79,16 +86,21 @@ function save() {
     </p>
     <button type="submit" class="btn order-1 bg-sage text-milk lg:order-none">Salvesta</button>
     <button type="button" class="btn order-1 grain text-sage lg:order-none" @click="router.back()">Tühista</button>
+    <button v-if="existing" type="button" class="order-1 mt-2 flex items-center justify-center gap-2 text-lg text-danger lg:order-none" @click="remove">
+      <AppIcon name="trash" :size="18" /> Kustuta see koht
+    </button>
     </div>
 
-    <section class="flex flex-col gap-2">
-      <span class="text-xl">Asukoht</span>
-      <PickMap v-model="coords" />
-      <p class="font-hand text-lg text-muted">Puuduta kaarti, et koht märkida.</p>
-      <button type="button" class="grain card flex items-center gap-3 text-left text-muted" @click="locate()">
-        <AppIcon name="pin" :size="20" />
-        <span class="flex-1">{{ gps || 'Kasuta praegust asukohta' }}</span>
-      </button>
+    <!-- The place comes first on phones: it's what makes a spot, and the GPS lookup is already running. -->
+    <section class="order-first flex flex-col gap-2 lg:order-none">
+      <span class="flex items-baseline justify-between gap-3"><span class="text-xl">Asukoht</span><span class="font-hand text-lg text-muted">puuduta kaarti</span></span>
+      <div class="relative">
+        <PickMap v-model="coords" />
+        <button type="button" class="grain absolute top-3 right-3 z-[600] flex max-w-[80%] items-center gap-2 rounded-full px-4 py-2 text-left text-base leading-5 text-sage shadow-neu-raised-sm active:shadow-neu-inset" @click="locate()">
+          <AppIcon name="pin" :size="18" />
+          <span>{{ gps || 'Kasuta praegust asukohta' }}</span>
+        </button>
+      </div>
     </section>
   </form>
 </template>

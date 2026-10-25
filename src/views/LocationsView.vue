@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import AppIcon from '../components/AppIcon.vue'
 import SpotMap from '../components/SpotMap.vue'
 import StarRating from '../components/StarRating.vue'
+import BerryGlyph from '../components/BerryGlyph.vue'
 import { findProduce } from '../data/berries.js'
 import { store, berriesAt, averageRating, formatDate } from '../data/store.js'
 import { account } from '../data/account.js'
@@ -25,24 +26,34 @@ const groupName = (l) => account.groups.find((g) => g.id === l.groupId)?.name
 
   <SpotMap
     :spots="spots"
-    :style="empty && { '--map-room': '4.5rem' }"
+    :style="{ '--map-room': empty ? '4.5rem' : '8rem' }"
     class="lg:sticky lg:top-12 lg:col-start-2 lg:row-start-1 lg:h-[calc(100dvh-12rem)]"
   />
 
   <div class="contents lg:col-start-1 lg:row-start-1 lg:flex lg:flex-col lg:gap-8">
   <section v-for="list in lists" :key="list.title" class="flex flex-col gap-3" :class="{ 'order-1': empty }">
-    <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">{{ list.title }}</h2>
+    <h2 class="ruled text-2xl leading-7 lg:text-3xl lg:leading-9">{{ list.title }}</h2>
     <RouterLink
-      v-for="l in list.spots"
+      v-for="(l, i) in list.spots"
       :key="l.id"
       :to="`/asukohad/${l.id}`"
-      class="grain card flex flex-col gap-1 press active:shadow-neu-inset"
+      :style="{ '--i': i }"
+      class="grain card settle flex flex-col gap-2 press active:shadow-neu-inset"
     >
-      <span class="text-xl lg:text-2xl">{{ l.name }}</span>
+      <span class="flex items-baseline gap-2">
+        <span class="text-xl lg:text-2xl">{{ l.name }}</span>
+        <span class="leader" />
+        <span class="font-hand text-lg whitespace-nowrap text-muted">{{ l.visits.length ? formatDate(l.visits[0].date, false) : 'käimata' }}</span>
+      </span>
       <span v-if="l.shared" class="font-hand text-lg text-muted">{{ l.owner }}{{ groupName(l) ? ` · ${groupName(l)}` : '' }}</span>
       <span v-else-if="groupName(l)" class="font-hand text-lg text-muted">Jagatud: {{ groupName(l) }}</span>
-      <span class="text-muted">Marjad: {{ berriesAt(l).map((id) => findProduce(id)?.name).join(', ') || '–' }}</span>
-      <span v-if="l.visits.length" class="flex items-center gap-2 text-muted">Viimati käidud: {{ formatDate(l.visits[0].date) }} <StarRating :model-value="averageRating(l)" readonly :size="14" /></span>
+      <span class="flex items-center gap-2">
+        <span class="flex -space-x-1.5">
+          <BerryGlyph v-for="id in berriesAt(l).slice(0, 4)" :key="id" :name="id" :image="findProduce(id)?.image" :size="30" />
+        </span>
+        <span class="flex-1 truncate italic text-muted">{{ berriesAt(l).map((id) => findProduce(id)?.name).join(', ') || 'marju pole veel kirjas' }}</span>
+        <StarRating v-if="averageRating(l)" :model-value="averageRating(l)" readonly :size="14" />
+      </span>
     </RouterLink>
     <p v-if="!list.spots.length" class="italic text-muted">Sul pole veel ühtegi marjakohta salvestatud.</p>
   </section>

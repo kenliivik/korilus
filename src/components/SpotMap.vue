@@ -17,7 +17,9 @@ const fit = (spots) => spots.length && map.fitBounds(spots.map((s) => [s.lat, s.
 function draw(spots) {
   pins.clearLayers()
   for (const s of spots) {
-    L.marker([s.lat, s.lng], { icon: s.shared ? sharedPin : pin, title: s.name }).addTo(pins).on('click', () => props.small || router.push(`/asukohad/${s.id}`))
+    const m = L.marker([s.lat, s.lng], { icon: s.shared ? sharedPin : pin, title: s.name }).addTo(pins).on('click', () => props.small || router.push(`/asukohad/${s.id}`))
+    // Names written beside the pins, like place names on an old plate.
+    if (!props.small) m.bindTooltip(s.name, { permanent: true, direction: 'right', offset: [10, -15], className: 'pin-label' })
   }
 }
 
