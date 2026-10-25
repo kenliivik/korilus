@@ -52,11 +52,9 @@ if ($action === 'verify') {
     // At most 15 wrong codes a day per address, however many codes were asked for, so guessing one stays hopeless.
     if (q('SELECT SUM(attempts) FROM login_codes WHERE email = ?', [$email])->fetchColumn() >= 15) reply_error('too_many', 429);
     $row = q('SELECT * FROM login_codes WHERE email = ? AND expires_at > ? ORDER BY id DESC LIMIT 1', [$email, time()])->fetch();
-    if (!$row || $row['attempts'] >= CODE_ATTEMPTS) reply_error('expired');
-    if (!hash_equals($row['code_hash'], $hash($email, preg_replace('/\D/', '', (string) ($in['code'] ?? ''))))) {
-        q('UPDATE login_codes SET attempts = attempts + 1 WHERE id = ?', [$row['id']]);
-        reply_error('wrong_code');
-    }
+    // The try is counted before the code is compared, in one query, so many guesses sent at once can't get past the limit.
+    if (!$row || !q('UPDATE login_codes SET attempts = attempts + 1 WHERE id = ? AND attempts < ?', [$row['id'], CODE_ATTEMPTS])->rowCount()) reply_error('expired');
+    if (!hash_equals($row['code_hash'], $hash($email, preg_replace('/\D/', '', (string) ($in['code'] ?? ''))))) reply_error('wrong_code');
     q('DELETE FROM login_codes WHERE email = ?', [$email]);
 
     $user = q('SELECT * FROM users WHERE email = ?', [$email])->fetch();
