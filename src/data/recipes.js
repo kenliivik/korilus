@@ -7,6 +7,7 @@ export const recipeTypes = {
   mahl: 'Mahl',
   kuivatamine: 'Kuivatamine',
   külmutamine: 'Külmutamine',
+  hoidis: 'Hoidis',
   muu: 'Muu',
 }
 
