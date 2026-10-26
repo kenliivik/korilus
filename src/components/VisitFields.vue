@@ -3,13 +3,24 @@ import StarRating from './StarRating.vue'
 import { produce } from '../data/berries.js'
 import { today } from '../data/store.js'
 
-// The parts of a visit: when, what was found, a note and a 1–5 rating.
+// The parts of a visit: when, what was found (and how much, the harvest log), a note and a 1–5 rating.
 const visit = defineModel({ type: Object, required: true })
 
-const toggle = (id) =>
-  (visit.value.berries = visit.value.berries.includes(id)
-    ? visit.value.berries.filter((b) => b !== id)
-    : [...visit.value.berries, id])
+function toggle(id) {
+  const v = visit.value
+  if (v.berries.includes(id)) {
+    v.berries = v.berries.filter((b) => b !== id)
+    if (v.amounts) delete v.amounts[id]
+  } else v.berries = [...v.berries, id]
+}
+
+// Litres per berry, optional. An emptied field drops the amount, so "nothing logged" stays different from 0.
+function setAmount(id, value) {
+  const v = visit.value
+  v.amounts ??= {}
+  if (value === '' || !(+value > 0)) delete v.amounts[id]
+  else v.amounts[id] = Math.round(+value * 10) / 10
+}
 </script>
 
 <template>
@@ -33,6 +44,25 @@ const toggle = (id) =>
         {{ p.name }}
       </button>
     </div>
+  </fieldset>
+
+  <fieldset v-if="visit.berries.length" class="flex flex-col gap-2">
+    <legend class="mb-2 text-xl">Kui palju korjasid?</legend>
+    <label v-for="id in visit.berries" :key="id" class="flex items-center gap-3 text-lg">
+      <span class="min-w-0 truncate">{{ produce.find((p) => p.id === id)?.name ?? id }}</span>
+      <span class="leader" />
+      <input
+        type="number"
+        inputmode="decimal"
+        min="0"
+        step="0.5"
+        :value="visit.amounts?.[id] ?? ''"
+        class="field w-24 shrink-0 py-2 text-right [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+        placeholder="–"
+        @input="setAmount(id, $event.target.value)"
+      />
+      <span class="shrink-0 text-muted">liitrit</span>
+    </label>
   </fieldset>
 
   <label class="flex flex-col gap-2">
