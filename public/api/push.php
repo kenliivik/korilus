@@ -34,7 +34,10 @@ if (!$reminders) {
 } elseif (isset($subs[$key]) || (count($subs) < 1000 && $fromIp < 10)) {
     $subs[$key] = [
         'subscription' => ['endpoint' => $endpoint, 'keys' => ['p256dh' => $sub['keys']['p256dh'], 'auth' => $sub['keys']['auth']]],
-        'reminders' => array_map(fn($r) => ['id' => $r['id'], 'name' => $r['name'], 'season' => $r['season']], $reminders),
+        // `mine`: the user's own usual first find and best day from their harvest log ("07-14"), when they have logged one.
+        'reminders' => array_map(fn($r) => ['id' => $r['id'], 'name' => $r['name'], 'season' => $r['season']]
+            + (preg_match('/^\d\d-\d\d$/', $r['mine']['start'] ?? '') ? ['mine' => [
+                'start' => $r['mine']['start'], 'peak' => preg_match('/^\d\d-\d\d$/', $r['mine']['peak'] ?? '') ? $r['mine']['peak'] : null]] : []), $reminders),
         'notify' => ['start' => !empty($in['notify']['start']), 'peak' => !empty($in['notify']['peak'])],
         'sent' => $subs[$key]['sent'] ?? [],
         'ip' => $ip,

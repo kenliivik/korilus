@@ -1,5 +1,6 @@
 import { reactive, watch } from 'vue'
 import { findProduce } from './berries.js'
+import { personalDates } from './harvest.js'
 
 // Everything is kept on this phone. The reminders also go to the server, for push (see syncPush),
 // and when logged in the spots sync with the account (see account.js).
@@ -70,6 +71,9 @@ export function touchVisits(loc) {
   if (!store.dirtyGuest.includes(loc.id)) store.dirtyGuest.push(loc.id)
 }
 
+// Every visit the user logged themselves: on their own spots and on spots their groups share (the harvest log's personal dates).
+export const ownVisits = () => [...store.locations.flatMap((l) => l.visits), ...Object.values(store.guestVisits).flatMap((g) => g.visits)]
+
 // Every visit at a spot, newest first: { v, mine, name }. name is who logged it, when it wasn't the user.
 export function allVisits(loc) {
   const others = (store.otherVisits[loc.id] ?? []).flatMap((o) => o.visits.map((v) => ({ v, name: o.name })))
@@ -107,15 +111,25 @@ export async function syncPush() {
       const key = Uint8Array.from(atob(publicKey.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0))
       sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key })
     }
-    // Berries removed or hidden in /admin are skipped.
-    const reminders = store.reminders.map(findProduce).filter(Boolean).map(({ id, name, season }) => ({ id, name, season }))
+    // Berries removed or hidden in /admin are skipped. `mine` = the user's usual first find and best day ("07-14"),
+    // from their harvest log; the push then follows those instead of the general month.
+    const reminders = store.reminders.map(findProduce).filter(Boolean).map(({ id, name, season }) => {
+      const t = personalDates(ownVisits(), id)
+      return { id, name, season, ...(t && { mine: { start: t.first, peak: t.best } }) }
+    })
     const res = await fetch('/api/push.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ subscription: sub, reminders, notify: store.notify }),
     })
+    if (res.ok) store.pushedDates = datesKey()
     return res.ok
   } catch {
     return false
   }
 }
+
+// The personal dates change as visits are logged: send them again when the app opens and they differ from what the server has.
+// Only when notifications are already allowed, so this never asks for permission by itself.
+const datesKey = () => store.reminders.map((id) => [id, Object.values(personalDates(ownVisits(), id) ?? {})]).join(';')
+if (globalThis.Notification?.permission === 'granted' && store.reminders.length && store.pushedDates !== datesKey()) syncPush()

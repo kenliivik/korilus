@@ -218,7 +218,7 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
       </p>
       <p>
         Meeldetuletuste jaoks hoiame serveris su telefoni teavitusaadressi (selle annab Google, Apple või Mozilla) ja
-        valitud marjad, ilma nime ja e-postita. Kui eemaldad kõik meeldetuletused, kustub see.
+        valitud marjad koos su tavaliste korjekuupäevadega (kui oled korjatut märkinud), ilma nime ja e-postita. Kui eemaldad kõik meeldetuletused, kustub see.
       </p>
       <p>
         Kaart tuleb OpenStreetMapist, nii et kaarti vaadates näeb OpenStreetMap Foundation (Suurbritannia) su IP-aadressi.
