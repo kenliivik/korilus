@@ -10,6 +10,7 @@ import { findProduce } from '../data/berries.js'
 import { findLocation, today, formatDate, myVisits, touchVisits, allVisits } from '../data/store.js'
 import { account } from '../data/account.js'
 import { ask, guardLeave } from '../data/confirm.js'
+import { amountOf, litres, bestTimes, usualDay } from '../data/harvest.js'
 
 const props = defineProps({ id: { type: String, required: true } })
 
@@ -21,6 +22,16 @@ const names = (ids) => ids.map((id) => findProduce(id)?.name).join(', ')
 // Everyone's visits (the user's own can be edited; on a shared spot the user can add theirs too),
 // grouped by year (newest first), so seasons can be compared.
 const rows = computed(() => allVisits(loc.value))
+// "Mustikas 3 l, pohl" for a ledger row (the harvest log), and the litres picked in a year (everyone's).
+const picked = (v) => v.berries.map((id) => [findProduce(id)?.name, amountOf(v, id) && litres(amountOf(v, id))].filter(Boolean).join(' ')).join(', ')
+const yearTotal = (list) => list.reduce((sum, { v }) => sum + v.berries.reduce((s, id) => s + amountOf(v, id), 0), 0)
+// When each berry is at its best here, from everyone's logged hauls.
+const bestHere = computed(() =>
+  allBerries.value.flatMap((id) => {
+    const t = bestTimes(rows.value.map((r) => r.v), id)
+    return t?.best ? [{ id, name: findProduce(id)?.name ?? id, day: usualDay(t.best), years: t.bestYears }] : []
+  }),
+)
 const years = computed(() =>
   rows.value.reduce((m, r) => m.set(r.v.date.slice(0, 4), [...(m.get(r.v.date.slice(0, 4)) ?? []), r]), new Map()),
 )
@@ -121,13 +132,17 @@ async function copyCoords() {
       <div class="flex items-baseline gap-2"><dt class="text-muted">Marjad</dt><span class="leader" /><dd>{{ names(allBerries) || '–' }}</dd></div>
       <div class="flex items-baseline gap-2"><dt class="text-muted">Hinne</dt><span class="leader" /><dd><StarRating :model-value="rating" readonly /></dd></div>
       <div class="flex items-baseline gap-2"><dt class="text-muted">Käidud</dt><span class="leader" /><dd>{{ rows.length }} korda</dd></div>
+      <div v-for="b in bestHere" :key="b.id" class="flex items-baseline gap-2">
+        <dt class="text-muted">{{ b.name }} parim</dt><span class="leader" />
+        <dd class="whitespace-nowrap">{{ b.day }} <span v-if="b.years > 1" class="text-base text-muted">({{ b.years }} aastat)</span></dd>
+      </div>
     </dl>
     </div>
 
     <section class="flex flex-col">
       <h2 class="ruled mb-2 text-2xl leading-7 lg:text-3xl lg:leading-9">Käigud</h2>
       <template v-for="[year, list] in years" :key="year">
-        <h3 class="mt-3 font-hand text-xl text-muted">{{ year }}</h3>
+        <h3 class="mt-3 font-hand text-xl text-muted">{{ year }}<template v-if="yearTotal(list)"> · kokku {{ litres(yearTotal(list)) }}</template></h3>
         <template v-for="({ v, mine: own, name }, i) in list" :key="i">
           <form v-if="editing && own && mine()[editing.i] === v" class="grain card settle my-2 flex flex-col gap-4" @submit.prevent="saveVisit">
             <VisitFields v-model="editing.visit" />
@@ -150,7 +165,7 @@ async function copyCoords() {
           >
             <span class="font-hand text-lg leading-7 whitespace-nowrap text-muted">{{ shortDate(v.date) }}</span>
             <span class="flex flex-col gap-0.5">
-              <span class="flex items-center justify-between gap-2">{{ names(v.berries) || '–' }} <StarRating v-if="v.rating" :model-value="v.rating" readonly :size="14" /></span>
+              <span class="flex items-center justify-between gap-2">{{ picked(v) || '–' }} <StarRating v-if="v.rating" :model-value="v.rating" readonly :size="14" /></span>
               <span v-if="v.note" class="italic text-muted">„{{ v.note }}”</span>
               <span v-if="name" class="font-hand text-lg text-muted">{{ name }}</span>
             </span>
