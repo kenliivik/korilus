@@ -41,22 +41,7 @@ switch ($in['action'] ?? '') {
         reply(['ok' => true]);
 
     case 'delete':
-        db()->beginTransaction();
-        foreach (q("SELECT group_id FROM group_members WHERE user_id = ? AND role = 'owner'", [$uid])->fetchAll(PDO::FETCH_COLUMN) as $gid) delete_group($gid);
-        q('DELETE FROM group_members WHERE user_id = ?', [$uid]);
-        q('DELETE FROM spot_visits WHERE user_id = ? OR spot_id IN (SELECT id FROM spots WHERE user_id = ?)', [$uid, $uid]);
-        q('DELETE FROM spots WHERE user_id = ?', [$uid]);
-        q('DELETE FROM recipe_notes WHERE user_id = ?', [$uid]);
-        q('DELETE FROM user_recipes WHERE user_id = ?', [$uid]);
-        q('DELETE FROM pantry WHERE user_id = ?', [$uid]);
-        q('DELETE FROM invites WHERE invited_by = ? OR email = ?', [$uid, $user['email']]);
-        q('DELETE FROM contacts WHERE user_id = ? OR contact_id = ?', [$uid, $uid]);
-        q('DELETE FROM login_codes WHERE email = ?', [$user['email']]);
-        q('DELETE FROM feedback WHERE user_id = ?', [$uid]);
-        q('DELETE FROM mail_log WHERE user_id = ?', [$uid]);
-        q('DELETE FROM sessions WHERE user_id = ?', [$uid]);
-        q('DELETE FROM users WHERE id = ?', [$uid]);
-        db()->commit();
+        delete_user($uid, $user['email']);
         session_cookie('', 1);
         reply(['ok' => true]);
 }

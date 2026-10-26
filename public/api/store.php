@@ -26,6 +26,26 @@ function config($key = null) {
     return $key === null ? $config : ($config[$key] ?? null);
 }
 
+// Settings changed in /admin (Haldus → Liitumine), kept next to config.php: { signupOpen: bool }.
+const SETTINGS_FILE = DATA_DIR . '/settings.json';
+
+function setting($key) {
+    static $settings;
+    $settings ??= is_file(SETTINGS_FILE) ? (json_decode(file_get_contents(SETTINGS_FILE), true) ?: []) : [];
+    return $settings[$key] ?? null;
+}
+
+function save_setting($key, $value) {
+    $settings = is_file(SETTINGS_FILE) ? (json_decode(file_get_contents(SETTINGS_FILE), true) ?: []) : [];
+    $settings[$key] = $value;
+    file_put_contents(SETTINGS_FILE, json_encode($settings), LOCK_EX);
+}
+
+// Anyone may create an account (not only the invited) when the switch in /admin is on, or config.php says so.
+function signup_open() {
+    return (bool) (config('signup_open') || setting('signupOpen'));
+}
+
 // Berries and recipes edited in /admin. Version 0 means nothing has been saved yet,
 // so the app keeps showing the berries bundled with it.
 const CONTENT_FILE = DATA_DIR . '/content.json';

@@ -6,6 +6,7 @@ require __DIR__ . '/mail.php';
 
 const CODE_MINUTES = 10;
 const CODE_ATTEMPTS = 5;
+const NEW_PER_DAY = 30;
 
 $in = input();
 $action = $in['action'] ?? '';
@@ -33,9 +34,11 @@ if ($action === 'code') {
     $fromIp = q('SELECT COUNT(*) FROM login_codes WHERE ip = ? AND created_at > ?', [$ip, time() - 3600])->fetchColumn();
     if ($mail['n'] >= 5 || $mail['last'] > time() - 30 || $fromIp >= 20) reply_error('too_many', 429);
 
-    $allowed = config('signup_open')
-        || q('SELECT 1 FROM users WHERE email = ?', [$email])->fetchColumn()
-        || q('SELECT 1 FROM invites WHERE email = ?', [$email])->fetchColumn();
+    $known = q('SELECT 1 FROM users WHERE email = ?', [$email])->fetchColumn() || q('SELECT 1 FROM invites WHERE email = ?', [$email])->fetchColumn();
+    $allowed = $known || signup_open();
+    // Open signup: at most 30 new accounts a day, so a script can't fill the database.
+    if (!$known && $allowed && q('SELECT COUNT(*) FROM users WHERE created_at > ?', [time() - 86400])->fetchColumn() >= NEW_PER_DAY) reply_error('busy', 503);
+    if ($allowed && !mail_budget_left()) reply_error('busy', 503);
     $code = sprintf('%06d', random_int(0, 999999));
     // A refused address is logged too (as an already expired row), so the IP limit also slows down guessing who is invited.
     q('INSERT INTO login_codes (email, code_hash, ip, created_at, expires_at) VALUES (?, ?, ?, ?, ?)',

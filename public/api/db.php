@@ -48,6 +48,37 @@ function now_ms() {
     return (int) floor(microtime(true) * 1000);
 }
 
+// Every email the app sends to someone (login codes and invitations), app-wide, so a script can't get the Korilus mailbox
+// blocked or marked as spam on the shared host: at most 60 an hour and 300 a day. Refused login codes ('-') sent nothing.
+const MAIL_PER_HOUR = 60;
+const MAIL_PER_DAY = 300;
+
+function mail_budget_left() {
+    $sent = fn($since) => (int) q("SELECT COUNT(*) FROM login_codes WHERE code_hash <> '-' AND created_at > ?", [$since])->fetchColumn()
+        + (int) q('SELECT COUNT(*) FROM mail_log WHERE created_at > ?', [$since])->fetchColumn();
+    return $sent(time() - 3600) < MAIL_PER_HOUR && $sent(time() - 86400) < MAIL_PER_DAY;
+}
+
+// Deletes an account and everything the server keeps for it (Konto → Kustuta konto, or an admin removing a spam account).
+function delete_user($uid, $email) {
+    db()->beginTransaction();
+    foreach (q("SELECT group_id FROM group_members WHERE user_id = ? AND role = 'owner'", [$uid])->fetchAll(PDO::FETCH_COLUMN) as $gid) delete_group($gid);
+    q('DELETE FROM group_members WHERE user_id = ?', [$uid]);
+    q('DELETE FROM spot_visits WHERE user_id = ? OR spot_id IN (SELECT id FROM spots WHERE user_id = ?)', [$uid, $uid]);
+    q('DELETE FROM spots WHERE user_id = ?', [$uid]);
+    q('DELETE FROM recipe_notes WHERE user_id = ?', [$uid]);
+    q('DELETE FROM user_recipes WHERE user_id = ?', [$uid]);
+    q('DELETE FROM pantry WHERE user_id = ?', [$uid]);
+    q('DELETE FROM invites WHERE invited_by = ? OR email = ?', [$uid, $email]);
+    q('DELETE FROM contacts WHERE user_id = ? OR contact_id = ?', [$uid, $uid]);
+    q('DELETE FROM login_codes WHERE email = ?', [$email]);
+    q('DELETE FROM feedback WHERE user_id = ?', [$uid]);
+    q('DELETE FROM mail_log WHERE user_id = ?', [$uid]);
+    q('DELETE FROM sessions WHERE user_id = ?', [$uid]);
+    q('DELETE FROM users WHERE id = ?', [$uid]);
+    db()->commit();
+}
+
 function app_url() {
     return rtrim(config('app_url') ?? 'https://' . ($_SERVER['SERVER_NAME'] ?? 'localhost'), '/');
 }

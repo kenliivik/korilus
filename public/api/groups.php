@@ -37,6 +37,11 @@ switch ($in['action'] ?? '') {
         if (($invitee && !$gid) || ($invitee && q('SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ?', [$gid, $invitee])->fetchColumn())) break;
         // Only a new invitation sends an email. To resend, uninvite and invite again.
         if (q('SELECT 1 FROM invites WHERE email = ? AND group_id <=> ?', [$email, $gid ?: null])->fetchColumn()) break;
+        // Open signup: someone who joined by themselves (nobody invited them, so they know no one yet) can't send invitations
+        // to new addresses in their first 3 days, so a fresh account can't be used to mail strangers.
+        if (!$picked && signup_open() && $user['created_at'] > time() - 3 * 86400
+            && !q('SELECT 1 FROM contacts WHERE user_id = ?', [$uid])->fetchColumn()) reply_error('too_new', 403);
+        if (!mail_budget_left()) reply_error('busy', 503);
         // The mail log keeps counting when an invite is withdrawn, so nobody can use invites to flood an inbox from Korilus's address:
         // at most 20 invitation emails a day from one account and 3 a day to one address.
         if (q('SELECT COUNT(*) FROM mail_log WHERE user_id = ? AND created_at > ?', [$uid, time() - 86400])->fetchColumn() >= 20
