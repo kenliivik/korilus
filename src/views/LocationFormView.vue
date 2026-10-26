@@ -7,7 +7,7 @@ import VisitFields from '../components/VisitFields.vue'
 import PickMap from '../components/PickMap.vue'
 import { store, today, touch, removeLocation } from '../data/store.js'
 import { account } from '../data/account.js'
-import { ask } from '../data/confirm.js'
+import { ask, guardLeave } from '../data/confirm.js'
 
 // New spot (no id) or editing an existing one ("Muuda").
 const props = defineProps({ id: { type: String, default: '' } })
@@ -19,6 +19,12 @@ const coords = ref(existing?.lat != null ? { lat: existing.lat, lng: existing.ln
 const groupId = ref(existing?.groupId ?? null) // null = private
 const visit = ref({ date: today(), berries: [], note: '', rating: 0 })
 const gps = ref('')
+
+// Typing or picking anything counts as a change; the GPS finding the place on its own doesn't.
+const form = () => JSON.stringify([name.value, groupId.value, visit.value, existing && coords.value])
+const before = form()
+let tapped = false
+const leave = guardLeave(() => form() !== before || tapped)
 
 // auto: the lookup when the form opens, which mustn't overwrite a spot already tapped on the map.
 function locate(auto) {
@@ -39,6 +45,7 @@ if (!existing) locate(true)
 const noPlace = ref(false)
 function save() {
   if (!coords.value) return (noPlace.value = true)
+  leave()
   if (existing) {
     touch(Object.assign(existing, { name: name.value.trim(), ...coords.value, groupId: groupId.value }))
     return router.replace(`/asukohad/${existing.id}`)
@@ -48,7 +55,8 @@ function save() {
     name: name.value.trim(),
     ...coords.value,
     groupId: groupId.value,
-    visits: [visit.value],
+    // A spot saved before going there (a tip from a friend) gets no visit until there is something to note.
+    visits: visit.value.berries.length || visit.value.note.trim() || visit.value.rating ? [visit.value] : [],
   }))
   router.replace('/asukohad')
 }
@@ -57,6 +65,7 @@ function save() {
 async function remove() {
   if (!(await ask(`Kas kustutad „${existing.name}” koos kõigi märkmetega?`))) return
   removeLocation(existing)
+  leave()
   router.replace('/asukohad')
 }
 </script>
@@ -72,7 +81,10 @@ async function remove() {
       <input v-model="name" required class="field" placeholder='nt. "Vana metsa pool"' />
     </label>
 
-    <VisitFields v-if="!existing" v-model="visit" />
+    <template v-if="!existing">
+      <p class="-mb-2 font-hand text-lg text-muted">Kui käisid seal juba, märgi, mida leidsid. Kui veel mitte, jäta tühjaks.</p>
+      <VisitFields v-model="visit" />
+    </template>
 
     <label v-if="account.user && account.groups.length" class="flex flex-col gap-2">
       <span class="text-xl">Jaga</span>
@@ -96,7 +108,7 @@ async function remove() {
     <section class="order-first flex flex-col gap-2 lg:order-none">
       <span class="flex items-baseline justify-between gap-3"><span class="text-xl">Asukoht</span><span class="font-hand text-lg text-muted">puuduta kaarti</span></span>
       <div class="relative">
-        <PickMap v-model="coords" />
+        <PickMap v-model="coords" @pick="tapped = true" />
         <button type="button" class="grain absolute top-3 right-3 z-[600] flex max-w-[80%] items-center gap-2 rounded-full px-4 py-2 text-left text-base leading-5 text-sage shadow-neu-raised-sm active:shadow-neu-inset" @click="locate()">
           <AppIcon name="pin" :size="18" />
           <span>{{ gps || 'Kasuta praegust asukohta' }}</span>

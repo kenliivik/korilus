@@ -7,7 +7,7 @@ import RecipeFields from '../components/RecipeFields.vue'
 import { blankRecipe, cleanRecipe, removeMyRecipe, saveMyRecipe } from '../data/recipes.js'
 import { store } from '../data/store.js'
 import { account } from '../data/account.js'
-import { ask } from '../data/confirm.js'
+import { ask, guardLeave } from '../data/confirm.js'
 
 // Add (id "uus") or edit one of the user's own recipes. They stay on this phone, or in their account when logged in,
 // and only they see them unless they share them with a group.
@@ -20,15 +20,19 @@ const d = { ...blankRecipe(), groupId: null, ...JSON.parse(JSON.stringify(existi
 if (!d.ingredients.length) d.ingredients.push({ amount: '', item: '' })
 if (!d.steps.length) d.steps.push('')
 const draft = ref(d)
+const before = JSON.stringify(d)
+const leave = guardLeave(() => JSON.stringify(draft.value) !== before)
 
 function save() {
   const id = saveMyRecipe({ ...cleanRecipe(draft.value), id: existing?.id, groupId: draft.value.groupId })
+  leave()
   router.replace(`/retsept/${id}`)
 }
 
 async function remove() {
   if (!(await ask(`Kas kustutad „${existing.title}”?`))) return
   removeMyRecipe(existing.id)
+  leave()
   router.replace('/retseptid')
 }
 </script>

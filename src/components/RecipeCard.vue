@@ -1,5 +1,6 @@
 <script setup>
 import BerryGlyph from './BerryGlyph.vue'
+import AppIcon from './AppIcon.vue'
 import { recipeTypes } from '../data/recipes.js'
 
 defineProps({
@@ -22,7 +23,11 @@ defineProps({
       class="size-14 shrink-0 rounded-full object-cover shadow-neu-inset"
       :class="tile && 'lg:-mt-12 lg:aspect-[4/3] lg:h-auto lg:w-full lg:rounded-card lg:shadow-neu-raised-sm'"
     />
-    <BerryGlyph v-else :name="recipe.berries[0] ?? ''" :size="56" class="shrink-0" :class="tile && 'lg:-mt-16 lg:size-44!'" />
+    <BerryGlyph v-else-if="recipe.berries[0]" :name="recipe.berries[0]" :size="56" class="shrink-0" :class="tile && 'lg:-mt-16 lg:size-44!'" />
+    <!-- A recipe without a berry (an apple cake, say) gets a book, not some other berry's sprig. -->
+    <span v-else class="grid size-14 shrink-0 place-items-center text-leaf" :class="tile && 'lg:-mt-16 lg:size-44 lg:[&>svg]:size-24'">
+      <AppIcon name="book" :size="32" />
+    </span>
     <span class="flex min-w-0 flex-col">
       <span class="text-xl leading-6" :class="tile && 'lg:text-2xl lg:leading-7'">{{ recipe.title }}</span>
       <span class="font-hand text-sm text-muted" :class="tile && 'lg:text-lg'">

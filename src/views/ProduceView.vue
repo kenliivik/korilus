@@ -4,20 +4,21 @@ import PageHeader from '../components/PageHeader.vue'
 import BerryGlyph from '../components/BerryGlyph.vue'
 import AppIcon from '../components/AppIcon.vue'
 import RecipeCard from '../components/RecipeCard.vue'
-import { findProduce, phaseIn, statusText, dateLabel } from '../data/berries.js'
+import { contentState, findProduce, phaseIn, statusText, dateLabel } from '../data/berries.js'
 import { recipesFor } from '../data/recipes.js'
 import { store, toggleReminder, formatDate } from '../data/store.js'
 
 const props = defineProps({ id: { type: String, required: true } })
 
 const p = computed(() => findProduce(props.id))
-// Spots where this was found, with the latest date it was found there.
-const foundAt = computed(() =>
-  store.locations.flatMap((l) => {
+// Spots where this was found, with the latest date it was found there: the user's own, then the ones their groups share.
+const found = (spots) =>
+  spots.flatMap((l) => {
     const v = l.visits.find((v) => v.berries.includes(props.id))
-    return v ? [{ id: l.id, name: l.name, date: v.date }] : []
-  }),
-)
+    return v ? [{ id: l.id, name: l.name, date: v.date, owner: l.owner }] : []
+  })
+const foundAt = computed(() => found(store.locations))
+const foundShared = computed(() => found(store.shared))
 const linkedRecipes = computed(() => recipesFor(props.id))
 const reminded = computed(() => store.reminders.includes(props.id))
 const noPush = ref(false)
@@ -72,9 +73,9 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
     </section>
 
     <section v-if="linkedRecipes.length" class="flex flex-col gap-3">
-      <h2 class="flex items-baseline justify-between text-2xl leading-7 lg:text-3xl lg:leading-9">
+      <h2 class="ruled text-2xl leading-7 lg:text-3xl lg:leading-9">
         Retseptid
-        <RouterLink :to="`/retseptid?mari=${p.id}`" class="text-base text-muted underline underline-offset-4">Kõik retseptid</RouterLink>
+        <RouterLink :to="`/retseptid?mari=${p.id}`" class="order-last text-base text-muted underline underline-offset-4">Kõik retseptid</RouterLink>
       </h2>
       <RecipeCard v-for="r in linkedRecipes" :key="r.id" :recipe="r" />
     </section>
@@ -90,9 +91,25 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
       </ul>
       <p v-else class="italic text-muted">Sul pole veel ühtegi kohta, kus see kasvab.</p>
     </section>
+
+    <section v-if="foundShared.length" class="flex flex-col gap-3">
+      <h2 class="ruled text-2xl leading-7 lg:text-3xl lg:leading-9">Teiste kohad</h2>
+      <ul class="grain card flex flex-col gap-2 text-lg lg:p-6 lg:text-xl">
+        <li v-for="f in foundShared" :key="f.id">
+          <RouterLink :to="`/asukohad/${f.id}`" class="press flex items-center gap-2">
+            <AppIcon name="pin" :size="18" />{{ f.name }}<span class="font-hand text-muted">{{ f.owner }}</span>
+            <span class="ml-auto text-base text-muted">{{ formatDate(f.date) }}</span>
+          </RouterLink>
+        </li>
+      </ul>
+    </section>
     </div>
     </div>
   </template>
 
+  <template v-else-if="!contentState.ready">
+    <PageHeader title="" back="/" />
+    <p class="italic text-muted">Laen…</p>
+  </template>
   <PageHeader v-else title="Seda marja ei leitud" back="/" />
 </template>

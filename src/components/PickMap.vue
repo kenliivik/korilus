@@ -5,6 +5,7 @@ import { createMap, pin, droppedPin } from './map.js'
 
 // Tap the map to put the spot there (e.g. adding it at home after the forest trip).
 const coords = defineModel({ type: Object, default: null }) // { lat, lng } or null
+const emit = defineEmits(['pick']) // the person tapped the map (not the GPS)
 const el = ref()
 let map, marker, tapped = false, ready = false
 
@@ -23,6 +24,7 @@ onMounted(() => {
     tapped = true
     navigator.vibrate?.(8) // a small tick on Android phones
     coords.value = { lat: e.latlng.lat, lng: e.latlng.lng }
+    emit('pick')
   })
   show(coords.value)
   ready = true
