@@ -97,14 +97,14 @@ function add_member($gid, $uid, $role = 'member') {
     }
 }
 
-// Someone leaves or is removed: their spots in the group become private again (newer updated_at, so phones pick it up).
+// Someone leaves or is removed: their spots and recipe notes in the group become private again (newer updated_at, so phones pick it up).
 function remove_member($gid, $uid) {
     q('DELETE FROM group_members WHERE group_id = ? AND user_id = ?', [$gid, $uid]);
-    q('UPDATE spots SET group_id = NULL, updated_at = GREATEST(updated_at + 1, ?) WHERE group_id = ? AND user_id = ?', [now_ms(), $gid, $uid]);
+    foreach (['spots', 'recipe_notes'] as $t) q("UPDATE $t SET group_id = NULL, updated_at = GREATEST(updated_at + 1, ?) WHERE group_id = ? AND user_id = ?", [now_ms(), $gid, $uid]);
 }
 
 function delete_group($gid) {
-    q('UPDATE spots SET group_id = NULL, updated_at = GREATEST(updated_at + 1, ?) WHERE group_id = ?', [now_ms(), $gid]);
+    foreach (['spots', 'recipe_notes'] as $t) q("UPDATE $t SET group_id = NULL, updated_at = GREATEST(updated_at + 1, ?) WHERE group_id = ?", [now_ms(), $gid]);
     q('DELETE FROM group_members WHERE group_id = ?', [$gid]);
     q('DELETE FROM invites WHERE group_id = ?', [$gid]);
     q('DELETE FROM `groups` WHERE id = ?', [$gid]);

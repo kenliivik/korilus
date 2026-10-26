@@ -45,6 +45,7 @@ export async function api(file, body) {
 function forget() {
   Object.assign(account, { user: null, groups: [], people: [], invitations: [], syncedAt: 0, error: '' })
   store.shared = []
+  store.sharedNotes = []
 }
 
 export const requestCode = (email) => api('login.php', { action: 'code', email })
@@ -109,9 +110,10 @@ async function push() {
     store.dirty = store.dirty.filter((id) => store.locations.some((l) => l.id === id && l.updatedAt !== sent.get(id)))
     store.deleted = store.deleted.filter((d) => !tombstones.includes(d))
     merge(spots)
+    await pushNotes()
     account.syncedAt = started
     account.error = ''
-    if (store.dirty.length || store.deleted.length) later(1500) // changed while this sync was on its way
+    if (store.dirty.length || store.deleted.length || store.dirtyNotes.length) later(1500) // changed while this sync was on its way
   } catch (e) {
     account.error = e.message
   } finally {
@@ -137,13 +139,33 @@ export function merge(spots) {
   store.shared = shared
 }
 
+async function pushNotes() {
+  const changed = (account.syncedAt ? store.dirtyNotes : Object.keys(store.notes)).filter((id) => store.notes[id])
+  const sent = new Map(changed.map((id) => [id, store.notes[id].updatedAt]))
+  const { notes } = await api('notes.php', { notes: changed.map((id) => ({ recipe: id, ...store.notes[id] })) })
+  store.dirtyNotes = store.dirtyNotes.filter((id) => store.notes[id] && store.notes[id].updatedAt !== sent.get(id))
+  mergeNotes(notes)
+}
+
+export function mergeNotes(notes) {
+  const shared = []
+  for (const { recipe, mine, owner, ...note } of notes) {
+    if (!mine) {
+      if (note.general || Object.keys(note.lines ?? {}).length) shared.push({ recipe, owner, lines: note.lines ?? {}, general: note.general ?? '' })
+    } else if ((store.notes[recipe]?.updatedAt ?? 0) < note.updatedAt) {
+      store.notes[recipe] = { lines: {}, general: '', ...note }
+    }
+  }
+  store.sharedNotes = shared
+}
+
 // Sync shortly after a change, when the app comes back to the screen, and when the phone is online again.
 let timer
 const later = (ms) => {
   clearTimeout(timer)
   timer = setTimeout(sync, ms)
 }
-watch(() => store.dirty.length + store.deleted.length, (n) => n && account.user && later(1500))
+watch(() => store.dirty.length + store.deleted.length + store.dirtyNotes.length, (n) => n && account.user && later(1500))
 document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && Date.now() - account.syncedAt > 60000 && sync())
 addEventListener('online', () => sync())
 

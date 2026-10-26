@@ -98,3 +98,15 @@ CREATE TABLE IF NOT EXISTS mail_log (
   INDEX (user_id),
   INDEX (email)
 ) DEFAULT CHARSET = utf8mb4;
+
+-- Someone's own notes on one of Ken's recipes (the recipe itself stays as it is). data = {lines: {line: note}, general}.
+-- group_id NULL = only for them. updated_at is milliseconds, like spots. An emptied note stays as an empty row.
+CREATE TABLE IF NOT EXISTS recipe_notes (
+  user_id INT UNSIGNED NOT NULL,
+  recipe_id VARCHAR(80) NOT NULL,
+  group_id INT UNSIGNED NULL,
+  data TEXT NOT NULL,
+  updated_at BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (user_id, recipe_id),
+  INDEX (group_id)
+) DEFAULT CHARSET = utf8mb4;
