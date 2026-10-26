@@ -47,6 +47,7 @@ function forget() {
   store.shared = []
   store.sharedRecipes = []
   store.sharedNotes = []
+  store.otherVisits = {}
 }
 
 export const requestCode = (email) => api('login.php', { action: 'code', email })
@@ -106,10 +107,11 @@ async function push() {
     store.shared = merge(await pushList('spots.php', 'spots', store.locations, 'dirty', 'deleted'), store.locations, store.deleted)
     store.sharedRecipes = merge(await pushList('myrecipes.php', 'recipes', store.myRecipes, 'dirtyRecipes', 'deletedRecipes'), store.myRecipes, store.deletedRecipes)
     await pushNotes()
+    await pushVisits()
     account.syncedAt = started
     account.error = ''
     // Changed while this sync was on its way.
-    if (store.dirty.length + store.deleted.length + store.dirtyRecipes.length + store.deletedRecipes.length + store.dirtyNotes.length) later(1500)
+    if (store.dirty.length + store.deleted.length + store.dirtyRecipes.length + store.deletedRecipes.length + store.dirtyNotes.length + store.dirtyGuest.length) later(1500)
   } catch (e) {
     account.error = e.message
   } finally {
@@ -169,13 +171,27 @@ export function mergeNotes(notes) {
   store.sharedNotes = shared
 }
 
+// The user's visits on spots others share, the same way as notes. Others' visits come back into store.otherVisits.
+async function pushVisits() {
+  const changed = (account.syncedAt ? store.dirtyGuest : Object.keys(store.guestVisits)).filter((id) => store.guestVisits[id])
+  const sent = new Map(changed.map((id) => [id, store.guestVisits[id].updatedAt]))
+  const { visits } = await api('visits.php', { visits: changed.map((id) => ({ spot: id, ...store.guestVisits[id] })) })
+  store.dirtyGuest = store.dirtyGuest.filter((id) => store.guestVisits[id] && store.guestVisits[id].updatedAt !== sent.get(id))
+  const others = {}
+  for (const { spot, mine, name, updatedAt, visits: list } of visits) {
+    if (!mine) (others[spot] ??= []).push({ name, visits: list })
+    else if ((store.guestVisits[spot]?.updatedAt ?? 0) < updatedAt) store.guestVisits[spot] = { visits: list, updatedAt }
+  }
+  store.otherVisits = others
+}
+
 // Sync shortly after a change, when the app comes back to the screen, and when the phone is online again.
 let timer
 const later = (ms) => {
   clearTimeout(timer)
   timer = setTimeout(sync, ms)
 }
-watch(() => store.dirty.length + store.deleted.length + store.dirtyRecipes.length + store.deletedRecipes.length + store.dirtyNotes.length, (n) => n && account.user && later(1500))
+watch(() => store.dirty.length + store.deleted.length + store.dirtyRecipes.length + store.deletedRecipes.length + store.dirtyNotes.length + store.dirtyGuest.length, (n) => n && account.user && later(1500))
 document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && Date.now() - account.syncedAt > 60000 && sync())
 addEventListener('online', () => sync())
 

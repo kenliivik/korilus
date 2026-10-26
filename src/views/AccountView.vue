@@ -202,7 +202,8 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
         märkmetega, oma retsepte ja märkmeid retseptidel ning gruppe, kuhu kuulud. Nii jäävad kohad alles ka uues telefonis ja saad neid jagada.
       </p>
       <p>
-        Grupiga jagatud kohti, retsepte ja retseptimärkmeid ning su nime näevad selle grupi liikmed. Seda, mis on ainult sinu, ei näe
+        Grupiga jagatud kohti, retsepte ja retseptimärkmeid ning su nime näevad selle grupi liikmed. Kui märgid käigu kellegi
+        teise jagatud kohta, näevad seda selle koha omanik ja grupi liikmed, kuni oled grupis. Seda, mis on ainult sinu, ei näe
         keegi teine. Andmeid
         kasutame ainult selleks, et Korilus töötaks: neid ei müüda ega anta kellelegi edasi. Reklaame ega jälgimist pole.
       </p>
@@ -224,7 +225,7 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
         Veebimajutus hoiab tavapäraseid serverilogisid.
       </p>
       <p>
-        Saad oma andmed igal ajal alla laadida ja konto kustutada. Siis kaovad serverist su konto, kohad, retseptid, retseptimärkmed ja su
+        Saad oma andmed igal ajal alla laadida ja konto kustutada. Siis kaovad serverist su konto, kohad, käigud teiste kohtades, retseptid, retseptimärkmed ja su
         loodud grupid. Kui oleme midagi valesti teinud, võid pöörduda ka Andmekaitse Inspektsiooni poole (aki.ee).
       </p>
     </div>

@@ -111,6 +111,17 @@ CREATE TABLE IF NOT EXISTS recipe_notes (
   INDEX (group_id)
 ) DEFAULT CHARSET = utf8mb4;
 
+-- Visits someone logged on a spot another person shares with their group. One row per person and spot,
+-- data = {visits: [{date, berries, note, rating}]}. updated_at is milliseconds, like spots.
+CREATE TABLE IF NOT EXISTS spot_visits (
+  user_id INT UNSIGNED NOT NULL,
+  spot_id VARCHAR(64) NOT NULL,
+  data MEDIUMTEXT NOT NULL,
+  updated_at BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (user_id, spot_id),
+  INDEX (spot_id)
+) DEFAULT CHARSET = utf8mb4;
+
 -- Recipes people write for themselves (their own recipe book), private or shared with a group like spots.
 -- data = the recipe as the app keeps it. Deleted ones stay as empty tombstones so the user's other phones drop them.
 CREATE TABLE IF NOT EXISTS user_recipes (

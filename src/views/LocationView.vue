@@ -7,7 +7,7 @@ import VisitFields from '../components/VisitFields.vue'
 import SpotMap from '../components/SpotMap.vue'
 import { directionsUrl } from '../components/map.js'
 import { findProduce } from '../data/berries.js'
-import { findLocation, berriesAt, averageRating, today, formatDate, touch } from '../data/store.js'
+import { findLocation, today, formatDate, myVisits, touchVisits, allVisits } from '../data/store.js'
 import { account } from '../data/account.js'
 import { ask, guardLeave } from '../data/confirm.js'
 
@@ -18,13 +18,22 @@ const groupName = computed(() => account.groups.find((g) => g.id === loc.value?.
 // "14. sept" for the ledger margin; the year is the heading above.
 const shortDate = (d) => new Date(`${d}T12:00`).toLocaleDateString('et-EE', { day: 'numeric', month: 'short' })
 const names = (ids) => ids.map((id) => findProduce(id)?.name).join(', ')
-// Visits grouped by year (newest first), so seasons can be compared.
+// Everyone's visits (the user's own can be edited; on a shared spot the user can add theirs too),
+// grouped by year (newest first), so seasons can be compared.
+const rows = computed(() => allVisits(loc.value))
 const years = computed(() =>
-  loc.value.visits.reduce((m, v) => m.set(v.date.slice(0, 4), [...(m.get(v.date.slice(0, 4)) ?? []), v]), new Map()),
+  rows.value.reduce((m, r) => m.set(r.v.date.slice(0, 4), [...(m.get(r.v.date.slice(0, 4)) ?? []), r]), new Map()),
 )
+// The overview counts every visit; visits saved without stars don't count for the rating.
+const allBerries = computed(() => [...new Set(rows.value.flatMap((r) => r.v.berries))])
+const rating = computed(() => {
+  const rated = rows.value.filter((r) => r.v.rating)
+  return Math.round(rated.reduce((sum, r) => sum + r.v.rating, 0) / (rated.length || 1))
+})
 
-// Newest visit first; dates are YYYY-MM-DD so they sort as text.
-const sortVisits = () => loc.value.visits.sort((a, b) => b.date.localeCompare(a.date))
+// The list the user's own visits live in. Newest first; dates are YYYY-MM-DD so they sort as text.
+const mine = () => myVisits(loc.value)
+const sortVisits = () => mine().sort((a, b) => b.date.localeCompare(a.date))
 
 // The visit just added or edited lights up in the log and scrolls into view.
 const justSaved = ref(null)
@@ -41,30 +50,30 @@ const blankVisit = () => ({ date: today(), berries: [], note: '', rating: 0 })
 guardLeave(
   () =>
     (draft.value && JSON.stringify(draft.value) !== JSON.stringify(blankVisit())) ||
-    (editing.value && JSON.stringify(editing.value.visit) !== JSON.stringify(loc.value.visits[editing.value.i])),
+    (editing.value && JSON.stringify(editing.value.visit) !== JSON.stringify(mine()[editing.value.i])),
 )
 function addVisit() {
-  loc.value.visits.push(draft.value)
+  mine().push(draft.value)
   sortVisits()
-  touch(loc.value)
+  touchVisits(loc.value)
   showSaved(draft.value)
   draft.value = null
 }
 
-// Tapping an earlier visit opens it for editing in place: { i: index in loc.visits, visit: a copy }.
+// Tapping one of the user's earlier visits opens it for editing in place: { i: index in mine(), visit: a copy }.
 const editing = ref(null)
-const editVisit = (v) => (editing.value = { i: loc.value.visits.indexOf(v), visit: JSON.parse(JSON.stringify(v)) })
+const editVisit = (v) => (editing.value = { i: mine().indexOf(v), visit: JSON.parse(JSON.stringify(v)) })
 function saveVisit() {
-  loc.value.visits[editing.value.i] = editing.value.visit
+  mine()[editing.value.i] = editing.value.visit
   sortVisits()
-  touch(loc.value)
+  touchVisits(loc.value)
   showSaved(editing.value.visit)
   editing.value = null
 }
 async function deleteVisit() {
   if (!(await ask('Kas kustutad selle käigu?'))) return
-  loc.value.visits.splice(editing.value.i, 1)
-  touch(loc.value)
+  mine().splice(editing.value.i, 1)
+  touchVisits(loc.value)
   editing.value = null
 }
 
@@ -92,11 +101,11 @@ async function copyCoords() {
       </button>
     </section>
 
-    <div class="grid gap-3" :class="!loc.shared && !draft && 'grid-cols-2'">
+    <div class="grid gap-3" :class="loc.lat != null && !draft && 'grid-cols-2'">
       <a v-if="loc.lat != null" :href="directionsUrl(loc)" target="_blank" rel="noopener" class="btn grain text-sage">
         <AppIcon name="pin" :size="20" /> Juhata kohale
       </a>
-      <button v-if="!loc.shared && !draft" type="button" class="btn bg-sage text-milk" @click="draft = blankVisit()">
+      <button v-if="!draft" type="button" class="btn bg-sage text-milk" @click="draft = blankVisit()">
         <AppIcon name="plus" :size="20" /> Käisin siin
       </button>
     </div>
@@ -109,18 +118,18 @@ async function copyCoords() {
     </form>
 
     <dl class="flex flex-col gap-2 text-lg">
-      <div class="flex items-baseline gap-2"><dt class="text-muted">Marjad</dt><span class="leader" /><dd>{{ names(berriesAt(loc)) || '–' }}</dd></div>
-      <div class="flex items-baseline gap-2"><dt class="text-muted">Hinne</dt><span class="leader" /><dd><StarRating :model-value="averageRating(loc)" readonly /></dd></div>
-      <div class="flex items-baseline gap-2"><dt class="text-muted">Käidud</dt><span class="leader" /><dd>{{ loc.visits.length }} korda</dd></div>
+      <div class="flex items-baseline gap-2"><dt class="text-muted">Marjad</dt><span class="leader" /><dd>{{ names(allBerries) || '–' }}</dd></div>
+      <div class="flex items-baseline gap-2"><dt class="text-muted">Hinne</dt><span class="leader" /><dd><StarRating :model-value="rating" readonly /></dd></div>
+      <div class="flex items-baseline gap-2"><dt class="text-muted">Käidud</dt><span class="leader" /><dd>{{ rows.length }} korda</dd></div>
     </dl>
     </div>
 
     <section class="flex flex-col">
       <h2 class="ruled mb-2 text-2xl leading-7 lg:text-3xl lg:leading-9">Käigud</h2>
-      <template v-for="[year, visits] in years" :key="year">
+      <template v-for="[year, list] in years" :key="year">
         <h3 class="mt-3 font-hand text-xl text-muted">{{ year }}</h3>
-        <template v-for="(v, i) in visits" :key="i">
-          <form v-if="editing && loc.visits[editing.i] === v" class="grain card settle my-2 flex flex-col gap-4" @submit.prevent="saveVisit">
+        <template v-for="({ v, mine: own, name }, i) in list" :key="i">
+          <form v-if="editing && own && mine()[editing.i] === v" class="grain card settle my-2 flex flex-col gap-4" @submit.prevent="saveVisit">
             <VisitFields v-model="editing.visit" />
             <button type="submit" class="btn bg-sage text-milk">Salvesta</button>
             <div class="grid grid-cols-2 gap-4">
@@ -128,25 +137,27 @@ async function copyCoords() {
               <button type="button" class="btn grain text-danger" @click="deleteVisit"><AppIcon name="trash" :size="20" /> Kustuta käik</button>
             </div>
           </form>
-          <!-- A ledger row, like a page of a field notebook: date in the margin, then what was found. -->
+          <!-- A ledger row, like a page of a field notebook: date in the margin, then what was found.
+               The user's own visits can be tapped to edit; others' carry the name of who went. -->
           <component
-            :is="loc.shared ? 'article' : 'button'"
+            :is="own ? 'button' : 'article'"
             v-else
-            :type="loc.shared ? undefined : 'button'"
-            :aria-label="loc.shared ? undefined : `Muuda käiku ${formatDate(v.date)}`"
+            :type="own ? 'button' : undefined"
+            :aria-label="own ? `Muuda käiku ${formatDate(v.date)}` : undefined"
             class="grid grid-cols-[4.5rem_1fr] gap-x-3 border-b border-sage/15 py-3 text-left"
-            :class="[!loc.shared && 'press', v === justSaved && 'just-saved']"
-            @click="loc.shared || editVisit(v)"
+            :class="[own && 'press', v === justSaved && 'just-saved']"
+            @click="own && editVisit(v)"
           >
             <span class="font-hand text-lg leading-7 whitespace-nowrap text-muted">{{ shortDate(v.date) }}</span>
             <span class="flex flex-col gap-0.5">
               <span class="flex items-center justify-between gap-2">{{ names(v.berries) || '–' }} <StarRating v-if="v.rating" :model-value="v.rating" readonly :size="14" /></span>
               <span v-if="v.note" class="italic text-muted">„{{ v.note }}”</span>
+              <span v-if="name" class="font-hand text-lg text-muted">{{ name }}</span>
             </span>
           </component>
         </template>
       </template>
-      <p v-if="!loc.visits.length" class="italic text-muted">Siin pole veel käidud.</p>
+      <p v-if="!rows.length" class="italic text-muted">Siin pole veel käidud.</p>
     </section>
     </div>
 
