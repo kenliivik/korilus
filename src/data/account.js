@@ -108,10 +108,11 @@ async function push() {
     store.sharedRecipes = merge(await pushList('myrecipes.php', 'recipes', store.myRecipes, 'dirtyRecipes', 'deletedRecipes'), store.myRecipes, store.deletedRecipes)
     await pushNotes()
     await pushVisits()
+    merge(await pushList('pantry.php', 'pantry', store.pantry, 'dirtyPantry', 'deletedPantry'), store.pantry, store.deletedPantry)
     account.syncedAt = started
     account.error = ''
     // Changed while this sync was on its way.
-    if (store.dirty.length + store.deleted.length + store.dirtyRecipes.length + store.deletedRecipes.length + store.dirtyNotes.length + store.dirtyGuest.length) later(1500)
+    if (pending()) later(1500)
   } catch (e) {
     account.error = e.message
   } finally {
@@ -119,7 +120,7 @@ async function push() {
   }
 }
 
-// Spots and own recipes sync the same way. After logging in every item goes up, later only the changed (dirty) ones
+// Spots, own recipes and the pantry sync the same way. After logging in every item goes up, later only the changed (dirty) ones
 // and the deleted ones (tombstones). Answers with the server's list.
 async function pushList(file, key, list, dirtyKey, deletedKey) {
   const changed = account.syncedAt ? list.filter((x) => store[dirtyKey].includes(x.id)) : [...list]
@@ -131,7 +132,7 @@ async function pushList(file, key, list, dirtyKey, deletedKey) {
   return data[key]
 }
 
-// Puts the server's copies into `list` (store.locations or store.myRecipes), the newer updatedAt winning,
+// Puts the server's copies into `list` (store.locations, store.myRecipes or store.pantry), the newer updatedAt winning,
 // and returns the ones others share with the user's groups.
 export function merge(items, list = store.locations, deletedList = store.deleted) {
   const shared = []
@@ -191,7 +192,10 @@ const later = (ms) => {
   clearTimeout(timer)
   timer = setTimeout(sync, ms)
 }
-watch(() => store.dirty.length + store.deleted.length + store.dirtyRecipes.length + store.deletedRecipes.length + store.dirtyNotes.length + store.dirtyGuest.length, (n) => n && account.user && later(1500))
+const pending = () =>
+  store.dirty.length + store.deleted.length + store.dirtyRecipes.length + store.deletedRecipes.length + store.dirtyNotes.length
+  + store.dirtyGuest.length + store.dirtyPantry.length + store.deletedPantry.length
+watch(pending, (n) => n && account.user && later(1500))
 document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && Date.now() - account.syncedAt > 60000 && sync())
 addEventListener('online', () => sync())
 

@@ -27,6 +27,9 @@ export default createRouter({
     { path: '/retsept/:id', component: RecipeView, props: true, meta: { tab: 'recipes', wide: true } },
     // Own recipes. `:id` "uus" = new.
     { path: '/oma-retsept/:id', component: () => import('./views/MyRecipeFormView.vue'), props: true, meta: { tab: 'recipes', wide: true, doc: true } },
+    // Sahver (pantry). `:id` "uus" = new, with ?retsept=<id> from a recipe.
+    { path: '/sahver', component: () => import('./views/PantryView.vue'), meta: { tab: 'recipes', wide: true } },
+    { path: '/sahver/:id', component: () => import('./views/PantryFormView.vue'), props: true, meta: { tab: 'recipes', wide: true, doc: true } },
     // Admin screens are only for Ken, so they load separately. `:id` "uus" = new recipe.
     { path: '/admin/retseptid', component: () => import('./views/admin/RecipesAdmin.vue'), meta: { tab: 'settings', wide: true, doc: true } },
     { path: '/admin/retseptid/:id', component: () => import('./views/admin/RecipeEditor.vue'), props: true, meta: { tab: 'settings', wide: true, doc: true } },

@@ -7,8 +7,9 @@ import { contentState, findProduce } from '../data/berries.js'
 import {
   findRecipe, isMine, recipeTypes, toggleSavedRecipe, ingKey, stepKey, notesOn, orphanNotes, setNoteLine, setNoteGeneral, setNoteGroup,
 } from '../data/recipes.js'
-import { store } from '../data/store.js'
+import { store, formatDate } from '../data/store.js'
 import { account } from '../data/account.js'
+import { notesFor } from '../data/pantry.js'
 
 const props = defineProps({ id: { type: String, required: true } })
 
@@ -26,6 +27,8 @@ const orphans = computed(() => orphanNotes(r.value, note.value?.lines))
 const sharedGeneral = computed(() => store.sharedNotes.filter((n) => n.recipe === props.id && n.general))
 const groupName = computed(() => account.groups.find((g) => g.id === note.value?.groupId)?.name)
 const noteGroup = computed({ get: () => note.value?.groupId ?? null, set: (g) => setNoteGroup(props.id, g) })
+// Sahver: earlier batches of this recipe with a note, "Eelmisel korral …".
+const batches = computed(() => notesFor(props.id).slice(0, 3))
 const editing = ref(false)
 const open = ref(null) // the line being written on
 // A note that starts with a number is a new amount, so the recipe's amount is crossed out.
@@ -210,6 +213,16 @@ async function write(key) {
     <section v-if="r.tip" class="grain card flex flex-col gap-1">
       <h2 class="font-hand text-xl text-muted">Hea nõu</h2>
       <p class="text-lg italic lg:text-xl">{{ r.tip }}</p>
+    </section>
+
+    <section class="flex flex-col gap-3" aria-label="Sahver">
+      <div v-for="j in batches" :key="j.id" class="px-2">
+        <p class="text-base text-muted">Eelmisel korral, {{ formatDate(j.made) }}:</p>
+        <p class="hand-note whitespace-pre-line">{{ j.note }}</p>
+      </div>
+      <RouterLink :to="`/sahver/uus?retsept=${r.id}`" class="btn grain text-sage lg:self-start">
+        <AppIcon name="plus" :size="18" /> Tegin selle
+      </RouterLink>
     </section>
     </div>
     </div>
