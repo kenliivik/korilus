@@ -27,8 +27,7 @@ const art = computed(() => ART[props.name])
 </script>
 
 <template>
-  <img v-if="image" :src="image" alt="" class="rounded-full object-cover" :style="{ width: `${size}px`, height: `${size}px` }" />
-  <img v-else-if="art" :src="art" alt="" class="object-contain" :style="{ width: `${size}px`, height: `${size}px` }" />
+  <img v-if="image || art" :src="image || art" alt="" class="object-contain" :style="{ width: `${size}px`, height: `${size}px` }" />
   <svg
     v-else
     :width="size"
