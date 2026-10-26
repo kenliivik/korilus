@@ -32,6 +32,11 @@ store.sharedRecipes ??= []
 store.notes ??= {}
 store.dirtyNotes ??= []
 store.sharedNotes ??= [] // { recipe, owner, lines, general }
+// Visits on spots others share with the user's groups ("Käisin siin" on a shared spot), by spot id: { visits, updatedAt }.
+// They sync like notes (dirtyGuest). otherVisits holds the visits other people logged on spots the user sees: { spotId: [{ name, visits }] }.
+store.guestVisits ??= {}
+store.dirtyGuest ??= []
+store.otherVisits ??= {}
 
 watch(store, () => localStorage.setItem(KEY, JSON.stringify(store)), { deep: true })
 
@@ -52,6 +57,25 @@ export function touch(loc) {
   loc.updatedAt = Math.max(Date.now(), (loc.updatedAt ?? 0) + 1)
   if (!store.dirty.includes(loc.id)) store.dirty.push(loc.id)
   return loc
+}
+
+// The user's own visits on a spot: its own list, or on a shared spot the ones they logged there.
+export const myVisits = (loc) => (loc.shared ? (store.guestVisits[loc.id] ??= { visits: [], updatedAt: 0 }).visits : loc.visits)
+
+// Call after changing myVisits(loc), so they get synced.
+export function touchVisits(loc) {
+  if (!loc.shared) return touch(loc)
+  const g = store.guestVisits[loc.id]
+  g.updatedAt = Math.max(Date.now(), g.updatedAt + 1)
+  if (!store.dirtyGuest.includes(loc.id)) store.dirtyGuest.push(loc.id)
+}
+
+// Every visit at a spot, newest first: { v, mine, name }. name is who logged it, when it wasn't the user.
+export function allVisits(loc) {
+  const others = (store.otherVisits[loc.id] ?? []).flatMap((o) => o.visits.map((v) => ({ v, name: o.name })))
+  const owner = loc.shared ? loc.visits.map((v) => ({ v, name: loc.owner })) : []
+  const mine = (loc.shared ? store.guestVisits[loc.id]?.visits ?? [] : loc.visits).map((v) => ({ v, mine: true }))
+  return [...mine, ...owner, ...others].sort((a, b) => b.v.date.localeCompare(a.v.date))
 }
 
 export function removeLocation(loc) {

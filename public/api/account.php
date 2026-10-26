@@ -21,6 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             + json_decode($r['data'], true), q('SELECT * FROM recipe_notes WHERE user_id = ?', [$uid])->fetchAll()),
         'recipes' => array_map(fn($r) => ['id' => $r['id'], 'groupId' => $r['group_id'], 'updated' => date('c', intdiv($r['updated_at'], 1000))]
             + json_decode($r['data'], true), q('SELECT * FROM user_recipes WHERE user_id = ? AND deleted = 0', [$uid])->fetchAll()),
+        'visitsOnSharedSpots' => array_map(fn($r) => ['spot' => $r['spot_id'], 'updated' => date('c', intdiv($r['updated_at'], 1000))]
+            + json_decode($r['data'], true), q('SELECT * FROM spot_visits WHERE user_id = ?', [$uid])->fetchAll()),
         'invitesSent' => q('SELECT email, group_id groupId, FROM_UNIXTIME(created_at) created FROM invites WHERE invited_by = ?', [$uid])->fetchAll(),
     ]);
 }
@@ -40,6 +42,7 @@ switch ($in['action'] ?? '') {
         db()->beginTransaction();
         foreach (q("SELECT group_id FROM group_members WHERE user_id = ? AND role = 'owner'", [$uid])->fetchAll(PDO::FETCH_COLUMN) as $gid) delete_group($gid);
         q('DELETE FROM group_members WHERE user_id = ?', [$uid]);
+        q('DELETE FROM spot_visits WHERE user_id = ? OR spot_id IN (SELECT id FROM spots WHERE user_id = ?)', [$uid, $uid]);
         q('DELETE FROM spots WHERE user_id = ?', [$uid]);
         q('DELETE FROM recipe_notes WHERE user_id = ?', [$uid]);
         q('DELETE FROM user_recipes WHERE user_id = ?', [$uid]);

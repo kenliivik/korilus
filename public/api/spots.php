@@ -44,6 +44,7 @@ foreach (array_slice($in['spots'] ?? [], 0, 2000) as $s) {
     $row
         ? q('UPDATE spots SET group_id = ?, data = ?, updated_at = ?, deleted = ? WHERE id = ?', [$group, $data, $at, (int) $deleted, $id])
         : q('INSERT INTO spots (id, user_id, group_id, data, updated_at, deleted) VALUES (?, ?, ?, ?, ?, ?)', [$id, $uid, $group, $data, $at, (int) $deleted]);
+    if ($deleted) q('DELETE FROM spot_visits WHERE spot_id = ?', [$id]); // the family's visits go with the spot
 }
 db()->commit();
 
