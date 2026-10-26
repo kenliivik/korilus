@@ -122,6 +122,17 @@ CREATE TABLE IF NOT EXISTS spot_visits (
   INDEX (spot_id)
 ) DEFAULT CHARSET = utf8mb4;
 
+-- Sahver: jars someone made (recipe, batch, a note for next time). Only for them. data = the entry as the app keeps it.
+-- Deleted ones stay as empty tombstones so the user's other phones drop them.
+CREATE TABLE IF NOT EXISTS pantry (
+  id VARCHAR(64) PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  data TEXT NOT NULL,
+  updated_at BIGINT UNSIGNED NOT NULL,
+  deleted TINYINT(1) NOT NULL DEFAULT 0,
+  INDEX (user_id)
+) DEFAULT CHARSET = utf8mb4;
+
 -- Recipes people write for themselves (their own recipe book), private or shared with a group like spots.
 -- data = the recipe as the app keeps it. Deleted ones stay as empty tombstones so the user's other phones drop them.
 CREATE TABLE IF NOT EXISTS user_recipes (

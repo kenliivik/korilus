@@ -23,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             + json_decode($r['data'], true), q('SELECT * FROM user_recipes WHERE user_id = ? AND deleted = 0', [$uid])->fetchAll()),
         'visitsOnSharedSpots' => array_map(fn($r) => ['spot' => $r['spot_id'], 'updated' => date('c', intdiv($r['updated_at'], 1000))]
             + json_decode($r['data'], true), q('SELECT * FROM spot_visits WHERE user_id = ?', [$uid])->fetchAll()),
+        'pantry' => array_map(fn($r) => ['id' => $r['id'], 'updated' => date('c', intdiv($r['updated_at'], 1000))]
+            + json_decode($r['data'], true), q('SELECT * FROM pantry WHERE user_id = ? AND deleted = 0', [$uid])->fetchAll()),
         'invitesSent' => q('SELECT email, group_id groupId, FROM_UNIXTIME(created_at) created FROM invites WHERE invited_by = ?', [$uid])->fetchAll(),
     ]);
 }
@@ -46,6 +48,7 @@ switch ($in['action'] ?? '') {
         q('DELETE FROM spots WHERE user_id = ?', [$uid]);
         q('DELETE FROM recipe_notes WHERE user_id = ?', [$uid]);
         q('DELETE FROM user_recipes WHERE user_id = ?', [$uid]);
+        q('DELETE FROM pantry WHERE user_id = ?', [$uid]);
         q('DELETE FROM invites WHERE invited_by = ? OR email = ?', [$uid, $user['email']]);
         q('DELETE FROM contacts WHERE user_id = ? OR contact_id = ?', [$uid, $uid]);
         q('DELETE FROM login_codes WHERE email = ?', [$user['email']]);

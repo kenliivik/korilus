@@ -38,6 +38,10 @@ store.sharedNotes ??= [] // { recipe, owner, lines, general }
 store.guestVisits ??= {}
 store.dirtyGuest ??= []
 store.otherVisits ??= {}
+// Sahver (src/data/pantry.js), private, synced like own recipes.
+store.pantry ??= []
+store.dirtyPantry ??= []
+store.deletedPantry ??= []
 
 watch(store, () => localStorage.setItem(KEY, JSON.stringify(store)), { deep: true })
 

@@ -16,6 +16,7 @@ const { berry, type, saved, own } = toRefs(recipeFilters)
 const query = useRoute().query.mari
 if (query) Object.assign(recipeFilters, { berry: query, type: '', saved: false, own: false })
 const ownCount = computed(() => store.myRecipes.length + store.sharedRecipes.length)
+const jarsLeft = computed(() => store.pantry.reduce((sum, j) => sum + j.left, 0))
 
 // Offer only berries and types that actually have recipes.
 const berries = computed(() => produce.filter((p) => recipes.value.some((r) => r.berries.includes(p.id))))
@@ -38,9 +39,14 @@ const chip = (on) => (on ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-
 
   <p class="-mt-3 italic leading-5 text-muted lg:text-xl">Moosid, mahlad ja talvevarud.</p>
 
-  <RouterLink to="/oma-retsept/uus" class="btn grain text-sage lg:self-start">
-    <AppIcon name="plus" :size="20" /> Lisa oma retsept
-  </RouterLink>
+  <div class="flex flex-col gap-3 lg:flex-row">
+    <RouterLink to="/oma-retsept/uus" class="btn grain text-sage">
+      <AppIcon name="plus" :size="20" /> Lisa oma retsept
+    </RouterLink>
+    <RouterLink to="/sahver" class="btn grain text-sage">
+      <AppIcon name="book" :size="20" /> Sahver<span v-if="jarsLeft" class="font-hand text-muted">{{ jarsLeft }} purki</span>
+    </RouterLink>
+  </div>
 
   <section v-if="recipes.length" class="flex flex-col gap-3" aria-label="Valikud">
     <div class="flex flex-wrap gap-2">
