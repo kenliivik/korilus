@@ -4,6 +4,7 @@ import PageHeader from '../../components/PageHeader.vue'
 import AppIcon from '../../components/AppIcon.vue'
 import BerryGlyph from '../../components/BerryGlyph.vue'
 import LinkCard from '../../components/LinkCard.vue'
+import SignupAdmin from './SignupAdmin.vue'
 import { content, loadContent, saveContent } from '../../data/berries.js'
 import { account } from '../../data/account.js'
 
@@ -93,5 +94,7 @@ function drop() {
       <h2 class="text-2xl leading-7">Tagasiside</h2>
       <LinkCard label="Loe tagasisidet" icon="chat" to="/admin/tagasiside" />
     </section>
+
+    <SignupAdmin />
   </template>
 </template>

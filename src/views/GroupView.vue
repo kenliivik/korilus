@@ -31,7 +31,8 @@ async function act(body, done) {
     const groups = await groupAction({ groupId: group.value?.id, ...body })
     done?.(groups)
   } catch (e) {
-    error.value = { email: 'See e-posti aadress ei tundu õige.', too_many: 'Täna on liiga palju kutseid saadetud. Proovi homme uuesti.' }[e.message] ?? 'Ei saanud ühendust. Kas internet töötab?'
+    error.value = { email: 'See e-posti aadress ei tundu õige.', too_many: 'Täna on liiga palju kutseid saadetud. Proovi homme uuesti.',
+      busy: 'Korilus on praegu hõivatud. Proovi tunni aja pärast uuesti.', too_new: 'Uuelt kontolt saab kutseid saata paari päeva pärast.' }[e.message] ?? 'Ei saanud ühendust. Kas internet töötab?'
   } finally {
     busy.value = false
   }

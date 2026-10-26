@@ -15,6 +15,8 @@ const messages = {
   expired: 'Kood on aegunud või sisestati liiga mitu korda valesti. Küsi uus kood.',
   mail: 'Kirja saatmine ei õnnestunud. Proovi hiljem uuesti.',
   email: 'See e-posti aadress ei tundu õige.',
+  busy: 'Korilus on praegu hõivatud. Proovi tunni aja pärast uuesti.',
+  too_new: 'Uuelt kontolt saab kutseid saata paari päeva pärast.',
 }
 const say = (e) => messages[e.message] ?? 'Ei saanud ühendust. Kas internet töötab?'
 
