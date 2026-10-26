@@ -5,7 +5,7 @@ import BerryGlyph from '../components/BerryGlyph.vue'
 import AppIcon from '../components/AppIcon.vue'
 import { findProduce } from '../data/berries.js'
 import {
-  findRecipe, recipeTypes, toggleSavedRecipe, ingKey, stepKey, notesOn, orphanNotes, setNoteLine, setNoteGeneral, setNoteGroup,
+  findRecipe, isMine, recipeTypes, toggleSavedRecipe, ingKey, stepKey, notesOn, orphanNotes, setNoteLine, setNoteGeneral, setNoteGroup,
 } from '../data/recipes.js'
 import { store } from '../data/store.js'
 import { account } from '../data/account.js'
@@ -15,6 +15,9 @@ const props = defineProps({ id: { type: String, required: true } })
 const r = computed(() => findRecipe(props.id))
 const berries = computed(() => r.value.berries.map(findProduce).filter(Boolean))
 const saved = computed(() => store.savedRecipes.includes(props.id))
+// The user's own recipe is edited directly, so it gets no handwritten notes.
+const mine = computed(() => isMine(r.value))
+const sharedWith = (groupId) => account.groups.find((g) => g.id === groupId)?.name
 
 // The user's own notes, written onto the recipe in handwriting. Ken's text never changes.
 const note = computed(() => store.notes[props.id])
@@ -57,6 +60,14 @@ async function write(key) {
         <dt class="text-muted">Kogus</dt>
         <dd>{{ r.yield }}</dd>
       </template>
+      <template v-if="mine">
+        <dt class="text-muted">Näeb</dt>
+        <dd>{{ sharedWith(r.groupId) ? `Sina ja grupp „${sharedWith(r.groupId)}”` : 'Ainult sina' }}</dd>
+      </template>
+      <template v-else-if="r.owner">
+        <dt class="text-muted">Lisas</dt>
+        <dd>{{ r.owner }}</dd>
+      </template>
     </dl>
 
     <section v-if="berries.length" class="flex flex-wrap gap-2" aria-label="Marjad">
@@ -71,7 +82,11 @@ async function write(key) {
       </RouterLink>
     </section>
 
+    <RouterLink v-if="mine" :to="`/oma-retsept/${r.id}`" class="btn grain order-1 text-sage lg:order-none">
+      <AppIcon name="edit" :size="18" /> Muuda retsepti
+    </RouterLink>
     <button
+      v-else
       type="button"
       class="btn order-1 lg:order-none"
       :class="editing ? 'bg-sage text-milk' : 'grain text-sage'"

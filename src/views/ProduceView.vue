@@ -4,7 +4,8 @@ import PageHeader from '../components/PageHeader.vue'
 import BerryGlyph from '../components/BerryGlyph.vue'
 import AppIcon from '../components/AppIcon.vue'
 import RecipeCard from '../components/RecipeCard.vue'
-import { findProduce, phaseIn, statusText, recipesFor, dateLabel } from '../data/berries.js'
+import { findProduce, phaseIn, statusText, dateLabel } from '../data/berries.js'
+import { recipesFor } from '../data/recipes.js'
 import { store, toggleReminder, formatDate } from '../data/store.js'
 
 const props = defineProps({ id: { type: String, required: true } })

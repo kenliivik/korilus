@@ -1,7 +1,9 @@
+import { computed } from 'vue'
 import { recipes } from './berries.js'
 import { store } from './store.js'
 
-// Recipe helpers. The recipe list itself (`recipes`, `recipesFor`) is loaded in berries.js.
+// Recipe helpers. Ken's recipes (`recipes`) are loaded in berries.js; people's own ones live in store.myRecipes,
+// and the ones their groups share in store.sharedRecipes.
 export const recipeTypes = {
   moos: 'Moos',
   mahl: 'Mahl',
@@ -11,7 +13,45 @@ export const recipeTypes = {
   muu: 'Muu',
 }
 
-export const findRecipe = (id) => recipes.find((r) => r.id === id)
+export const allRecipes = computed(() => [...recipes, ...store.myRecipes, ...store.sharedRecipes])
+export const findRecipe = (id) => allRecipes.value.find((r) => r.id === id)
+export const recipesFor = (berryId) => allRecipes.value.filter((r) => r.berries?.includes(berryId))
+export const isMine = (r) => store.myRecipes.includes(r)
+
+export const blankRecipe = () => ({
+  title: '', berries: [], type: 'moos', time: '', yield: '', ingredients: [{ amount: '', item: '' }], steps: [''], tip: '',
+})
+
+// A recipe form's draft as it is saved: trimmed, empty rows and empty optional fields left out.
+export function cleanRecipe(d) {
+  const r = {
+    title: d.title.trim(),
+    berries: d.berries,
+    type: d.type,
+    ingredients: d.ingredients.map((i) => ({ amount: i.amount.trim(), item: i.item.trim() })).filter((i) => i.item),
+    steps: d.steps.map((s) => s.trim()).filter(Boolean),
+  }
+  for (const k of ['time', 'yield', 'tip']) if (d[k]?.trim()) r[k] = d[k].trim()
+  return r
+}
+
+// Saves an own recipe (new when it has no id) and returns its id.
+export function saveMyRecipe(recipe) {
+  const old = store.myRecipes.find((r) => r.id === recipe.id)
+  const r = { ...recipe, id: recipe.id || `oma-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}` }
+  r.updatedAt = Math.max(Date.now(), (old?.updatedAt ?? 0) + 1)
+  old ? store.myRecipes.splice(store.myRecipes.indexOf(old), 1, r) : store.myRecipes.unshift(r)
+  if (!store.dirtyRecipes.includes(r.id)) store.dirtyRecipes.push(r.id)
+  return r.id
+}
+
+export function removeMyRecipe(id) {
+  const i = store.myRecipes.findIndex((r) => r.id === id)
+  if (i === -1) return
+  store.deletedRecipes.push({ id, updatedAt: Math.max(Date.now(), store.myRecipes[i].updatedAt + 1), deleted: true })
+  store.myRecipes.splice(i, 1)
+  delete store.notes[id]
+}
 
 export function toggleSavedRecipe(id) {
   const i = store.savedRecipes.indexOf(id)
