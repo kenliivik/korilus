@@ -199,10 +199,10 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
       <p>Ilma kontota on kõik su andmed ainult selles telefonis.</p>
       <p>
         Kui logid sisse, hoiame Koriluse serveris (Veebimajutus, Eestis) su e-posti aadressi, nime, marjakohti koos
-        märkmetega, oma märkmeid retseptidel ja gruppe, kuhu kuulud. Nii jäävad kohad alles ka uues telefonis ja saad neid jagada.
+        märkmetega, oma retsepte ja märkmeid retseptidel ning gruppe, kuhu kuulud. Nii jäävad kohad alles ka uues telefonis ja saad neid jagada.
       </p>
       <p>
-        Grupiga jagatud kohti ja retseptimärkmeid ning su nime näevad selle grupi liikmed. Seda, mis on ainult sinu, ei näe
+        Grupiga jagatud kohti, retsepte ja retseptimärkmeid ning su nime näevad selle grupi liikmed. Seda, mis on ainult sinu, ei näe
         keegi teine. Andmeid
         kasutame ainult selleks, et Korilus töötaks: neid ei müüda ega anta kellelegi edasi. Reklaame ega jälgimist pole.
       </p>
@@ -224,7 +224,7 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
         Veebimajutus hoiab tavapäraseid serverilogisid.
       </p>
       <p>
-        Saad oma andmed igal ajal alla laadida ja konto kustutada. Siis kaovad serverist su konto, kohad, retseptimärkmed ja su
+        Saad oma andmed igal ajal alla laadida ja konto kustutada. Siis kaovad serverist su konto, kohad, retseptid, retseptimärkmed ja su
         loodud grupid. Kui oleme midagi valesti teinud, võid pöörduda ka Andmekaitse Inspektsiooni poole (aki.ee).
       </p>
     </div>

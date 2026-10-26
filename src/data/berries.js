@@ -202,7 +202,6 @@ export async function saveContent(body) {
   return post(body)
 }
 
-export const recipesFor = (berryId) => recipes.filter((r) => r.berries?.includes(berryId))
 
 export const phases = { a: 'Algus', t: 'Parim aeg', l: 'Lõpp' }
 // The dates are stored under Algus/Tipp/Lõpp (api/content.php); this is how a key is shown.

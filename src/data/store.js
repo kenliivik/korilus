@@ -23,6 +23,12 @@ store.shared ??= []
 for (const l of store.locations) l.updatedAt ??= Date.now()
 // Own notes on Ken's recipes, by recipe id: { lines: { 'i:suhkrut': '500 g', 's:<step text>': '...' }, general, groupId, updatedAt }.
 // They sync like spots: dirtyNotes lists recipe ids changed since the last sync, sharedNotes holds what the user's groups share.
+// Recipes the user wrote (their own recipe book), synced like spots: { id: 'oma-…', title, type, berries, ingredients, steps,
+// time?, yield?, tip?, groupId, updatedAt }. sharedRecipes holds the ones others share with the user's groups (with owner).
+store.myRecipes ??= []
+store.dirtyRecipes ??= []
+store.deletedRecipes ??= []
+store.sharedRecipes ??= []
 store.notes ??= {}
 store.dirtyNotes ??= []
 store.sharedNotes ??= [] // { recipe, owner, lines, general }

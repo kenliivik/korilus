@@ -45,6 +45,7 @@ export async function api(file, body) {
 function forget() {
   Object.assign(account, { user: null, groups: [], people: [], invitations: [], syncedAt: 0, error: '' })
   store.shared = []
+  store.sharedRecipes = []
   store.sharedNotes = []
 }
 
@@ -101,19 +102,14 @@ export function sync() {
 async function push() {
   account.syncing = true
   const started = Date.now()
-  // After logging in send every spot, later only the changed ones.
-  const changed = account.syncedAt ? store.locations.filter((l) => store.dirty.includes(l.id)) : [...store.locations]
-  const sent = new Map(changed.map((l) => [l.id, l.updatedAt]))
-  const tombstones = [...store.deleted]
   try {
-    const { spots } = await api('spots.php', { spots: [...changed.map((l) => ({ ...l })), ...tombstones] })
-    store.dirty = store.dirty.filter((id) => store.locations.some((l) => l.id === id && l.updatedAt !== sent.get(id)))
-    store.deleted = store.deleted.filter((d) => !tombstones.includes(d))
-    merge(spots)
+    store.shared = merge(await pushList('spots.php', 'spots', store.locations, 'dirty', 'deleted'), store.locations, store.deleted)
+    store.sharedRecipes = merge(await pushList('myrecipes.php', 'recipes', store.myRecipes, 'dirtyRecipes', 'deletedRecipes'), store.myRecipes, store.deletedRecipes)
     await pushNotes()
     account.syncedAt = started
     account.error = ''
-    if (store.dirty.length || store.deleted.length || store.dirtyNotes.length) later(1500) // changed while this sync was on its way
+    // Changed while this sync was on its way.
+    if (store.dirty.length + store.deleted.length + store.dirtyRecipes.length + store.deletedRecipes.length + store.dirtyNotes.length) later(1500)
   } catch (e) {
     account.error = e.message
   } finally {
@@ -121,22 +117,36 @@ async function push() {
   }
 }
 
-export function merge(spots) {
+// Spots and own recipes sync the same way. After logging in every item goes up, later only the changed (dirty) ones
+// and the deleted ones (tombstones). Answers with the server's list.
+async function pushList(file, key, list, dirtyKey, deletedKey) {
+  const changed = account.syncedAt ? list.filter((x) => store[dirtyKey].includes(x.id)) : [...list]
+  const sent = new Map(changed.map((x) => [x.id, x.updatedAt]))
+  const tombstones = [...store[deletedKey]]
+  const data = await api(file, { [key]: [...changed.map((x) => ({ ...x })), ...tombstones] })
+  store[dirtyKey] = store[dirtyKey].filter((id) => list.some((x) => x.id === id && x.updatedAt !== sent.get(id)))
+  store[deletedKey] = store[deletedKey].filter((d) => !tombstones.includes(d))
+  return data[key]
+}
+
+// Puts the server's copies into `list` (store.locations or store.myRecipes), the newer updatedAt winning,
+// and returns the ones others share with the user's groups.
+export function merge(items, list = store.locations, deletedList = store.deleted) {
   const shared = []
-  for (const { mine, owner, deleted, ...spot } of spots) {
+  for (const { mine, owner, deleted, ...item } of items) {
     if (!mine) {
-      if (!deleted) shared.push({ ...spot, owner, shared: true })
+      if (!deleted) shared.push({ ...item, owner, shared: true })
       continue
     }
-    const i = store.locations.findIndex((l) => l.id === spot.id)
-    if (i !== -1 && store.locations[i].updatedAt >= spot.updatedAt) continue // this phone's copy is newer, it goes up next time
+    const i = list.findIndex((x) => x.id === item.id)
+    if (i !== -1 && list[i].updatedAt >= item.updatedAt) continue // this phone's copy is newer, it goes up next time
     if (deleted) {
-      if (i !== -1) store.locations.splice(i, 1)
-    } else if (!store.deleted.some((d) => d.id === spot.id && d.updatedAt > spot.updatedAt)) {
-      i === -1 ? store.locations.unshift(spot) : (store.locations[i] = spot)
+      if (i !== -1) list.splice(i, 1)
+    } else if (!deletedList.some((d) => d.id === item.id && d.updatedAt > item.updatedAt)) {
+      i === -1 ? list.unshift(item) : (list[i] = item)
     }
   }
-  store.shared = shared
+  return shared
 }
 
 async function pushNotes() {
@@ -165,7 +175,7 @@ const later = (ms) => {
   clearTimeout(timer)
   timer = setTimeout(sync, ms)
 }
-watch(() => store.dirty.length + store.deleted.length + store.dirtyNotes.length, (n) => n && account.user && later(1500))
+watch(() => store.dirty.length + store.deleted.length + store.dirtyRecipes.length + store.deletedRecipes.length + store.dirtyNotes.length, (n) => n && account.user && later(1500))
 document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && Date.now() - account.syncedAt > 60000 && sync())
 addEventListener('online', () => sync())
 

@@ -45,3 +45,21 @@ test('an emptied line note goes away, and a note on a rewritten line moves to th
   assert.deepEqual(store.notes.moos.lines, {})
   assert.deepEqual(orphanNotes(recipe, { 's:Keeda 15 minutit.': 'kauem', 'i:suhkrut': 'vähem' }), ['Keeda 15 minutit.: kauem'])
 })
+
+const { merge } = await import('../src/data/account.js')
+const { saveMyRecipe, removeMyRecipe, findRecipe } = await import('../src/data/recipes.js')
+
+test('an own recipe is saved, synced, found and deleted with a tombstone', () => {
+  Object.assign(store, { myRecipes: [], dirtyRecipes: [], deletedRecipes: [], sharedRecipes: [] })
+  const id = saveMyRecipe({ title: 'Pohlamoos', berries: [], type: 'moos', ingredients: [], steps: [] })
+  assert.match(id, /^oma-[a-z0-9]+$/)
+  assert.deepEqual(store.dirtyRecipes, [id])
+  store.sharedRecipes = merge([{ id: 'x', updatedAt: 1, mine: false, owner: 'Mari', deleted: false, title: 'Mari moos' }], store.myRecipes, store.deletedRecipes)
+  assert.equal(findRecipe('x').owner, 'Mari')
+  removeMyRecipe(id)
+  assert.equal(findRecipe(id), undefined)
+  assert.equal(store.deletedRecipes[0].id, id)
+  // An older server copy does not bring it back.
+  merge([{ id, updatedAt: 1, mine: true, deleted: false, title: 'Pohlamoos' }], store.myRecipes, store.deletedRecipes)
+  assert.equal(store.myRecipes.length, 0)
+})

@@ -110,3 +110,16 @@ CREATE TABLE IF NOT EXISTS recipe_notes (
   PRIMARY KEY (user_id, recipe_id),
   INDEX (group_id)
 ) DEFAULT CHARSET = utf8mb4;
+
+-- Recipes people write for themselves (their own recipe book), private or shared with a group like spots.
+-- data = the recipe as the app keeps it. Deleted ones stay as empty tombstones so the user's other phones drop them.
+CREATE TABLE IF NOT EXISTS user_recipes (
+  id VARCHAR(64) PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  group_id INT UNSIGNED NULL,
+  data MEDIUMTEXT NOT NULL,
+  updated_at BIGINT UNSIGNED NOT NULL,
+  deleted TINYINT(1) NOT NULL DEFAULT 0,
+  INDEX (user_id),
+  INDEX (group_id)
+) DEFAULT CHARSET = utf8mb4;

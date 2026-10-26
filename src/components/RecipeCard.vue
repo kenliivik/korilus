@@ -26,7 +26,7 @@ defineProps({
     <span class="flex min-w-0 flex-col">
       <span class="text-xl leading-6" :class="tile && 'lg:text-2xl lg:leading-7'">{{ recipe.title }}</span>
       <span class="font-hand text-sm text-muted" :class="tile && 'lg:text-lg'">
-        {{ [recipeTypes[recipe.type], recipe.time].filter(Boolean).join(' · ') }}
+        {{ [recipeTypes[recipe.type], recipe.time, recipe.owner].filter(Boolean).join(' · ') }}
       </span>
     </span>
   </RouterLink>
