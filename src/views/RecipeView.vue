@@ -29,6 +29,7 @@ const groupName = computed(() => account.groups.find((g) => g.id === note.value?
 const noteGroup = computed({ get: () => note.value?.groupId ?? null, set: (g) => setNoteGroup(props.id, g) })
 // Sahver: earlier batches of this recipe with a note, "Eelmisel korral …".
 const batches = computed(() => notesFor(props.id).slice(0, 3))
+const inPantry = computed(() => store.pantry.filter((j) => j.recipeId === props.id).reduce((sum, j) => sum + j.left, 0))
 const editing = ref(false)
 const open = ref(null) // the line being written on
 // A note that starts with a number is a new amount, so the recipe's amount is crossed out.
@@ -220,9 +221,12 @@ async function write(key) {
         <p class="text-base text-muted">Eelmisel korral, {{ formatDate(j.made) }}:</p>
         <p class="hand-note whitespace-pre-line">{{ j.note }}</p>
       </div>
-      <RouterLink :to="`/sahver/uus?retsept=${r.id}`" class="btn grain text-sage lg:self-start">
-        <AppIcon name="plus" :size="18" /> Tegin selle
-      </RouterLink>
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <RouterLink :to="`/sahver/uus?retsept=${r.id}`" class="btn grain text-sage">
+          <AppIcon name="plus" :size="18" /> Tegin selle
+        </RouterLink>
+        <RouterLink v-if="inPantry" to="/sahver" class="press font-hand text-xl text-muted underline decoration-sage/30 underline-offset-4">Sahvris {{ inPantry }} purki</RouterLink>
+      </div>
     </section>
     </div>
     </div>

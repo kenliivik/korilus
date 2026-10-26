@@ -20,10 +20,10 @@ const found = (spots) =>
   })
 const foundAt = computed(() => found(store.locations))
 const foundShared = computed(() => found(store.shared))
-// The user's own dates from their harvest log, as rows under the general ones: "Sinu esimesed ~12. juuli".
+// The user's own dates from their harvest log, as rows under the general ones: "Sinu algus ~12. juuli".
 const mine = computed(() => {
   const t = personalDates(ownVisits(), props.id)
-  return t ? { 'Sinu esimesed': usualDay(t.first), ...(t.best && { 'Sinu parim': usualDay(t.best) }) } : {}
+  return t ? { 'Sinu algus': usualDay(t.first), ...(t.best && { 'Sinu parim': usualDay(t.best) }) } : {}
 })
 const linkedRecipes = computed(() => recipesFor(props.id))
 const reminded = computed(() => store.reminders.includes(props.id))

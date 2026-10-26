@@ -2,14 +2,20 @@
 import { computed } from 'vue'
 import PageHeader from '../components/PageHeader.vue'
 import AppIcon from '../components/AppIcon.vue'
+import BerryGlyph from '../components/BerryGlyph.vue'
+import Stepper from '../components/Stepper.vue'
 import { byNewest, useJar } from '../data/pantry.js'
 import { findRecipe } from '../data/recipes.js'
 import { findLocation, formatDate } from '../data/store.js'
 
 // Sahver: what was made this season and before, grouped by year, with jars left. −/+ when a jar is opened.
+// Used-up batches go last in their year and fade, but stay for their note.
 const years = computed(() =>
-  byNewest.value.reduce((m, j) => m.set(j.made.slice(0, 4), [...(m.get(j.made.slice(0, 4)) ?? []), j]), new Map()),
+  [...byNewest.value]
+    .sort((a, b) => !a.left - !b.left)
+    .reduce((m, j) => m.set(j.made.slice(0, 4), [...(m.get(j.made.slice(0, 4)) ?? []), j]), new Map()),
 )
+const where = (j) => [formatDate(j.made, false), findLocation(j.spotId ?? '')?.name, j.recipeId && !findRecipe(j.recipeId) && 'retsepti enam pole'].filter(Boolean).join(' · ')
 const leftIn = (jars) => jars.reduce((sum, j) => sum + j.left, 0)
 </script>
 
@@ -24,20 +30,18 @@ const leftIn = (jars) => jars.reduce((sum, j) => sum + j.left, 0)
   <section v-for="[year, jars] in years" :key="year" class="flex flex-col gap-3 lg:max-w-3xl">
     <h2 class="ruled text-2xl leading-7 lg:text-3xl lg:leading-9">{{ year }} <span class="font-hand text-xl text-muted">· alles {{ leftIn(jars) }} purki</span></h2>
     <ul class="grain card flex flex-col">
-      <li v-for="j in jars" :key="j.id" class="flex flex-wrap items-center gap-x-3 border-b border-sage/12 py-3 last:border-0">
-        <RouterLink :to="`/sahver/${j.id}`" class="press flex min-w-0 flex-1 flex-col">
-          <span class="truncate text-lg lg:text-xl">{{ j.title }}</span>
-          <span class="text-base text-muted">
-            {{ formatDate(j.made, false) }}<template v-if="findLocation(j.spotId ?? '')"> · {{ findLocation(j.spotId).name }}</template>
-            <template v-if="j.recipeId && !findRecipe(j.recipeId)"> · retsepti enam pole</template>
-          </span>
+      <li v-for="j in jars" :key="j.id" class="grid grid-cols-[3.5rem_1fr_auto] items-center gap-x-3 border-b border-sage/12 py-3 last:border-0" :class="!j.left && 'opacity-55'">
+        <BerryGlyph v-if="j.berries[0]" :name="j.berries[0]" :size="56" />
+        <span v-else class="grid size-14 place-items-center text-leaf"><AppIcon name="book" :size="28" /></span>
+        <RouterLink :to="`/sahver/${j.id}`" class="press flex min-w-0 flex-col">
+          <span class="text-lg leading-6 lg:text-xl">{{ j.title }}</span>
+          <span class="text-base leading-5 text-muted">{{ where(j) }}</span>
         </RouterLink>
-        <span class="flex shrink-0 items-center gap-2">
-          <button type="button" class="grain grid size-11 place-items-center rounded-full text-xl shadow-neu-raised-sm active:shadow-neu-inset disabled:opacity-40" :disabled="!j.left" :aria-label="`Võtsin ühe: ${j.title}`" @click="useJar(j, -1)">−</button>
-          <span class="w-14 text-center text-lg tabular-nums" :aria-label="`${j.left} purki ${j.jars}-st alles`">{{ j.left }}<span class="text-base text-muted">/{{ j.jars }}</span></span>
-          <button type="button" class="grain grid size-11 place-items-center rounded-full text-xl shadow-neu-raised-sm active:shadow-neu-inset disabled:opacity-40" :disabled="j.left >= j.jars" :aria-label="`Panin ühe tagasi: ${j.title}`" @click="useJar(j, 1)">+</button>
-        </span>
-        <RouterLink v-if="j.note" :to="`/sahver/${j.id}`" class="hand-note w-full">{{ j.note }}</RouterLink>
+        <Stepper :down="`Võtsin ühe: ${j.title}`" :up="`Panin ühe tagasi: ${j.title}`" :can-down="j.left > 0" :can-up="j.left < j.jars" @down="useJar(j, -1)" @up="useJar(j, 1)">
+          <template v-if="j.left">{{ j.left }}<span class="text-base text-muted">/{{ j.jars }}</span></template>
+          <span v-else class="font-hand text-base text-muted">tühi</span>
+        </Stepper>
+        <RouterLink v-if="j.note" :to="`/sahver/${j.id}`" class="hand-note col-span-2 col-start-2 mt-1">{{ j.note }}</RouterLink>
       </li>
     </ul>
   </section>

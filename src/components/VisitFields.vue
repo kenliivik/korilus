@@ -1,5 +1,6 @@
 <script setup>
 import StarRating from './StarRating.vue'
+import Stepper from './Stepper.vue'
 import { produce } from '../data/berries.js'
 import { today } from '../data/store.js'
 
@@ -14,13 +15,16 @@ function toggle(id) {
   } else v.berries = [...v.berries, id]
 }
 
-// Litres per berry, optional. An emptied field drops the amount, so "nothing logged" stays different from 0.
-function setAmount(id, value) {
+// Litres per berry, optional, half a litre per tap. Back at 0 the amount is dropped, so "nothing logged" stays different from 0.
+const amount = (id) => visit.value.amounts?.[id] ?? 0
+function step(id, by) {
   const v = visit.value
+  const next = Math.min(99, Math.max(0, Math.round((amount(id) + by) * 2) / 2))
   v.amounts ??= {}
-  if (value === '' || !(+value > 0)) delete v.amounts[id]
-  else v.amounts[id] = Math.round(+value * 10) / 10
+  if (next) v.amounts[id] = next
+  else delete v.amounts[id]
 }
+const shown = (n) => String(n).replace('.', ',')
 </script>
 
 <template>
@@ -48,21 +52,20 @@ function setAmount(id, value) {
 
   <fieldset v-if="visit.berries.length" class="flex flex-col gap-2">
     <legend class="mb-2 text-xl">Kui palju korjasid?</legend>
-    <label v-for="id in visit.berries" :key="id" class="flex items-center gap-3 text-lg">
+    <div v-for="id in visit.berries" :key="id" class="flex items-center gap-3 text-lg">
       <span class="min-w-0 truncate">{{ produce.find((p) => p.id === id)?.name ?? id }}</span>
       <span class="leader" />
-      <input
-        type="number"
-        inputmode="decimal"
-        min="0"
-        step="0.5"
-        :value="visit.amounts?.[id] ?? ''"
-        class="field w-24 shrink-0 py-2 text-right [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
-        placeholder="–"
-        @input="setAmount(id, $event.target.value)"
-      />
-      <span class="shrink-0 text-muted">liitrit</span>
-    </label>
+      <Stepper
+        :down="`Vähem: ${produce.find((p) => p.id === id)?.name ?? id}`"
+        :up="`Rohkem: ${produce.find((p) => p.id === id)?.name ?? id}`"
+        :can-down="amount(id) > 0"
+        @down="step(id, -0.5)"
+        @up="step(id, 0.5)"
+      >
+        <template v-if="amount(id)">{{ shown(amount(id)) }} <span class="text-base text-muted">l</span></template>
+        <span v-else class="text-muted">–</span>
+      </Stepper>
+    </div>
   </fieldset>
 
   <label class="flex flex-col gap-2">

@@ -28,6 +28,13 @@ function pickRecipe(id) {
   if (r && !draft.value.title.trim()) draft.value.title = r.title
   if (r && !draft.value.berries.length) draft.value.berries = [...(r.berries ?? [])]
 }
+// With a recipe picked, only its berries (and any already chosen) are offered; "muuda" shows them all.
+const allChips = ref(false)
+const chips = computed(() => {
+  const r = findRecipe(draft.value.recipeId ?? '')
+  if (allChips.value || !r?.berries?.length) return produce
+  return produce.filter((p) => r.berries.includes(p.id) || draft.value.berries.includes(p.id))
+})
 const toggle = (id) =>
   (draft.value.berries = draft.value.berries.includes(id) ? draft.value.berries.filter((b) => b !== id) : [...draft.value.berries, id])
 // The batch: own spots where one of these berries was found, the ones found most recently first.
@@ -48,7 +55,7 @@ async function remove() {
 </script>
 
 <template>
-  <PageHeader :title="isNew ? 'Lisa purgid' : 'Muuda'" back="/sahver" />
+  <PageHeader :title="isNew ? 'Lisa purgid' : existing?.title || 'Muuda'" back="/sahver" />
 
   <p v-if="!isNew && !existing" class="italic text-muted">Seda kirjet ei leitud.</p>
 
@@ -79,9 +86,9 @@ async function remove() {
 
     <fieldset class="flex flex-col gap-2">
       <legend class="mb-2 text-xl">Millest?</legend>
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <button
-          v-for="p in produce"
+          v-for="p in chips"
           :key="p.id"
           type="button"
           :aria-pressed="draft.berries.includes(p.id)"
@@ -91,6 +98,7 @@ async function remove() {
         >
           {{ p.name }}
         </button>
+        <button v-if="chips.length < produce.length" type="button" class="px-2 py-1.5 font-hand text-lg text-muted underline underline-offset-4" @click="allChips = true">muuda</button>
       </div>
     </fieldset>
 
