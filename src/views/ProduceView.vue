@@ -6,7 +6,8 @@ import AppIcon from '../components/AppIcon.vue'
 import RecipeCard from '../components/RecipeCard.vue'
 import { contentState, findProduce, phaseIn, statusText, dateLabel } from '../data/berries.js'
 import { recipesFor } from '../data/recipes.js'
-import { store, toggleReminder, formatDate } from '../data/store.js'
+import { store, toggleReminder, formatDate, ownVisits } from '../data/store.js'
+import { personalDates, usualDay } from '../data/harvest.js'
 
 const props = defineProps({ id: { type: String, required: true } })
 
@@ -19,6 +20,11 @@ const found = (spots) =>
   })
 const foundAt = computed(() => found(store.locations))
 const foundShared = computed(() => found(store.shared))
+// The user's own dates from their harvest log, as rows under the general ones: "Sinu esimesed ~12. juuli".
+const mine = computed(() => {
+  const t = personalDates(ownVisits(), props.id)
+  return t ? { 'Sinu esimesed': usualDay(t.first), ...(t.best && { 'Sinu parim': usualDay(t.best) }) } : {}
+})
 const linkedRecipes = computed(() => recipesFor(props.id))
 const reminded = computed(() => store.reminders.includes(props.id))
 const noPush = ref(false)
@@ -47,6 +53,10 @@ const remind = async () => (noPush.value = !(await toggleReminder(props.id)) && 
         <template v-for="(value, label) in p.dates" :key="label">
           <dt class="text-muted">{{ dateLabel(label) }}</dt>
           <dd>{{ value }}</dd>
+        </template>
+        <template v-for="(value, label) in mine" :key="label">
+          <dt class="text-muted">{{ label }}</dt>
+          <dd class="font-hand text-xl">{{ value }}</dd>
         </template>
         <dt class="text-muted">Praegu</dt>
         <dd class="font-hand text-xl">{{ statusText[phaseIn(p)] }}</dd>

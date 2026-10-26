@@ -28,3 +28,6 @@ export function bestTimes(visits, id) {
   const best = [...years.values()].filter((y) => y.best).map((y) => dayOf(y.best))
   return { first: average([...years.values()].map((y) => dayOf(y.first))), best: best.length ? average(best) : null, years: years.size, bestYears: best.length }
 }
+
+// Personal ripening dates for one berry, from all the visits the user logged (store.js ownVisits), or null.
+export const personalDates = (visits, id) => bestTimes(visits, id)
