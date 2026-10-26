@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import PageHeader from '../components/PageHeader.vue'
 import AppIcon from '../components/AppIcon.vue'
 import BerryGlyph from '../components/BerryGlyph.vue'
+import SortSwitch from '../components/SortSwitch.vue'
 import { produce, phases, statusText, months } from '../data/berries.js'
 
 const now = new Date().getMonth()
@@ -25,30 +26,18 @@ const sorts = { season: 'Hooaeg', az: 'A–Ü' }
 </script>
 
 <template>
-  <PageHeader title="Korjekalender" />
+  <PageHeader title="Korjekalender"><SortSwitch v-model="sort" :options="sorts" class="ml-auto lg:hidden" /></PageHeader>
 
   <!-- Desktop: year chart with the month panel beside it (below it on small laptops). On phones the wrappers dissolve (display: contents). -->
   <div class="contents lg:flex lg:flex-col lg:gap-6 xl:grid xl:grid-cols-[1fr_22rem] xl:items-start xl:gap-10">
   <div class="contents lg:flex lg:flex-col lg:gap-6">
-  <div class="flex flex-wrap items-center justify-between gap-x-5 gap-y-3">
+  <div class="flex items-center justify-between gap-5">
   <ul class="flex gap-5 text-base text-muted lg:text-lg" aria-label="Selgitus">
     <li v-for="(label, key) in phases" :key="key" class="flex items-center gap-2">
       <span class="size-4 rounded" :class="cellColor[key]" />{{ label }}
     </li>
   </ul>
-  <div role="group" aria-label="Järjestus" class="grain flex rounded-full p-1 shadow-neu-raised-sm">
-    <button
-      v-for="(label, key) in sorts"
-      :key="key"
-      type="button"
-      :aria-pressed="sort === key"
-      class="h-9 min-w-16 rounded-full px-3 text-base lg:text-lg"
-      :class="sort === key ? 'grain shadow-neu-inset text-sage' : 'text-muted'"
-      @click="sort = key"
-    >
-      {{ label }}
-    </button>
-  </div>
+  <SortSwitch v-model="sort" :options="sorts" class="hidden lg:flex" />
   </div>
 
   <section class="grain card grid grid-cols-[5.5rem_repeat(12,1fr)] items-center gap-y-1.5 px-3 lg:grid-cols-[10rem_repeat(12,1fr)] lg:gap-y-2.5 lg:px-6 lg:py-6">
@@ -66,14 +55,15 @@ const sorts = { season: 'Hooaeg', az: 'A–Ü' }
       <span class="lg:hidden">{{ m[0] }}</span><span class="hidden lg:inline">{{ m.slice(0, 3) }}</span>
     </button>
 
-    <template v-for="p in sorted" :key="p.id">
-      <RouterLink :to="`/mari/${p.id}`" class="truncate pr-1 text-[15px] leading-8 underline-offset-4 active:underline lg:text-lg lg:hover:underline">
+    <!-- Keyed by order too, so a re-sort fades the rows in instead of jumping. -->
+    <template v-for="p in sorted" :key="sort + p.id">
+      <RouterLink :to="`/mari/${p.id}`" class="fade-in truncate pr-1 text-[15px] leading-8 underline-offset-4 active:underline lg:text-lg lg:hover:underline">
         {{ p.name }}
       </RouterLink>
       <span
         v-for="(c, i) in p.season"
         :key="i"
-        class="mx-px h-6 cursor-pointer rounded-sm lg:mx-0.5 lg:h-8"
+        class="fade-in mx-px h-6 cursor-pointer rounded-sm lg:mx-0.5 lg:h-8"
         @click="selected = i"
         :class="cellColor[c] || (i === selected && 'bg-sage/8')"
         :title="c !== '.' ? `${months[i]}: ${phases[c]}` : undefined"
