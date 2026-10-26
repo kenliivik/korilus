@@ -281,3 +281,16 @@
     animation-name: fade;
   }
 }
+
+/* Someone's own notes written onto a recipe (RecipeView): handwriting in leaf green, a little askew like pencil in a cookbook. */
+@layer components {
+  .hand-note {
+    @apply inline-block origin-left -rotate-1 font-hand text-2xl leading-8 text-leaf;
+  }
+  .note-pen {
+    @apply -my-3 ml-auto flex min-h-11 min-w-11 shrink-0 items-center justify-end gap-3 self-center text-leaf;
+  }
+  .note-field {
+    @apply w-full rounded-xl border border-dashed border-leaf/60 bg-transparent px-3 py-1 font-hand text-2xl leading-9 text-sage outline-none resize-none [field-sizing:content] placeholder:text-muted/70 focus:border-solid focus:border-leaf;
+  }
+}
