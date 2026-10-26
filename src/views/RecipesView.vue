@@ -1,20 +1,20 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, toRefs } from 'vue'
 import { useRoute } from 'vue-router'
 import PageHeader from '../components/PageHeader.vue'
 import RecipeCard from '../components/RecipeCard.vue'
 import AppIcon from '../components/AppIcon.vue'
 import { produce } from '../data/berries.js'
-import { allRecipes, recipeTypes } from '../data/recipes.js'
+import { allRecipes, recipeTypes, recipeFilters } from '../data/recipes.js'
 import { store } from '../data/store.js'
 
 // Ken's recipes, the user's own ones and the ones their groups share. Filters: one berry, one type, the favourites,
 // or only the user's own recipe book (own + shared). `?mari=` comes from a berry page.
+// The filters are kept while the app is open, so coming back from a recipe shows the same list.
 const recipes = allRecipes
-const berry = ref(useRoute().query.mari ?? '')
-const type = ref('')
-const saved = ref(false)
-const own = ref(false)
+const { berry, type, saved, own } = toRefs(recipeFilters)
+const query = useRoute().query.mari
+if (query) Object.assign(recipeFilters, { berry: query, type: '', saved: false, own: false })
 const ownCount = computed(() => store.myRecipes.length + store.sharedRecipes.length)
 
 // Offer only berries and types that actually have recipes.
@@ -60,7 +60,7 @@ const chip = (on) => (on ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-
       </button>
     </div>
     <div class="flex flex-wrap gap-2">
-      <button type="button" :aria-pressed="!type && !saved && !own" class="rounded-full px-3 py-1.5" :class="chip(!type && !saved && !own)" @click="(type = ''), (saved = false), (own = false)">
+      <button type="button" :aria-pressed="!type" class="rounded-full px-3 py-1.5" :class="chip(!type)" @click="type = ''">
         Kõik liigid
       </button>
       <button
@@ -74,6 +74,8 @@ const chip = (on) => (on ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-
       >
         {{ recipeTypes[t] }}
       </button>
+    </div>
+    <div v-if="store.savedRecipes.length || ownCount" class="flex flex-wrap gap-2">
       <button
         v-if="store.savedRecipes.length"
         type="button"

@@ -17,7 +17,7 @@ const move = (i, by) => {
 }
 
 const chip = (on) => (on ? 'bg-sage text-milk shadow-neu-inset' : 'grain shadow-neu-raised-sm')
-const small = 'grain grid size-9 shrink-0 place-items-center rounded-full shadow-neu-raised-sm active:shadow-neu-inset disabled:opacity-30'
+const small = 'grain grid size-11 shrink-0 place-items-center rounded-full shadow-neu-raised-sm active:shadow-neu-inset disabled:opacity-30'
 </script>
 
 <template>
@@ -85,7 +85,7 @@ const small = 'grain grid size-9 shrink-0 place-items-center rounded-full shadow
       <div v-for="(_, i) in draft.steps" :key="i" class="flex items-start gap-2">
         <span class="font-hand w-6 pt-3 text-xl text-leaf">{{ i + 1 }}.</span>
         <textarea v-model="draft.steps[i]" rows="2" class="field min-w-0" :aria-label="`Samm ${i + 1}`" />
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-2">
           <button type="button" :class="small" aria-label="Liiguta üles" :disabled="i === 0" @click="move(i, -1)">
             <AppIcon name="up" :size="16" />
           </button>

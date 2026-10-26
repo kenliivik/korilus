@@ -13,6 +13,7 @@ const toggles = [
 // Whether this phone can show the reminders at all (an iPhone only can after "Lisa avakuvale").
 const pushState = typeof Notification === 'undefined' ? 'none' : Notification.permission
 const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v) => v.note).length)
+const recipeNotes = computed(() => Object.values(store.notes).filter((n) => n.general || Object.keys(n.lines).length).length)
 </script>
 
 <template>
@@ -24,7 +25,7 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
   <section class="flex flex-col gap-3">
     <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Konto</h2>
     <RouterLink to="/konto" class="grain card flex items-center justify-between gap-3 text-lg press active:shadow-neu-inset">
-      <span class="truncate">{{ account.user ? account.user.email : 'Logi sisse ja jaga kohti perega' }}</span>
+      <span class="truncate">{{ account.user ? account.user.email : 'Logi sisse ja jaga kohti ja retsepte perega' }}</span>
       <AppIcon name="arrow" :size="20" />
     </RouterLink>
   </section>
@@ -73,7 +74,9 @@ const notes = computed(() => store.locations.flatMap((l) => l.visits).filter((v)
     <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Minu andmed</h2>
     <dl class="grain card grid grid-cols-[1fr_auto] gap-y-1 text-lg">
       <dt>Marjakohad</dt><dd>{{ store.locations.length }} kohta</dd>
-      <dt>Märkmed</dt><dd>{{ notes }} märget</dd>
+      <dt>Käikude märkmed</dt><dd>{{ notes }} märget</dd>
+      <dt>Oma retseptid</dt><dd>{{ store.myRecipes.length }} retsepti</dd>
+      <dt>Märkmetega retseptid</dt><dd>{{ recipeNotes }} retsepti</dd>
     </dl>
     <p class="text-base italic text-muted">{{ account.user ? 'Kõik on alles selles telefonis ja sinu kontol.' : 'Kõik on alles ainult selles telefonis.' }}</p>
   </section>

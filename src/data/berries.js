@@ -162,6 +162,9 @@ export const content = reactive({ version: 0, berries: [], recipes: [] })
 export const produce = reactive([])
 export const recipes = reactive([])
 let serverHasBerries = null // unknown until the server has answered
+// False until there is content to show (a saved copy, or the server's answer), so a recipe or an added berry
+// opened by link shows "loading" rather than "not found" on a first visit.
+export const contentState = reactive({ ready: false })
 
 // Species bundled after the server got its copy are added at the end until they are saved in /admin.
 const withBundled = (berries) => [...berries, ...bundled.filter((b) => !berries.some((s) => s.id === b.id))]
@@ -183,8 +186,9 @@ function fromServer(c) {
 }
 
 // Last good copy first, then whatever the server has now. Offline, the service worker answers from its cache.
-try { setContent(JSON.parse(localStorage.getItem(KEY)) ?? {}) } catch { setContent({}) }
-export const loadContent = () => fetch('/api/content.php').then((r) => r.json()).then(fromServer).catch(() => content)
+try { contentState.ready = !!setContent(JSON.parse(localStorage.getItem(KEY)) ?? {}).version } catch { setContent({}) }
+export const loadContent = () =>
+  fetch('/api/content.php').then((r) => r.json()).then(fromServer).catch(() => content).finally(() => (contentState.ready = true))
 loadContent()
 
 // For /admin: posts one change to api/content.php (see the build contract) and shows the result.

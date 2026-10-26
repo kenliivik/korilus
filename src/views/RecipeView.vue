@@ -3,7 +3,7 @@ import { computed, nextTick, ref } from 'vue'
 import PageHeader from '../components/PageHeader.vue'
 import BerryGlyph from '../components/BerryGlyph.vue'
 import AppIcon from '../components/AppIcon.vue'
-import { findProduce } from '../data/berries.js'
+import { contentState, findProduce } from '../data/berries.js'
 import {
   findRecipe, isMine, recipeTypes, toggleSavedRecipe, ingKey, stepKey, notesOn, orphanNotes, setNoteLine, setNoteGeneral, setNoteGroup,
 } from '../data/recipes.js'
@@ -25,6 +25,7 @@ const hasNotes = computed(() => !!(note.value?.general || Object.keys(note.value
 const orphans = computed(() => orphanNotes(r.value, note.value?.lines))
 const sharedGeneral = computed(() => store.sharedNotes.filter((n) => n.recipe === props.id && n.general))
 const groupName = computed(() => account.groups.find((g) => g.id === note.value?.groupId)?.name)
+const noteGroup = computed({ get: () => note.value?.groupId ?? null, set: (g) => setNoteGroup(props.id, g) })
 const editing = ref(false)
 const open = ref(null) // the line being written on
 // A note that starts with a number is a new amount, so the recipe's amount is crossed out.
@@ -82,14 +83,14 @@ async function write(key) {
       </RouterLink>
     </section>
 
-    <RouterLink v-if="mine" :to="`/oma-retsept/${r.id}`" class="btn grain order-1 text-sage lg:order-none">
+    <RouterLink v-if="mine" :to="`/oma-retsept/${r.id}`" class="btn bg-sage text-milk">
       <AppIcon name="edit" :size="18" /> Muuda retsepti
     </RouterLink>
     <button
       v-else
       type="button"
-      class="btn order-1 lg:order-none"
-      :class="editing ? 'bg-sage text-milk' : 'grain text-sage'"
+      class="btn"
+      :class="editing ? 'bg-sage text-milk max-lg:hidden' : 'grain text-sage'"
       :aria-pressed="editing"
       @click="(editing = !editing), (open = null)"
     >
@@ -98,6 +99,7 @@ async function write(key) {
     </button>
 
     <button
+      v-if="!mine"
       type="button"
       class="btn order-1 lg:order-none"
       :class="saved ? 'grain text-sage' : 'bg-sage text-milk'"
@@ -112,7 +114,7 @@ async function write(key) {
 
     <div class="contents lg:flex lg:flex-col lg:gap-8">
     <section v-if="r.ingredients?.length" class="flex flex-col gap-3">
-      <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Koostisosad</h2>
+      <h2 class="ruled text-2xl leading-7 lg:text-3xl lg:leading-9">Koostisosad</h2>
       <ul class="grain card grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-lg lg:gap-y-2 lg:p-6 lg:text-xl">
         <li v-for="(ing, i) in r.ingredients" :key="i" class="col-span-2 grid grid-cols-subgrid">
           <span class="text-right text-muted" :class="!editing && newAmount(ingKey(ing)) && 'line-through decoration-leaf'">{{ ing.amount }}</span>
@@ -144,7 +146,7 @@ async function write(key) {
     </section>
 
     <section v-if="r.steps?.length" class="flex flex-col gap-3">
-      <h2 class="text-2xl leading-7 lg:text-3xl lg:leading-9">Valmistamine</h2>
+      <h2 class="ruled text-2xl leading-7 lg:text-3xl lg:leading-9">Valmistamine</h2>
       <ol class="grain card flex flex-col gap-3 text-lg lg:gap-4 lg:p-6 lg:text-xl">
         <li v-for="(step, i) in r.steps" :key="i" class="flex gap-3">
           <span class="font-hand text-xl leading-7 text-leaf">{{ i + 1 }}.</span>
@@ -187,7 +189,7 @@ async function write(key) {
       </label>
       <label v-if="account.user && account.groups.length" class="flex flex-col gap-1">
         <span class="text-lg text-muted">Kes märkmeid näeb</span>
-        <select :value="note?.groupId ?? null" class="field" @change="setNoteGroup(r.id, account.groups.find((g) => g.id === +$event.target.value)?.id ?? null)">
+        <select v-model="noteGroup" class="field">
           <option :value="null">Ainult mina</option>
           <option v-for="g in account.groups" :key="g.id" :value="g.id">Mina ja grupp „{{ g.name }}”</option>
         </select>
@@ -211,7 +213,23 @@ async function write(key) {
     </section>
     </div>
     </div>
+
+    <!-- Phones: while writing notes, "Valmis" floats above the menu, so it's at hand wherever the pencil is
+         (with room below the page so it never covers the last lines). -->
+    <div v-if="editing" class="h-16 lg:hidden" />
+    <button
+      v-if="editing"
+      type="button"
+      class="btn fixed inset-x-5 bottom-[calc(max(1.5rem,env(safe-area-inset-bottom))+5rem)] z-10 mx-auto max-w-[390px] bg-sage text-milk shadow-neu-raised lg:hidden"
+      @click="(editing = false), (open = null)"
+    >
+      Valmis
+    </button>
   </template>
 
+  <template v-else-if="!contentState.ready">
+    <PageHeader title="" back="/retseptid" />
+    <p class="italic text-muted">Laen retsepti…</p>
+  </template>
   <PageHeader v-else title="Sellist retsepti ei leitud" back="/retseptid" />
 </template>

@@ -9,7 +9,7 @@ import { directionsUrl } from '../components/map.js'
 import { findProduce } from '../data/berries.js'
 import { findLocation, berriesAt, averageRating, today, formatDate, touch } from '../data/store.js'
 import { account } from '../data/account.js'
-import { ask } from '../data/confirm.js'
+import { ask, guardLeave } from '../data/confirm.js'
 
 const props = defineProps({ id: { type: String, required: true } })
 
@@ -36,6 +36,13 @@ async function showSaved(v) {
 }
 
 const draft = ref(null)
+const blankVisit = () => ({ date: today(), berries: [], note: '', rating: 0 })
+// An open visit form with something in it asks before the page is left.
+guardLeave(
+  () =>
+    (draft.value && JSON.stringify(draft.value) !== JSON.stringify(blankVisit())) ||
+    (editing.value && JSON.stringify(editing.value.visit) !== JSON.stringify(loc.value.visits[editing.value.i])),
+)
 function addVisit() {
   loc.value.visits.push(draft.value)
   sortVisits()
@@ -85,11 +92,11 @@ async function copyCoords() {
       </button>
     </section>
 
-    <div class="grid gap-3" :class="!loc.shared && 'grid-cols-2'">
+    <div class="grid gap-3" :class="!loc.shared && !draft && 'grid-cols-2'">
       <a v-if="loc.lat != null" :href="directionsUrl(loc)" target="_blank" rel="noopener" class="btn grain text-sage">
         <AppIcon name="pin" :size="20" /> Juhata kohale
       </a>
-      <button v-if="!loc.shared && !draft" type="button" class="btn bg-sage text-milk" @click="draft = { date: today(), berries: [], note: '', rating: 0 }">
+      <button v-if="!loc.shared && !draft" type="button" class="btn bg-sage text-milk" @click="draft = blankVisit()">
         <AppIcon name="plus" :size="20" /> Käisin siin
       </button>
     </div>

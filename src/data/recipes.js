@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { computed, reactive } from 'vue'
 import { recipes } from './berries.js'
 import { store } from './store.js'
 
@@ -12,6 +12,9 @@ export const recipeTypes = {
   hoidis: 'Hoidis',
   muu: 'Muu',
 }
+
+// The Retseptid page's filters, kept here so they survive opening a recipe and coming back.
+export const recipeFilters = reactive({ berry: '', type: '', saved: false, own: false })
 
 export const allRecipes = computed(() => [...recipes, ...store.myRecipes, ...store.sharedRecipes])
 export const findRecipe = (id) => allRecipes.value.find((r) => r.id === id)

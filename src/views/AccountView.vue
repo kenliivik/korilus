@@ -70,7 +70,7 @@ const signOutAll = async () =>
     step.value = 'email'
   })
 const remove = async () =>
-  (await ask('Kas kustutad konto? Serverist kaovad su konto, kohad ja grupid, mille sa lõid. Selles telefonis jäävad kohad alles.')) &&
+  (await ask('Kas kustutad konto? Serverist kaovad su konto, kohad, retseptid, märkmed ja grupid, mille sa lõid. Selles telefonis jäävad need alles.')) &&
   run(async () => {
     await deleteAccount()
     router.replace('/seaded')
@@ -133,7 +133,7 @@ const time = (ms) => new Date(ms).toLocaleTimeString('et-EE', { hour: '2-digit',
         <p class="text-lg">{{ account.user.email }}</p>
         <p class="text-base italic text-muted">
           {{ account.syncing ? 'Salvestan kontole…' : account.error ? 'Kontole salvestamine ei õnnestunud, proovin hiljem uuesti.'
-            : account.syncedAt ? `Kohad on kontol, viimati kell ${time(account.syncedAt)}.` : 'Kohad pole veel kontole jõudnud.' }}
+            : account.syncedAt ? `Kohad ja retseptid on kontol, viimati kell ${time(account.syncedAt)}.` : 'Kohad ja retseptid pole veel kontole jõudnud.' }}
         </p>
       </form>
     </section>

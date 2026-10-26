@@ -13,7 +13,8 @@ import FeedbackView from './views/FeedbackView.vue'
 // `meta.tab` decides which bottom-nav tab is highlighted.
 export default createRouter({
   history: createWebHistory(),
-  scrollBehavior: () => ({ top: 0 }),
+  // Back and forward return to where the page was scrolled; a new page starts at the top.
+  scrollBehavior: (to, from, savedPosition) => savedPosition ?? { top: 0 },
   routes: [
     { path: '/', component: HomeView, meta: { tab: 'home', wide: true } },
     { path: '/kalender', component: YearCalendarView, meta: { tab: 'calendar', wide: true } },
