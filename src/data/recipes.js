@@ -1,6 +1,6 @@
 import { computed, reactive } from 'vue'
 import { recipes } from './berries.js'
-import { store } from './store.js'
+import { store, markShared } from './store.js'
 
 // Recipe helpers. Ken's recipes (`recipes`) are loaded in berries.js; people's own ones live in store.myRecipes,
 // and the ones their groups share in store.sharedRecipes.
@@ -43,6 +43,7 @@ export function saveMyRecipe(recipe) {
   const old = store.myRecipes.find((r) => r.id === recipe.id)
   const r = { ...recipe, id: recipe.id || `oma-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}` }
   r.updatedAt = Math.max(Date.now(), (old?.updatedAt ?? 0) + 1)
+  markShared(Object.assign(r, old?.sharedTo && { sharedTo: old.sharedTo, sharedAt: old.sharedAt }))
   old ? store.myRecipes.splice(store.myRecipes.indexOf(old), 1, r) : store.myRecipes.unshift(r)
   if (!store.dirtyRecipes.includes(r.id)) store.dirtyRecipes.push(r.id)
   return r.id

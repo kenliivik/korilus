@@ -57,8 +57,17 @@ export const formatDate = (d, year = true) =>
   new Date(`${d}T12:00`).toLocaleDateString('et-EE', { day: 'numeric', month: 'long', ...(year && { year: 'numeric' }) })
 export const today = () => new Date().toLocaleDateString('sv-SE') // YYYY-MM-DD in local time (toISOString would give yesterday after midnight)
 
+// When a spot or own recipe is first shared with a group, sharedAt says when, so the group's activity line (activity.js)
+// can say "Mari jagas kohta …" without every later edit looking new. sharedTo remembers which group that was.
+export function markShared(item) {
+  if (!item.groupId) delete item.sharedTo
+  else if (item.sharedTo !== item.groupId) Object.assign(item, { sharedTo: item.groupId, sharedAt: Date.now() })
+  return item
+}
+
 // Call after changing a spot, so it gets synced. Returns the spot.
 export function touch(loc) {
+  markShared(loc)
   loc.updatedAt = Math.max(Date.now(), (loc.updatedAt ?? 0) + 1)
   if (!store.dirty.includes(loc.id)) store.dirty.push(loc.id)
   return loc
