@@ -21,6 +21,8 @@ function clean_recipe($r, $fields) {
     foreach ($r['steps'] ?? [] as $s) if (!$text($s, 2000)) return null;
     foreach ($r['ingredients'] ?? [] as $i) if (!is_array($i) || !$text($i['amount'] ?? '', 60) || !$text($i['item'] ?? null, 200)) return null;
     $out = array_intersect_key($r, $fields) + ['berries' => $r['berries'] ?? [], 'steps' => $r['steps'] ?? []];
+    // When it was first shared with which group (milliseconds), for the group's activity line.
+    foreach (['sharedAt', 'sharedTo'] as $k) if (is_int($r[$k] ?? null)) $out[$k] = $r[$k];
     $out['ingredients'] = array_map(fn($i) => ['amount' => $i['amount'] ?? '', 'item' => $i['item']], $r['ingredients'] ?? []);
     return $out;
 }

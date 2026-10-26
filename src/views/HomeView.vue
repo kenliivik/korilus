@@ -4,6 +4,7 @@ import BerryTile from '../components/BerryTile.vue'
 import BerryGlyph from '../components/BerryGlyph.vue'
 import InstallHint from '../components/InstallHint.vue'
 import { inSeason, comingSoon, phaseIn, statusText, months } from '../data/berries.js'
+import { activity, ago } from '../data/activity.js'
 
 const month = months[new Date().getMonth()]
 const ripe = computed(() => inSeason()) // updates when new content arrives from the server
@@ -46,6 +47,19 @@ const next = computed(() => comingSoon())
           <span class="flex items-center gap-3"><BerryGlyph :name="p.id" :image="p.image" :size="48" />{{ p.name }}</span>
           <span class="leader" />
           <span class="font-hand text-base text-muted">{{ months[month] }}</span>
+        </RouterLink>
+      </li>
+    </ul>
+  </section>
+
+  <!-- What the user's groups did lately: a few quiet lines, no badges or counts. -->
+  <section v-if="activity.length" class="mt-4 flex flex-col gap-2 lg:mt-16 lg:max-w-xl" aria-label="Sõpradelt">
+    <h2 class="ruled text-2xl leading-7 lg:text-3xl lg:leading-9">Sõpradelt</h2>
+    <ul class="flex flex-col">
+      <li v-for="a in activity" :key="a.at + a.to">
+        <RouterLink :to="a.to" class="press flex items-baseline gap-3 border-b border-sage/12 py-2 text-lg">
+          <span class="min-w-0 flex-1">{{ a.who }} {{ a.text }}</span>
+          <span class="shrink-0 font-hand text-base text-muted">{{ ago(a.at) }}</span>
         </RouterLink>
       </li>
     </ul>
