@@ -8,6 +8,7 @@ import RecipeFields from '../../components/RecipeFields.vue'
 import { loadContent, saveContent } from '../../data/berries.js'
 import { blankRecipe, cleanRecipe, slugify } from '../../data/recipes.js'
 import { uploadImage } from '../../data/admin.js'
+import { isCutout } from '../../data/cutout.js'
 
 // Add (id "uus") or edit one recipe. Fields follow the recipe item in the build contract.
 const props = defineProps({ id: { type: String, required: true } })
@@ -99,7 +100,13 @@ async function remove() {
 
     <div class="flex flex-col gap-2">
       <span class="text-xl">Pilt</span>
-      <img v-if="draft.image" :src="draft.image" alt="" class="aspect-[4/3] w-full rounded-card object-cover shadow-neu-raised" />
+      <img
+        v-if="draft.image"
+        :src="draft.image"
+        alt=""
+        class="aspect-[4/3] w-full rounded-card"
+        :class="isCutout(draft.image) ? 'object-contain' : 'object-cover shadow-neu-raised'"
+      />
       <div class="flex gap-3">
         <label class="btn grain flex-1 cursor-pointer text-sage">
           {{ draft.image ? 'Vaheta pilt' : 'Lisa pilt' }}

@@ -2,6 +2,7 @@
 import BerryGlyph from './BerryGlyph.vue'
 import AppIcon from './AppIcon.vue'
 import { recipeTypes } from '../data/recipes.js'
+import { isCutout } from '../data/cutout.js'
 
 defineProps({
   recipe: { type: Object, required: true },
@@ -16,8 +17,17 @@ defineProps({
     class="grain flex items-center gap-4 rounded-card p-3 text-sage shadow-neu-raised press active:shadow-neu-inset"
     :class="tile && 'lg:flex-col lg:gap-3 lg:px-4 lg:pb-6 lg:text-center'"
   >
+    <!-- A drawing on a see-through background is shown whole, like the berry illustrations; a photo is cropped. -->
+    <BerryGlyph
+      v-if="isCutout(recipe.image)"
+      :name="recipe.id"
+      :image="recipe.image"
+      :size="56"
+      class="shrink-0"
+      :class="tile && 'lg:-mt-16 lg:size-44!'"
+    />
     <img
-      v-if="recipe.image"
+      v-else-if="recipe.image"
       :src="recipe.image"
       alt=""
       class="size-14 shrink-0 rounded-full object-cover shadow-neu-inset"
