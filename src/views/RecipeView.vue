@@ -10,6 +10,7 @@ import {
 import { store, formatDate } from '../data/store.js'
 import { account } from '../data/account.js'
 import { notesFor } from '../data/pantry.js'
+import { isCutout } from '../data/cutout.js'
 
 const props = defineProps({ id: { type: String, required: true } })
 
@@ -52,7 +53,11 @@ async function write(key) {
     <div v-if="!r.image && berries.length" class="grain card mt-20 hidden justify-center lg:flex">
       <BerryGlyph :name="berries[0].id" :image="berries[0].image" :size="256" class="-mt-24" />
     </div>
-    <img v-if="r.image" :src="r.image" alt="" class="aspect-[4/3] w-full rounded-card object-cover shadow-neu-raised" />
+    <!-- A drawing on a see-through background stands whole on a card, spilling over its top; a photo fills its frame. -->
+    <div v-if="isCutout(r.image)" class="grain card mt-16 flex justify-center lg:mt-20">
+      <BerryGlyph :name="r.id" :image="r.image" :size="256" class="-mt-20 size-48! lg:-mt-24 lg:size-64!" />
+    </div>
+    <img v-else-if="r.image" :src="r.image" alt="" class="aspect-[4/3] w-full rounded-card object-cover shadow-neu-raised" />
 
     <dl class="grain card grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-lg lg:text-xl">
       <dt class="text-muted">Liik</dt>
